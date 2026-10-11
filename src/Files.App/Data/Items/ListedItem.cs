@@ -105,6 +105,8 @@ namespace Files.App.Utils
 			set
 			{
 				// fileTags is null when the item is first created
+				if (fileTags is not null && fileTags.SequenceEqual(value ?? []))
+					return;
 				var fileTagsInitialized = fileTags is not null;
 				if (SetProperty(ref fileTags, value))
 				{
