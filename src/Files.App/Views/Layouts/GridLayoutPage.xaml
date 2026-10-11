@@ -174,7 +174,6 @@
 							Grid.Column="0"
 							HorizontalAlignment="Left"
 							x:Load="{x:Bind ((cloud:CloudDriveSyncStatusUI)SyncStatusUI).LoadSyncStatus, Mode=OneWay}"
-							x:Phase="2"
 							Background="Transparent"
 							ToolTipService.ToolTip="{x:Bind SyncStatusUI.SyncStatusString, Mode=OneWay}">
 							<controls:ThemedIcon
@@ -189,7 +188,6 @@
 							Width="12"
 							Height="12"
 							Margin="0,0,4,0"
-							x:Phase="2"
 							Fill="{x:Bind FileTagsUI[0].Color, Mode=OneWay, Converter={StaticResource StringToBrushConverter}}"
 							ToolTipService.ToolTip="{x:Bind FileTagsUI[0].Name, Mode=OneWay}"
 							Visibility="{x:Bind FileTagsUI, Converter={StaticResource EmptyObjectToObjectConverter}, Mode=OneWay}" />
