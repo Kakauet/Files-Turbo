@@ -105,7 +105,7 @@ namespace Files.App.UserControls
 			_remeasureQueued = true;
 
 			// Deferred so bindings apply the changed content before measuring
-			var enqueued = DispatcherQueue.TryEnqueue(() =>
+			var enqueued = DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
 			{
 				_remeasureQueued = false;
 
