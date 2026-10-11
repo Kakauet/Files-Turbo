@@ -1565,6 +1565,7 @@ namespace Files.App.Views.Layouts
 			return Task.CompletedTask;
 		}
 
+		[DynamicWindowsRuntimeCast(typeof(ScrollViewer))]
 		private void DeferScrollViewer_ViewChanged(object? sender, ScrollViewerViewChangedEventArgs e)
 		{
 			if (isDisposed || sender is not ScrollViewer scrollViewer || !ReferenceEquals(scrollViewer, deferScrollViewer))
