@@ -730,7 +730,7 @@ namespace Files.App.Utils.Storage
 				}
 				else if (FileExtensionHelpers.IsWebLinkFile(linkPath))
 				{
-					targetPath = await STATask.Run(() => InternetShortcut.Load(linkPath), App.Logger);
+					targetPath = await STATask.RunPooled(() => InternetShortcut.Load(linkPath), App.Logger, priority: STATaskPriority.Fast);
 					return string.IsNullOrEmpty(targetPath) ?
 						new ShellLinkItem
 						{
