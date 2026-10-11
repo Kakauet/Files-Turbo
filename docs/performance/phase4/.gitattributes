@@ -1,0 +1,2 @@
+# Preserve the exact bytes used by the snapshot SHA-256 inventory.
+workspace-snapshot/** -text
