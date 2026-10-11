@@ -1632,7 +1632,7 @@ namespace Files.App.ViewModels
 			var path = item.GetRequiredPath();
 			var isItemNetwork = await DriveHelpers.IsNetworkStorageItemAsync(path);
 			// Extended properties open each file; only the Cards layout shows them (tooltips load them on hover)
-			var loadExtraProperties = !isItemNetwork && folderSettings.LayoutMode == FolderLayoutModes.CardsView;
+			var loadExtraProperties = folderSettings.LayoutMode == FolderLayoutModes.CardsView;
 			var loadSyncStatus = !isItemNetwork && MayHaveCloudStatus(item);
 
 			token.ThrowIfCancellationRequested();
@@ -1676,9 +1676,6 @@ namespace Files.App.ViewModels
 
 				token.ThrowIfCancellationRequested();
 				SetFileTag(item);
-
-				if (isItemNetwork && matchingStorageFile is not null)
-					_ = LoadExtendedFilePropertiesInBackgroundAsync(item, matchingStorageFile, token);
 
 				return (true, matchingStorageFile);
 			}
