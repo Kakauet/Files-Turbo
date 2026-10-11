@@ -1257,7 +1257,13 @@ namespace Files.App.ViewModels
 		private bool TryPublishFilesAndFoldersWithoutReset(List<ListedItem> displayedFilesAndFolders, long performanceOperation)
 		{
 			if (FilesAndFolders.IsGrouped || folderSettings.DirectoryGroupOption != GroupOption.None)
-				return false;
+			{
+				if (!FilesAndFolders.IsGrouped || FilesAndFolders.Count == 0 || Math.Max(FilesAndFolders.Count, displayedFilesAndFolders.Count) > 10_000)
+					return false;
+				FilesAndFolders.Reconcile(displayedFilesAndFolders);
+				OrderGroups();
+				return true;
+			}
 			var currentCount = FilesAndFolders.Count;
 			if (currentCount > displayedFilesAndFolders.Count)
 				return false;

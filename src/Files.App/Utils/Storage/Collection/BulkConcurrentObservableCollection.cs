@@ -11,6 +11,7 @@ namespace Files.App.Utils.Storage
 	public partial class BulkConcurrentObservableCollection<T> : INotifyCollectionChanged, INotifyPropertyChanged, ICollection<T>, IList<T>, ICollection, IList
 	{
 		protected bool isBulkOperationStarted;
+		private bool isReconciling;
 		private readonly object syncRoot = new object();
 		private readonly List<T> collection = [];
 
@@ -220,7 +221,7 @@ namespace Files.App.Utils.Storage
 				if (group is not null)
 				{
 					group.Remove(item);
-					if (group.Count == 0)
+					if (group.Count == 0 && !isReconciling)
 						GroupedCollection?.Remove(group);
 				}
 			}
@@ -532,7 +533,59 @@ namespace Files.App.Utils.Storage
 			{
 				result = func.Invoke(collection);
 
-				ReplaceRange(0, result);
+				if (isBulkOperationStarted)
+					ReplaceRange(0, result);
+				else
+					Reconcile(result);
+			}
+		}
+
+		/// <summary>Updates rows and existing groups with single-item notifications.</summary>
+		public void Reconcile(IEnumerable<T> items)
+		{
+			var snapshot = items.ToList();
+			var wanted = new HashSet<T>(snapshot);
+			lock (syncRoot)
+			{
+				isReconciling = true;
+				try
+				{
+					for (var index = collection.Count - 1; index >= 0; index--)
+						if (!wanted.Contains(collection[index]))
+							RemoveAt(index);
+
+					for (var index = 0; index < snapshot.Count; index++)
+					{
+						var item = snapshot[index];
+						if (index < collection.Count && EqualityComparer<T>.Default.Equals(collection[index], item))
+						continue;
+						var previous = index < collection.Count ? collection.FindIndex(index, candidate => EqualityComparer<T>.Default.Equals(candidate, item)) : -1;
+						if (previous < 0)
+							Insert(index, item);
+						else
+						{
+							collection.RemoveAt(previous);
+							collection.Insert(index, item);
+							OnCollectionChanged(new(NotifyCollectionChangedAction.Move, item, index, previous), false);
+						}
+					}
+					while (collection.Count > snapshot.Count)
+						RemoveAt(collection.Count - 1);
+
+					if (GroupedCollection is { } groups)
+					{
+						foreach (var group in groups.ToList())
+						{
+							group.Reconcile(snapshot.Where(item => GetGroupKeyForItem(item) == group.Model.Key));
+							if (group.Count == 0)
+								groups.Remove(group);
+						}
+					}
+				}
+				finally
+				{
+					isReconciling = false;
+				}
 			}
 		}
 
