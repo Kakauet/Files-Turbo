@@ -1,0 +1,12 @@
+{
+  "Status": "FailedBeforeDestinationCreation",
+  "Attempt": 1,
+  "Utc": "2026-10-11T18:40:05Z",
+  "Script": "tooling/Capture-Phase4WorkspaceSnapshot.ps1",
+  "Input": "reports/phase4-publication-contracts-firstvisit-ready.json",
+  "Reason": "Original authoritative evidence uses CRCRLF; the initial snapshot newline validator admitted only CRLF/LF.",
+  "InputSHA256": "A053D5D9557C86140E93B8CBE575DCE9D9EF9EB5DF2DB11A2829A1FA58CEFC9D",
+  "DestinationCreated": false,
+  "EvidenceModified": false,
+  "NextAction": "Extend exact newline reconstruction metadata without changing evidence."
+}

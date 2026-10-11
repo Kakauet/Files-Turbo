@@ -1,0 +1,10 @@
+{
+  "Status": "FailedBeforeFinalReportCreation",
+  "Utc": "2026-10-11T18:48:17Z",
+  "Reason": "Verifier referenced nonexistent Regression.SourceCommit instead of the recorded SourceHead",
+  "RecordedSourceHead": "bf4390ee0a2eed6cece0e99d1a021ce7fd255574",
+  "TargetAndPhase3RecoveryContentVerified": true,
+  "ContractEvidenceModified": false,
+  "ProductionModified": false,
+  "Fix": "Compare Regression.SourceHead with proof.SourceCommit"
+}
