@@ -988,7 +988,7 @@
 					Padding="8"
 					VerticalContentAlignment="Stretch"
 					ext:ScrollViewerMiddleClickExtensions.EnableMiddleClickScrolling="{x:Bind IsMiddleClickToScrollEnabled, Mode=OneWay}"
-					wctanimations:ItemsReorderAnimation.Duration="0:0:0.350"
+					wctanimations:ItemsReorderAnimation.Duration="{x:Bind GetReorderAnimationDuration(ParentShellPageInstance.ToolbarViewModel.CanRefresh), Mode=OneWay}"
 					x:FieldModifier="public"
 					AllowDrop="{x:Bind InstanceViewModel.IsPageTypeSearchResults, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
 					CanDragItems="{x:Bind AllowItemDrag, Mode=OneWay}"

@@ -55,6 +55,9 @@ namespace Files.App.Views.Layouts
 
 		public ScrollViewer? ContentScroller { get; private set; }
 
+		public TimeSpan GetReorderAnimationDuration(bool canRefresh)
+			=> canRefresh ? TimeSpan.FromMilliseconds(350) : TimeSpan.Zero;
+
 		protected override ListViewBase ListViewBase => FileList;
 		protected override SemanticZoom RootZoom => RootGridZoom;
 
