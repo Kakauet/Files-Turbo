@@ -186,6 +186,8 @@ namespace Files.App.ViewModels
 
 		public bool IsValidGitDirectory { get; private set; }
 
+		public Task<bool> GitRepositoryState { get; private set; } = Task.FromResult(false);
+
 		public List<IniSectionDataItem>? DesktopIni { get; private set; }
 
 		private StorageFolderWithPath? currentStorageFolder;
@@ -262,21 +264,28 @@ namespace Files.App.ViewModels
 				pathRoot = Path.GetPathRoot(WorkingDirectory);
 			}
 
-			var gitDirectory = await Task.Run(() => GitHelpers.GetGitRepositoryPath(value, pathRoot));
-			if (isDisposed || revision != workingDirectoryRevision)
-				return;
-
-			GitDirectory = gitDirectory;
-			var headName = await GitHelpers.GetRepositoryHeadName(gitDirectory);
-			if (isDisposed || revision != workingDirectoryRevision)
-				return;
-
-			IsValidGitDirectory = !string.IsNullOrEmpty(headName);
+			GitRepositoryState = UpdateGitDirectoryAsync(value, pathRoot, revision);
 
 			_ = UpdateFolderThumbnailImageSource();
 
 			OnPropertyChanged(nameof(WorkingDirectory));
 			OnPropertyChanged(nameof(ShowFilterHeader));
+		}
+
+		private async Task<bool> UpdateGitDirectoryAsync(string value, string? pathRoot, long revision)
+		{
+			var gitDirectory = await Task.Run(() => GitHelpers.GetGitRepositoryPath(value, pathRoot));
+			if (isDisposed || revision != workingDirectoryRevision)
+				return false;
+
+			GitDirectory = gitDirectory;
+			var headName = await GitHelpers.GetRepositoryHeadName(gitDirectory);
+			if (isDisposed || revision != workingDirectoryRevision)
+				return false;
+
+			IsValidGitDirectory = !string.IsNullOrEmpty(headName);
+
+			return IsValidGitDirectory;
 		}
 
 		public async Task<FilesystemResult<BaseStorageFolder>> GetFolderFromPathAsync(string value, CancellationToken cancellationToken = default)
@@ -2539,7 +2548,7 @@ namespace Files.App.ViewModels
 								await OrderFilesAndFoldersAsync(cancellationToken);
 
 							await ApplyFilesAndFoldersChangesAsync(cancellationToken);
-						}, performanceOperationId: PerformanceOperationId);
+						}, performanceOperationId: PerformanceOperationId, repositoryState: GitRepositoryState);
 
 						lock (loadCollectionSync)
 						{

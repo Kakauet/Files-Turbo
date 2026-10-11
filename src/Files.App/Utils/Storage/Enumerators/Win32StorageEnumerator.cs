@@ -24,12 +24,13 @@ namespace Files.App.Utils.Storage
 			int countLimit,
 			uint iconSize,
 			Func<List<ListedItem>, Task> intermediateAction,
-			long performanceOperationId = 0
+			long performanceOperationId = 0,
+			Task<bool>? repositoryState = null
 		)
 		{
 			var sampler = new IntervalSampler(500);
-			// Publish a screenful before scanning the rest of a large directory.
-			var firstBatchSampler = new IntervalSampler(25);
+			var firstBatchSampler = new IntervalSampler(150);
+			Task publication = Task.CompletedTask;
 			var hasFlushedFirstBatch = false;
 			var tempList = new List<ListedItem>();
 			var count = 0;
@@ -42,11 +43,12 @@ namespace Files.App.Utils.Storage
 			bool showDotFiles = userSettingsService.FoldersSettingsService.ShowDotFiles;
 			bool areAlternateStreamsVisible = userSettingsService.FoldersSettingsService.AreAlternateStreamsVisible;
 
-			var isGitRepo = GitHelpers.IsRepositoryEx(path, out var repoPath) && !string.IsNullOrEmpty(await GitHelpers.GetRepositoryHeadName(repoPath));
+			var isGitRepo = false;
 			var rawHandle = hFile.DangerousGetHandle();
 
 			try
 			{
+				isGitRepo = repositoryState is not null && await repositoryState.WaitAsync(cancellationToken);
 				do
 				{
 					cancellationToken.ThrowIfCancellationRequested();
@@ -114,14 +116,17 @@ namespace Files.App.Utils.Storage
 					if (intermediateAction is not null &&
 						(hasFlushedFirstBatch
 							? sampler.CheckNow()
-							: tempList.Count >= 64 || tempList.Count > 0 && firstBatchSampler.CheckNow()))
+							: tempList.Count > 0 && firstBatchSampler.CheckNow()))
 					{
 						hasFlushedFirstBatch = true;
-						await intermediateAction(tempList);
-						cancellationToken.ThrowIfCancellationRequested();
-
-						// clear the temporary list every time we do an intermediate action
-						tempList.Clear();
+						var batch = tempList;
+						tempList = new();
+						publication = publication.ContinueWith(async previous =>
+						{
+							await previous.ConfigureAwait(false);
+							cancellationToken.ThrowIfCancellationRequested();
+							await intermediateAction(batch).ConfigureAwait(false);
+						}, CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.Default).Unwrap();
 					}
 				} while (Win32PInvoke.FindNextFile(rawHandle, out findData));
 			}
@@ -130,6 +135,7 @@ namespace Files.App.Utils.Storage
 				hFile.Dispose();
 			}
 
+			await publication.WaitAsync(cancellationToken);
 			cancellationToken.ThrowIfCancellationRequested();
 			return tempList;
 		}
