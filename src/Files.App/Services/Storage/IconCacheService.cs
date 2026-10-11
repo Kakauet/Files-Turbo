@@ -79,7 +79,9 @@ namespace Files.App.Services
 			try
 			{
 				var data = await GetIconAsync(itemPath, extension, isFolder, size);
-				var image = data is null ? null : await data.ToBitmapAsync();
+				var decodeSize = Math.Max(1, (int)Math.Ceiling(size * App.AppModel.AppWindowDPI));
+				var image = data is null ? null : await data.ToBitmapAsync(decodeSize, DecodePixelType.Physical,
+					preserveAspectRatio: true, useSynchronousSmallThumbnail: true);
 				if (image is null)
 					imageCache.TryRemove(new KeyValuePair<IconCacheKey, Lazy<Task<BitmapImage?>>>(key, entry));
 

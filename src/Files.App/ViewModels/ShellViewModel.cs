@@ -1496,6 +1496,7 @@ namespace Files.App.ViewModels
 			var showThumbnails = UserSettingsService.FoldersSettingsService.ShowThumbnails;
 			var performanceOperation = PerformanceOperationId;
 			var cacheQueried = false;
+			BitmapImage? preloadedIconImage = null;
 			try
 			{
 				if (!item.IsFolder
@@ -1531,20 +1532,26 @@ namespace Files.App.ViewModels
 						if (token.IsCancellationRequested || item.FileImage is not null)
 							return;
 
+						var iconDecodeStarted = UiPerformanceTrace.IsEnabled && performanceOperation != 0 ? Stopwatch.GetTimestamp() : 0;
 						var image = await iconCacheService.GetIconImageAsync(item.ItemPath, item.FileExtension, item.IsFolder, iconSize);
+						if (iconDecodeStarted != 0)
+							UiPerformanceTrace.Mark(performanceOperation, "PreloadedIconImageCompleted", durationMs: Stopwatch.GetElapsedTime(iconDecodeStarted).TotalMilliseconds);
 						if (!token.IsCancellationRequested && image is not null && item.FileImage is null)
+						{
 							item.FileImage = image;
+							preloadedIconImage = image;
+						}
 					});
 				}
 			}
 			catch (OperationCanceledException) when (token.IsCancellationRequested)
 			{
 			}
-			return new(item, thumbnailSize, token, cacheQueried, false, itemPath, modified, scale, showThumbnails);
+			return new(item, thumbnailSize, token, cacheQueried, false, itemPath, modified, scale, showThumbnails, PreloadedIconImage: preloadedIconImage);
 		}
 
 		public readonly record struct InitialThumbnailLoadResult(ListedItem? Item, uint Size, CancellationToken Token, bool CacheQueried, bool ThumbnailApplied,
-			string? Path, DateTimeOffset Modified, float Scale, bool ShowThumbnails, bool LoadCompleted = false);
+			string? Path, DateTimeOffset Modified, float Scale, bool ShowThumbnails, bool LoadCompleted = false, BitmapImage? PreloadedIconImage = null);
 
 		public async Task<InitialThumbnailLoadResult> LoadViewportThumbnailAsync(ListedItem item, CancellationToken cancellationToken)
 		{
@@ -1649,7 +1656,8 @@ namespace Files.App.ViewModels
 
 					cancellationToken.ThrowIfCancellationRequested();
 				}
-				else if (result is null && !thumbnailApplied)
+				else if (result is null && !thumbnailApplied &&
+					!(reuseInitial && initialThumbnail.PreloadedIconImage is not null && ReferenceEquals(item.FileImage, initialThumbnail.PreloadedIconImage)))
 				{
 					// The final icon is the shared per-extension icon; apply it so an image from a previous layout size doesn't linger
 					await dispatcherQueue.EnqueueOrInvokeAsync(async () =>
