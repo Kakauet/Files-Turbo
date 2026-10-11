@@ -1,6 +1,6 @@
 # Comparación de exploradores — Phase IV
 
-11 de octubre de 2026. **IV final07, 4.2.39.9**, fuente **bf4390ee0a2eed6cece0e99d1a021ce7fd255574**, está registrado y medido en navegación, miniaturas, scroll, resistencia e interacciones. Build08, provenance y aperturas OFF están verificados; pasan **327/327 contratos**. Perfil ON se conserva separado con resultados mixtos. La entrega termina en PID 38424 con diagnóstico OFF; el tag local files-turbo-phase4 está previsto y pendiente de verificación. Las series .6/.7/.8 permanecen históricas y no se atribuyen a .9.
+11 de octubre de 2026. **IV final07, 4.2.39.9**, fuente **bf4390ee0a2eed6cece0e99d1a021ce7fd255574**, está registrado y medido en navegación, miniaturas, scroll, resistencia e interacciones. Build08, provenance y aperturas OFF están verificados; pasan **327/327 contratos**. Perfil ON se conserva separado con resultados mixtos. La entrega termina en PID 38424 con diagnóstico OFF; el tag local files-turbo-phase4 y el cierre final están verificados. Las series .6/.7/.8 permanecen históricas y no se atribuyen a .9.
 
 ## Variantes y condiciones
 
