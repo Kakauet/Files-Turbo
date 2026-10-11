@@ -108,6 +108,8 @@ namespace Files.App.Storage
 		{
 			for (lane = 0; lane < _lanes.Length; lane++)
 			{
+				if (lane >= (int)STATaskPriority.Slow && _laneActive[(int)STATaskPriority.Slow] + _laneActive[(int)STATaskPriority.Background] >= PooledThreadCount - 4)
+					continue;
 				if (_lanes[lane].Count > 0 && _laneActive[lane] < _laneLimits[lane])
 				{
 					work = _lanes[lane].Dequeue();
