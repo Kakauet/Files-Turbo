@@ -4,11 +4,24 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Runtime.ExceptionServices;
-using System.Threading.Channels;
 using Windows.Win32;
 
 namespace Files.App.Storage
 {
+	/// <summary>
+	/// Lanes of the shared STA pool, served in this order.
+	/// </summary>
+	public enum STATaskPriority
+	{
+		/// <summary>Quick visible work, such as cached thumbnails and icons.</summary>
+		Fast = 0,
+		Normal = 1,
+		/// <summary>Visible thumbnail generation; never takes every pool thread.</summary>
+		Slow = 2,
+		/// <summary>Overlays and prefetching.</summary>
+		Background = 3,
+	}
+
 	/// <summary>
 	/// Represents a work scheduled to execute on a STA thread.
 	/// </summary>
@@ -16,7 +29,11 @@ namespace Files.App.Storage
 	{
 		private const int PooledThreadCount = 12;
 
-		private static readonly Channel<Action> _pooledQueue = Channel.CreateUnbounded<Action>();
+		private static readonly object _poolLock = new();
+		private static readonly Queue<Action>[] _lanes = [new(), new(), new(), new()];
+		private static readonly int[] _laneActive = new int[4];
+		// Slow and background work leave threads free for quick visible requests
+		private static readonly int[] _laneLimits = [PooledThreadCount, PooledThreadCount, PooledThreadCount - 4, PooledThreadCount / 3];
 		private static bool _poolStarted;
 
 		/// <summary>
@@ -26,7 +43,7 @@ namespace Files.App.Storage
 		/// <param name="func">The work to execute on an STA pool thread.</param>
 		/// <param name="logger">A logger to capture any exception that occurs during execution.</param>
 		/// <returns>A <see cref="Task{T}"/> that represents the scheduled work.</returns>
-		public static Task<T> RunPooled<T>(Func<T> func, ILogger? logger, CancellationToken cancellationToken = default)
+		public static Task<T> RunPooled<T>(Func<T> func, ILogger? logger, CancellationToken cancellationToken = default, STATaskPriority priority = STATaskPriority.Normal)
 		{
 			if (cancellationToken.IsCancellationRequested)
 				return Task.FromCanceled<T>(cancellationToken);
@@ -38,7 +55,7 @@ namespace Files.App.Storage
 				? cancellationToken.UnsafeRegister(static (state, token) => ((TaskCompletionSource<T>)state!).TrySetCanceled(token), tcs)
 				: default;
 
-			_pooledQueue.Writer.TryWrite(() =>
+			Enqueue(() =>
 			{
 				try
 				{
@@ -59,7 +76,7 @@ namespace Files.App.Storage
 				{
 					registration.Dispose();
 				}
-			});
+			}, priority);
 
 			return tcs.Task;
 		}
@@ -67,15 +84,41 @@ namespace Files.App.Storage
 		/// <summary>
 		/// Cancels queued work promptly, but waits for a started native call before completing its task.
 		/// </summary>
-		public static Task<T> RunPooledUntilCompleted<T>(Func<T> func, ILogger? logger, CancellationToken cancellationToken = default)
+		public static Task<T> RunPooledUntilCompleted<T>(Func<T> func, ILogger? logger, CancellationToken cancellationToken = default, STATaskPriority priority = STATaskPriority.Normal)
 		{
 			if (cancellationToken.IsCancellationRequested)
 				return Task.FromCanceled<T>(cancellationToken);
 
 			EnsurePoolStarted();
 			var work = new PooledWork<T>(func, logger, cancellationToken);
-			_pooledQueue.Writer.TryWrite(work.Run);
+			Enqueue(work.Run, priority);
 			return work.Task;
+		}
+
+		private static void Enqueue(Action work, STATaskPriority priority)
+		{
+			lock (_poolLock)
+			{
+				_lanes[(int)priority].Enqueue(work);
+				Monitor.Pulse(_poolLock);
+			}
+		}
+
+		private static bool TryTakeWork(out Action work, out int lane)
+		{
+			for (lane = 0; lane < _lanes.Length; lane++)
+			{
+				if (_lanes[lane].Count > 0 && _laneActive[lane] < _laneLimits[lane])
+				{
+					work = _lanes[lane].Dequeue();
+					_laneActive[lane]++;
+					return true;
+				}
+			}
+
+			work = null!;
+			lane = -1;
+			return false;
 		}
 
 		private static void EnsurePoolStarted()
@@ -90,10 +133,30 @@ namespace Files.App.Storage
 							PInvoke.OleInitialize();
 
 							// Consume synchronously: awaiting here would resume on an MTA thread pool thread, losing the STA apartment
-							var reader = _pooledQueue.Reader;
-							while (reader.WaitToReadAsync().AsTask().GetAwaiter().GetResult())
-								while (reader.TryRead(out var work))
+							while (true)
+							{
+								Action work;
+								int lane;
+								lock (_poolLock)
+								{
+									while (!TryTakeWork(out work, out lane))
+										Monitor.Wait(_poolLock);
+								}
+
+								try
+								{
 									work();
+								}
+								finally
+								{
+									lock (_poolLock)
+									{
+										_laneActive[lane]--;
+										// A lane held back by its limit may now run
+										Monitor.Pulse(_poolLock);
+									}
+								}
+							}
 						});
 
 					thread.IsBackground = true;
