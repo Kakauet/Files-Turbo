@@ -1335,6 +1335,10 @@ namespace Files.App.Views.Layouts
 		{
 			public CancellationTokenSource Cancellation { get; } = new();
 
+			public CancellationToken Token { get; }
+
+			public ItemImageJob() => Token = Cancellation.Token;
+
 			public volatile bool Completed;
 
 			public int Attempts;
@@ -1387,7 +1391,7 @@ namespace Files.App.Views.Layouts
 		private async Task RunItemImageAsync(SelectorItem container, ListedItem item, ShellViewModel shellViewModel,
 			ShellViewModel.ItemImageRequest request, ShellViewModel.ItemImageWork work, int priority, ItemImageJob job)
 		{
-			var token = job.Cancellation.Token;
+			var token = job.Token;
 			var queued = false;
 			try
 			{
@@ -1424,13 +1428,17 @@ namespace Files.App.Views.Layouts
 				return;
 
 			job.Cancellation.Cancel();
+			job.Cancellation.Dispose();
 			slowImageWork?.Cancel(job);
 		}
 
 		private void CancelAllItemImages()
 		{
 			foreach (var job in imageJobs.Values)
+			{
 				job.Cancellation.Cancel();
+				job.Cancellation.Dispose();
+			}
 			imageJobs.Clear();
 			slowImageWork?.CancelAll();
 		}

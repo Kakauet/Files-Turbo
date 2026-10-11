@@ -1635,8 +1635,7 @@ namespace Files.App.ViewModels
 				var fileFRN = FileTagsHelper.GetFileFRN(path);
 				var fileTag = FileTagsHelper.ReadFileTag(path);
 				var extraProperties = loadExtraProperties && matchingStorageFile is not null ? await GetExtraProperties(matchingStorageFile) : null;
-				var syncStatusUI = CloudDriveSyncStatusUI.FromCloudDriveSyncStatus(syncStatus);
-				var isElevationRequired = !syncStatusUI.LoadSyncStatus && CheckElevationRights(item);
+				var isElevationRequired = syncStatus is CloudDriveSyncStatus.Unknown or CloudDriveSyncStatus.NotSynced && CheckElevationRights(item);
 
 				token.ThrowIfCancellationRequested();
 				await dispatcherQueue.EnqueueOrInvokeAsync(() =>
@@ -1649,7 +1648,7 @@ namespace Files.App.ViewModels
 
 					if (matchingStorageFile is not null)
 						item.FolderRelativeId = matchingStorageFile.FolderRelativeId;
-					item.SyncStatusUI = syncStatusUI;
+					item.SyncStatusUI = CloudDriveSyncStatusUI.FromCloudDriveSyncStatus(syncStatus);
 					item.FileFRN = fileFRN;
 					item.FileTags = fileTag;
 					item.IsElevationRequired = isElevationRequired;
@@ -3437,13 +3436,9 @@ namespace Files.App.ViewModels
 						if (result is not null)
 						{
 							var item = result.Value.Item;
-							var contentChanged = item.ItemDateModifiedReal != result.Value.Modified;
+							var contentChanged = item.ItemDateModifiedReal != result.Value.Modified || result.Value.Size is { } updatedSize && item.FileSizeBytes != updatedSize;
 							item.ItemDateModifiedReal = result.Value.Modified;
 							item.ItemDateCreatedReal = result.Value.Created;
-
-							// A visible row reloads its image; others pick up the new version when realized
-							if (contentChanged && item.FileImage is not null && !item.NeedsDelayedThumbnailLoad)
-								_ = ReloadItemImageAsync(item, loadPropsCTS.Token);
 
 							if (result.Value.SyncStatus is not null)
 								item.SyncStatusUI = CloudDriveSyncStatusUI.FromCloudDriveSyncStatus(result.Value.SyncStatus.Value);
@@ -3452,6 +3447,15 @@ namespace Files.App.ViewModels
 							{
 								item.FileSizeBytes = result.Value.Size.Value;
 								item.FileSize = item.FileSizeBytes.ToSizeString();
+							}
+
+							if (contentChanged)
+							{
+								imageCache.Remove(item.GetRequiredPath());
+								BeginItemImage(item);
+								item.ExtraPropertiesRequested = false;
+								if (item.FileImage is not null && !item.NeedsDelayedThumbnailLoad)
+									_ = ReloadItemImageAsync(item, loadPropsCTS.Token);
 							}
 
 							// Move the item to its correct group when the updated properties change

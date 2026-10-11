@@ -39,9 +39,9 @@ namespace Files.App.ViewModels
 		}
 
 		internal readonly record struct ItemImageRequest(ListedItem Item, int Token, string Path, DateTimeOffset Modified, uint Size, int PhysicalSize,
-			bool Thumbnails, bool IsFolder, bool ThumbnailExpected, bool IconExpected, long PerformanceOperation);
+			bool Thumbnails, bool IsFolder, bool ThumbnailExpected, bool IconExpected, long PerformanceOperation, long FileSizeBytes);
 
-		private sealed record PendingImage(ItemImageRequest Request, ShellImageData? Data, ThumbnailImageKind? Kind, bool Final, CancellationToken Token);
+		private sealed record PendingImage(ItemImageRequest Request, ShellImageData? Data, ThumbnailImageKind? Kind, bool Final, CancellationToken Token, bool Missing = false);
 
 		private uint GetPreloadIconSize()
 			=> LayoutSizeKindHelper.GetIconSize(folderSettings.LayoutMode);
@@ -55,7 +55,7 @@ namespace Files.App.ViewModels
 				(ignoreMissing || !imageCache.IsMissing(path, item.ItemDateModifiedReal));
 			var iconExpected = path.Length > 0 && HasPerItemIcon(item);
 			return new(item, item.ImageToken, path, item.ItemDateModifiedReal, size, FileThumbnailHelper.GetPhysicalSize(size),
-				thumbnails, item.IsFolder && !item.IsArchive, thumbnailExpected, iconExpected, PerformanceOperationId);
+				thumbnails, item.IsFolder && !item.IsArchive, thumbnailExpected, iconExpected, PerformanceOperationId, item.FileSizeBytes);
 		}
 
 		private static bool CanHaveThumbnail(ListedItem item)
@@ -199,19 +199,21 @@ namespace Files.App.ViewModels
 					return;
 				}
 
-				PostImage(new(request, null, null, true, token));
-				if (!IsStillBeingWritten(request.Item, request.Modified))
-				{
-					imageCache.MarkMissing(request.Path, request.Modified);
+				var retry = IsStillBeingWritten(request.Item, request.Modified);
+				PostImage(new(request, null, null, true, token, Missing: !retry));
+				if (!retry)
 					return;
-				}
 
 				// Some writers never emit a FILE_ACTION_MODIFIED event after finalizing the file, so the normal event-driven retry never fires.
 				// Schedule a 2s timer as a fallback; the FILE_ACTION_MODIFIED handler cancels it if the event arrives first.
-				var item = request.Item;
-				item.NeedsDelayedThumbnailLoad = true;
-				if (scheduleTimerRetry && !token.IsCancellationRequested)
+				await dispatcherQueue.EnqueueOrInvokeAsync(() =>
 				{
+					if (!IsCurrent(request, token))
+						return false;
+					var item = request.Item;
+					item.NeedsDelayedThumbnailLoad = true;
+					if (!scheduleTimerRetry)
+						return true;
 					var retryCts = CancellationTokenSource.CreateLinkedTokenSource(loadPropsCTS.Token);
 					// Capture the token before publishing the source to the debounce map,
 					// as another thread may remove and dispose it at any point afterwards
@@ -220,7 +222,8 @@ namespace Files.App.ViewModels
 						_ = RetryThumbnailAfterDelayAsync(item, retryCts, retryToken, 2000, scheduleTimerRetry: false);
 					else
 						retryCts.Dispose();
-				}
+					return true;
+				}, DispatcherQueuePriority.Low);
 			}
 			catch (OperationCanceledException)
 			{
@@ -267,6 +270,7 @@ namespace Files.App.ViewModels
 				return Task.CompletedTask;
 
 			imageCache.Remove(path);
+			BeginItemImage(item);
 			item.ImageKey = default;
 			item.HasFinalImage = false;
 			return ReloadItemImageAsync(item, loadPropsCTS.Token);
@@ -284,10 +288,10 @@ namespace Files.App.ViewModels
 		}
 
 		private static ThumbnailImageKey GetImageKey(in ItemImageRequest request, ThumbnailImageKind kind)
-			=> ThumbnailImageKey.Create(request.Path, request.Modified, request.PhysicalSize, kind);
+			=> ThumbnailImageKey.Create(request.Path, request.Modified, request.PhysicalSize, kind, request.FileSizeBytes);
 
 		private static bool IsSameFile(in ThumbnailImageKey key, in ItemImageRequest request)
-			=> key.Path == request.Path.ToUpperInvariant() && key.ModifiedTicks == request.Modified.UtcTicks;
+			=> key.Path == request.Path.ToUpperInvariant() && key.ModifiedTicks == request.Modified.UtcTicks && key.FileSizeBytes == request.FileSizeBytes;
 
 		private static void SetItemImage(ListedItem item, ImageSource image, ThumbnailImageKey key, bool final)
 		{
@@ -302,6 +306,7 @@ namespace Files.App.ViewModels
 			var item = request.Item;
 			return !isDisposed && !token.IsCancellationRequested && item.ImageToken == request.Token &&
 				string.Equals(item.ItemPath, request.Path, StringComparison.Ordinal) && item.ItemDateModifiedReal == request.Modified &&
+				item.FileSizeBytes == request.FileSizeBytes &&
 				LayoutSizeKindHelper.GetIconSize(folderSettings.LayoutMode) == request.Size &&
 				FileThumbnailHelper.GetPhysicalSize(request.Size) == request.PhysicalSize &&
 				(UserSettingsService.FoldersSettingsService.ShowThumbnails && request.Size >= 48) == request.Thumbnails;
@@ -343,8 +348,12 @@ namespace Files.App.ViewModels
 			var request = pending.Request;
 			var item = request.Item;
 			var current = IsCurrent(request, pending.Token);
+			if (!current)
+				return;
 			if (pending.Data is null)
 			{
+				if (pending.Missing)
+					imageCache.MarkMissing(request.Path, request.Modified);
 				if (current && pending.Final && item.FileImage is not null)
 					item.HasFinalImage = true;
 				return;
@@ -375,7 +384,7 @@ namespace Files.App.ViewModels
 		private async Task ApplyEncodedImageAsync(PendingImage pending, ThumbnailImageKey key)
 		{
 			var image = await pending.Data!.CreateImageAsync(pending.Request.PhysicalSize);
-			if (image is null)
+			if (image is null || !IsCurrent(pending.Request, pending.Token))
 				return;
 
 			imageCache.Add(key, image, pending.Data.ByteCount);
