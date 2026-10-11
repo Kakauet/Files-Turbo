@@ -49,6 +49,7 @@ namespace Files.App.Utils.Storage
 
 		private readonly IntervalSampler tickSampler = new(500);
 		private readonly HashSet<string> resultPaths = new(StringComparer.Ordinal);
+		private readonly object resultSync = new();
 		private string? resultRoot;
 		private readonly List<ShortcutItem> shortcutResults = [];
 		private List<ListedItem> pendingResults = [];
@@ -180,34 +181,51 @@ namespace Files.App.Utils.Storage
 
 		private void AddResult(IList<ListedItem> results, ListedItem item, CancellationToken token)
 		{
-			if (token.IsCancellationRequested)
-				return;
-			if (item.ItemPath is { } path && !resultPaths.Add(NativeNameSearch.GetResultPathKey(path, resultRoot)))
-				return;
+			lock (resultSync)
+			{
+				if (token.IsCancellationRequested)
+					return;
+				if (results.Count >= UsedMaxItemCount)
+					return;
+				if (item.ItemPath is { } path && !resultPaths.Add(NativeNameSearch.GetResultPathKey(path, resultRoot)))
+					return;
 
-			results.Add(item);
-			if (SearchTick is not null)
-				pendingResults.Add(item);
-			if (item is ShortcutItem shortcutItem)
-				shortcutResults.Add(shortcutItem);
+				results.Add(item);
+				if (SearchTick is not null)
+					pendingResults.Add(item);
+				if (item is ShortcutItem shortcutItem)
+					shortcutResults.Add(shortcutItem);
 
-			RaiseSearchTickIfDue(token);
+				RaiseSearchTickIfDue(token);
+			}
 		}
 
 		private void RaiseSearchTickIfDue(CancellationToken token)
 		{
-			if (pendingResults.Count == 0 || token.IsCancellationRequested || (hasRaisedTick && !tickSampler.CheckNow()))
-				return;
+			lock (resultSync)
+			{
+				if (pendingResults.Count == 0 || token.IsCancellationRequested || (hasRaisedTick && !tickSampler.CheckNow()))
+					return;
 
-			var batch = pendingResults;
-			pendingResults = [];
-			hasRaisedTick = true;
+				var batch = pendingResults;
+				pendingResults = [];
+				hasRaisedTick = true;
 
-			SearchTick?.Invoke(this, batch);
+				SearchTick?.Invoke(this, batch);
+			}
 		}
 
 		private uint GetRemainingItemCount(IList<ListedItem> results)
-			=> results.Count >= UsedMaxItemCount ? 0 : UsedMaxItemCount - (uint)results.Count;
+		{
+			lock (resultSync)
+				return results.Count >= UsedMaxItemCount ? 0 : UsedMaxItemCount - (uint)results.Count;
+		}
+
+		private bool HasResult(string path)
+		{
+			lock (resultSync)
+				return resultPaths.Contains(NativeNameSearch.GetResultPathKey(path, resultRoot));
+		}
 
 		private async Task SearchAsync(BaseStorageFolder folder, IList<ListedItem> results, CancellationToken token)
 		{
@@ -237,6 +255,8 @@ namespace Files.App.Utils.Storage
 
 					try
 					{
+						if (HasResult(item.Path))
+							continue;
 						if (nameExpression is not null && item.IsOfType(StorageItemTypes.File)
 							&& !FileSystemName.MatchesWin32Expression(nameExpression, item.Name))
 							continue;
@@ -544,9 +564,15 @@ namespace Files.App.Utils.Storage
 					return;
 				}
 
-				if (storageFolder is SystemStorageFolder && !DriveHelpers.IsMtpPath(folder) && !await IsFullyIndexedAsync(storageFolder, token))
+				if (storageFolder is SystemStorageFolder && !DriveHelpers.IsMtpPath(folder))
 				{
-					await SearchWithWin32Async(folder, false, results, token);
+					var native = SearchWithWin32Async(folder, false, results, token);
+					async Task Indexed()
+					{
+						if (await IsFullyIndexedAsync(storageFolder, token))
+							await SearchAsync(storageFolder, results, token);
+					}
+					await Task.WhenAll(native, Task.Run(Indexed, token));
 					return;
 				}
 
@@ -574,15 +600,14 @@ namespace Files.App.Utils.Storage
 
 		private Task SearchWithWin32Async(string folder, bool hiddenOnly, IList<ListedItem> results, CancellationToken token)
 		{
-			return Task.Factory.StartNew(
-				() => SearchWithWin32(folder, hiddenOnly, results, token),
-				token,
-				TaskCreationOptions.LongRunning,
-				TaskScheduler.Default)
-				.WaitAsync(token);
+			var useTimeout = RequiresFindTimeout(folder);
+			return ParallelDirectoryWork.RunAsync((folder, useTimeout), useTimeout ? 1 : 4,
+				(pending, enqueue, workToken) => SearchWithWin32(pending.Path, hiddenOnly, results, workToken,
+					(path, timeout) => enqueue((path, timeout)), pending.UseFindTimeout), token);
 		}
 
-		private void SearchWithWin32(string root, bool hiddenOnly, IList<ListedItem> results, CancellationToken token)
+		private void SearchWithWin32(string root, bool hiddenOnly, IList<ListedItem> results, CancellationToken token,
+			Action<string, bool>? queueFolder = null, bool? rootTimeout = null)
 		{
 			var expression = FileSystemName.TranslateWin32Expression($"*{QueryWithWildcard}");
 			var showHiddenItems = UserSettingsService.FoldersSettingsService.ShowHiddenItems;
@@ -590,12 +615,17 @@ namespace Files.App.Utils.Storage
 			var showDotFiles = UserSettingsService.FoldersSettingsService.ShowDotFiles;
 
 			var pendingFolders = new Queue<(string Path, bool UseFindTimeout)>();
-			pendingFolders.Enqueue((root, RequiresFindTimeout(root)));
+			pendingFolders.Enqueue((root, rootTimeout ?? RequiresFindTimeout(root)));
+			void EnqueueFolder(string path, bool timeout)
+			{
+				if (queueFolder is not null) queueFolder(path, timeout);
+				else pendingFolders.Enqueue((path, timeout));
+			}
 
 			while (pendingFolders.TryDequeue(out var pendingFolder))
 			{
 				var (folder, useFindTimeout) = pendingFolder;
-				if (token.IsCancellationRequested || results.Count >= UsedMaxItemCount)
+				if (token.IsCancellationRequested || GetRemainingItemCount(results) == 0)
 					return;
 
 				if (!useFindTimeout)
@@ -605,18 +635,18 @@ namespace Files.App.Utils.Storage
 						foreach (var entry in NativeNameSearch.Enumerate(folder, expression, showHiddenItems,
 							showProtectedSystemFiles, showDotFiles, hiddenOnly, token, () => HasIncompleteResults = true))
 						{
-							if (token.IsCancellationRequested || results.Count >= UsedMaxItemCount)
+							if (token.IsCancellationRequested || GetRemainingItemCount(results) == 0)
 								return;
 
 							if ((entry.Attributes & FileAttributes.Directory) != 0)
 							{
 								if ((entry.Attributes & FileAttributes.ReparsePoint) == 0)
-									pendingFolders.Enqueue((entry.Path, false));
+									EnqueueFolder(entry.Path, false);
 								else if (!IsNameSurrogateReparseTag(entry.ReparseTag))
-									pendingFolders.Enqueue((entry.Path, IsCloudFilesReparseTag(entry.ReparseTag)));
+									EnqueueFolder(entry.Path, IsCloudFilesReparseTag(entry.ReparseTag));
 							}
 
-							if (!entry.IsMatch || resultPaths.Contains(NativeNameSearch.GetResultPathKey(entry.Path, resultRoot)))
+							if (!entry.IsMatch || HasResult(entry.Path))
 								continue;
 
 							try
@@ -660,7 +690,7 @@ namespace Files.App.Utils.Storage
 						var reparseTag = attributes.HasFlag(FileAttributes.ReparsePoint) ? findData.dwReserved0 : 0;
 
 						if (isDirectory && !IsNameSurrogateReparseTag(reparseTag))
-							pendingFolders.Enqueue((Path.Combine(folder, fileName), useFindTimeout || IsCloudFilesReparseTag(reparseTag)));
+							EnqueueFolder(Path.Combine(folder, fileName), useFindTimeout || IsCloudFilesReparseTag(reparseTag));
 
 						if (!FileSystemName.MatchesWin32Expression(expression, fileName))
 							continue;
@@ -676,7 +706,7 @@ namespace Files.App.Utils.Storage
 							(!startWithDot || showDotFiles);
 
 						var itemPath = Path.Combine(folder, fileName);
-						if (!shouldBeListed || resultPaths.Contains(NativeNameSearch.GetResultPathKey(itemPath, resultRoot)))
+						if (!shouldBeListed || HasResult(itemPath))
 							continue;
 
 						try
@@ -690,8 +720,8 @@ namespace Files.App.Utils.Storage
 							App.Logger.LogWarning(ex, "Error creating ListedItem from Win32 find data");
 						}
 					}
-					while (!token.IsCancellationRequested && results.Count < UsedMaxItemCount && PInvoke.FindNextFile(findHandle, out findData));
-					if (!token.IsCancellationRequested && results.Count < UsedMaxItemCount && Marshal.GetLastPInvokeError() != 18)
+					while (!token.IsCancellationRequested && GetRemainingItemCount(results) > 0 && PInvoke.FindNextFile(findHandle, out findData));
+					if (!token.IsCancellationRequested && GetRemainingItemCount(results) > 0 && Marshal.GetLastPInvokeError() != 18)
 						HasIncompleteResults = true;
 				}
 
@@ -787,6 +817,7 @@ namespace Files.App.Utils.Storage
 			}
 
 			item.PrimaryItemAttribute = isFolder ? StorageItemTypes.Folder : StorageItemTypes.File;
+			item.Win32Attributes = entry.Attributes;
 			item.ItemNameRaw = entry.Name;
 			item.ItemPath = entry.Path;
 			item.ItemDateCreatedReal = entry.Created.UtcDateTime;

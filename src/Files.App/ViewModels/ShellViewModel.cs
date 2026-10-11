@@ -1153,7 +1153,7 @@ namespace Files.App.ViewModels
 			var token = filterDebounceCS.Token;
 
 			// filterDebounceCS is disposed on the next update, so the continuation must not register on its token.
-			_ = Task.Delay(250, token)
+			_ = Task.Delay(110, token)
 				.ContinueWith(_ => ApplyFilesAndFoldersChangesAsync(), CancellationToken.None,
 					TaskContinuationOptions.OnlyOnRanToCompletion,
 					TaskScheduler.Default)
