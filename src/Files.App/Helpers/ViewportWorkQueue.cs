@@ -24,7 +24,9 @@ namespace Files.App.Helpers
 		private readonly Func<Action, bool> dispatch;
 		private readonly Action? completed;
 		private readonly Action<Exception>? faulted;
+		private readonly bool newestFirst;
 		private bool pumping;
+		private bool paused;
 		private bool disposed;
 
 		private sealed class Request(TKey key, Func<CancellationToken, Task> work, int priority, int version)
@@ -38,7 +40,7 @@ namespace Files.App.Helpers
 			public int Version { get; } = version;
 		}
 
-		public ViewportWorkQueue(int concurrency, int capacity, Func<Action, bool> dispatch, Action? completed = null, Action<Exception>? faulted = null)
+		public ViewportWorkQueue(int concurrency, int capacity, Func<Action, bool> dispatch, Action? completed = null, Action<Exception>? faulted = null, bool newestFirst = true)
 		{
 			ArgumentOutOfRangeException.ThrowIfLessThan(concurrency, 1);
 			ArgumentOutOfRangeException.ThrowIfLessThan(capacity, 1);
@@ -47,10 +49,26 @@ namespace Files.App.Helpers
 			this.dispatch = dispatch;
 			this.completed = completed;
 			this.faulted = faulted;
+			this.newestFirst = newestFirst;
 		}
 
 		public int PendingCount { get { lock (gate) return pending.Count; } }
 		public int ActiveCount { get { lock (gate) return active.Count; } }
+
+		public void SetPaused(bool value)
+		{
+			lock (gate)
+				paused = value;
+			if (!value)
+				Pump();
+		}
+
+		public void SetPriority(TKey key, int priority)
+		{
+			lock (gate)
+				if (requests.TryGetValue(key, out var request))
+					request.Priority = priority;
+		}
 
 		public bool Enqueue(TKey key, Func<CancellationToken, Task> work, int priority = 0, int version = 0)
 		{
@@ -153,15 +171,15 @@ namespace Files.App.Helpers
 				Request request;
 				lock (gate)
 				{
-					if (disposed || active.Count >= concurrency || pending.Count == 0)
+					if (disposed || paused || active.Count >= concurrency || pending.Count == 0)
 					{
 						pumping = false;
 						return;
 					}
 					LinkedListNode<Request>? next = null;
-					for (var node = pending.Last; node is not null; node = node.Previous)
+					for (var node = pending.First; node is not null; node = node.Next)
 					{
-						if (!activeKeys.Contains(node.Value.Key) && (next is null || node.Value.Priority < next.Value.Priority))
+						if (!activeKeys.Contains(node.Value.Key) && (next is null || node.Value.Priority < next.Value.Priority || newestFirst && node.Value.Priority == next.Value.Priority))
 							next = node;
 					}
 					if (next is null)

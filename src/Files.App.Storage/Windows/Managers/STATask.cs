@@ -31,28 +31,7 @@ namespace Files.App.Storage
 			if (cancellationToken.IsCancellationRequested)
 				return Task.FromCanceled<T>(cancellationToken);
 
-			if (!Interlocked.CompareExchange(ref _poolStarted, true, false))
-			{
-				for (int i = 0; i < PooledThreadCount; i++)
-				{
-					Thread thread =
-						new(() =>
-						{
-							PInvoke.OleInitialize();
-
-							// Consume synchronously: awaiting here would resume on an MTA thread pool thread, losing the STA apartment
-							var reader = _pooledQueue.Reader;
-							while (reader.WaitToReadAsync().AsTask().GetAwaiter().GetResult())
-								while (reader.TryRead(out var work))
-									work();
-						});
-
-					thread.IsBackground = true;
-					thread.SetApartmentState(ApartmentState.STA);
-					thread.Name = $"STATask pool {i}";
-					thread.Start();
-				}
-			}
+			EnsurePoolStarted();
 
 			var tcs = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
 			var registration = cancellationToken.CanBeCanceled
@@ -83,6 +62,102 @@ namespace Files.App.Storage
 			});
 
 			return tcs.Task;
+		}
+
+		/// <summary>
+		/// Cancels queued work promptly, but waits for a started native call before completing its task.
+		/// </summary>
+		public static Task<T> RunPooledUntilCompleted<T>(Func<T> func, ILogger? logger, CancellationToken cancellationToken = default)
+		{
+			if (cancellationToken.IsCancellationRequested)
+				return Task.FromCanceled<T>(cancellationToken);
+
+			EnsurePoolStarted();
+			var work = new PooledWork<T>(func, logger, cancellationToken);
+			_pooledQueue.Writer.TryWrite(work.Run);
+			return work.Task;
+		}
+
+		private static void EnsurePoolStarted()
+		{
+			if (!Interlocked.CompareExchange(ref _poolStarted, true, false))
+			{
+				for (int i = 0; i < PooledThreadCount; i++)
+				{
+					Thread thread =
+						new(() =>
+						{
+							PInvoke.OleInitialize();
+
+							// Consume synchronously: awaiting here would resume on an MTA thread pool thread, losing the STA apartment
+							var reader = _pooledQueue.Reader;
+							while (reader.WaitToReadAsync().AsTask().GetAwaiter().GetResult())
+								while (reader.TryRead(out var work))
+									work();
+						});
+
+					thread.IsBackground = true;
+					thread.SetApartmentState(ApartmentState.STA);
+					thread.Name = $"STATask pool {i}";
+					thread.Start();
+				}
+			}
+		}
+
+		private sealed class PooledWork<T>
+		{
+			private readonly Func<T> func;
+			private readonly ILogger? logger;
+			private readonly CancellationToken token;
+			private readonly TaskCompletionSource<T> completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
+			private readonly CancellationTokenRegistration registration;
+			private int state;
+
+			public PooledWork(Func<T> func, ILogger? logger, CancellationToken token)
+			{
+				this.func = func;
+				this.logger = logger;
+				this.token = token;
+				registration = token.CanBeCanceled ? token.UnsafeRegister(static work => ((PooledWork<T>)work!).CancelQueued(), this) : default;
+			}
+
+			public Task<T> Task => completion.Task;
+
+			private void CancelQueued()
+			{
+				if (Interlocked.CompareExchange(ref state, 2, 0) == 0)
+					completion.TrySetCanceled(token);
+			}
+
+			public void Run()
+			{
+				try
+				{
+					if (Interlocked.CompareExchange(ref state, 1, 0) != 0 || token.IsCancellationRequested)
+					{
+						completion.TrySetCanceled(token);
+						return;
+					}
+
+					var result = func();
+					if (token.IsCancellationRequested)
+						completion.TrySetCanceled(token);
+					else
+						completion.TrySetResult(result);
+				}
+				catch (Exception ex)
+				{
+					if (token.IsCancellationRequested)
+						completion.TrySetCanceled(token);
+					else
+						completion.TrySetResult(default!);
+					logger?.LogWarning(ex, "An exception was occurred during the execution within STA.");
+				}
+				finally
+				{
+					registration.Dispose();
+				}
+			}
 		}
 
 		/// <summary>

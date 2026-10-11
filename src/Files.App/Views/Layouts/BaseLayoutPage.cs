@@ -67,7 +67,13 @@ namespace Files.App.Views.Layouts
 		private CancellationTokenSource? shellContextMenuItemCancellationToken;
 		private CancellationTokenSource? groupingCancellationToken;
 		private readonly Dictionary<SelectorItem, ListedItem> realizedItems = new(ReferenceEqualityComparer.Instance);
+		private readonly Dictionary<ListedItem, ShellViewModel.InitialThumbnailLoadResult> viewportThumbnails = new(ReferenceEqualityComparer.Instance);
+		private readonly Dictionary<ListedItem, int> metadataFailures = new(ReferenceEqualityComparer.Instance);
+		private readonly Dictionary<ListedItem, int> thumbnailFailures = new(ReferenceEqualityComparer.Instance);
 		private ViewportWorkQueue<ListedItem>? viewportWork;
+		private ViewportWorkQueue<ListedItem>? metadataWork;
+		private bool viewportRefillQueued;
+		private bool isReloadingRealizedItems;
 		private UiPerformanceViewProbe? performanceViewProbe;
 
 		private bool shiftPressed;
@@ -1285,9 +1291,14 @@ namespace Files.App.Views.Layouts
 			scrollSettleTimer?.Stop();
 			viewportWork?.Dispose();
 			viewportWork = null;
+			metadataWork?.Dispose();
+			metadataWork = null;
 			performanceViewProbe?.Dispose();
 			performanceViewProbe = null;
 			realizedItems.Clear();
+			viewportThumbnails.Clear();
+			metadataFailures.Clear();
+			thumbnailFailures.Clear();
 			ParentShellPageInstance?.ShellViewModel?.NotifyScrollStateChanged(false);
 
 			if (deferScrollViewer is not null)
@@ -1301,6 +1312,39 @@ namespace Files.App.Views.Layouts
 
 		// Layouts whose panel exposes a visible range override this so the settle pass can skip off-screen rows
 		protected virtual (int First, int Last) GetVisibleIndexRange() => (-1, -1);
+
+		public void UpdateDateDisplay()
+		{
+			ParentShellPageInstance?.ShellViewModel?.UpdateDateDisplay(realizedItems.ToArray()
+				.Where(pair => IsCurrentContainer(pair.Key, pair.Value)).Select(pair => pair.Value));
+		}
+
+		private void ReprioritizeViewportWork()
+		{
+			if (viewportWork is null)
+				return;
+			var (first, last) = GetVisibleIndexRange();
+			if (first < 0 || last < first)
+				return;
+
+			foreach (var (container, item) in realizedItems)
+			{
+				var index = ItemsControl.IndexFromContainer(container);
+				if (index >= first && index <= last)
+				{
+					viewportWork.SetPriority(item, index - first);
+					metadataWork?.SetPriority(item, index - first);
+				}
+				else
+				{
+					viewportWork.Cancel(item);
+					metadataWork?.Cancel(item);
+					viewportThumbnails.Remove(item);
+					metadataFailures.Remove(item);
+					thumbnailFailures.Remove(item);
+				}
+			}
+		}
 
 		// Loads extended properties for the rows visible where the scroll stopped; rows scrolled past load when they next come into view
 		[DynamicWindowsRuntimeCast(typeof(SelectorItem))]
@@ -1353,11 +1397,31 @@ namespace Files.App.Views.Layouts
 		{
 			if (!IsCurrentContainer(container, item) || shellViewModel.IsScrollInFlight)
 				return;
+			if (thumbnailFailures.GetValueOrDefault(item) >= 2)
+				return;
+			var (first, last) = GetVisibleIndexRange();
+			var index = ItemsControl.IndexFromContainer(container);
+			priority = index < 0 || first >= 0 && (index < first || index > last) ? int.MaxValue : index - Math.Max(0, first);
+			if (viewportThumbnails.TryGetValue(item, out var thumbnail))
+			{
+				if (shellViewModel.IsViewportThumbnailCurrent(item, thumbnail))
+				{
+					QueueItemMetadata(container, item, shellViewModel, thumbnail, priority);
+					return;
+				}
+				viewportThumbnails.Remove(item);
+				metadataFailures.Remove(item);
+				thumbnailFailures.Remove(item);
+				viewportWork?.Cancel(item);
+				metadataWork?.Cancel(item);
+				shellViewModel.CancelExtendedPropertiesLoadingForItem(item);
+			}
 
 			viewportWork ??= new ViewportWorkQueue<ListedItem>(4, 128,
 				action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => action()),
 				RefillVisibleItemWork,
-				exception => App.Logger.LogWarning(exception, "Failed to load deferred row properties."));
+				exception => App.Logger.LogWarning(exception, "Failed to load deferred row properties."), newestFirst: false);
+			viewportWork.SetPaused(isReloadingRealizedItems || shellViewModel.IsScrollInFlight);
 			var performanceOperation = shellViewModel.PerformanceOperationId;
 			viewportWork.Enqueue(item, async token =>
 			{
@@ -1371,23 +1435,60 @@ namespace Files.App.Views.Layouts
 						value: viewportWork?.PendingCount ?? 0);
 				try
 				{
-					if (item.FileImage is null)
-						await shellViewModel.ApplyCachedThumbnailOrPreloadedIconAsync(item, token);
+					var initialThumbnail = item.ItemPropertiesInitialized ? default : await shellViewModel.LoadViewportThumbnailAsync(item, token);
 					token.ThrowIfCancellationRequested();
-					if (!item.ItemPropertiesInitialized)
-						await shellViewModel.LoadExtendedItemPropertiesAsync(item, token);
-					token.ThrowIfCancellationRequested();
-					if (!item.ItemPropertiesInitialized)
-						throw new OperationCanceledException();
-					if (shellViewModel.EnabledGitProperties is not GitProperties.None && item is IGitItem gitItem)
-						await shellViewModel.LoadGitPropertiesAsync(gitItem, token);
+					if (initialThumbnail.LoadCompleted)
+						viewportThumbnails[item] = initialThumbnail;
+					thumbnailFailures.Remove(item);
+					QueueItemMetadata(container, item, shellViewModel, initialThumbnail, priority);
 					if (started != 0)
 						UiPerformanceTrace.Mark(performanceOperation, "ItemJobCompleted", durationMs: Stopwatch.GetElapsedTime(started).TotalMilliseconds);
 				}
 				catch (OperationCanceledException)
 				{
+					if (!token.IsCancellationRequested && IsCurrentContainer(container, item))
+						thumbnailFailures[item] = thumbnailFailures.GetValueOrDefault(item) + 1;
 					if (started != 0)
 						UiPerformanceTrace.Mark(performanceOperation, "ItemJobCancelled", durationMs: Stopwatch.GetElapsedTime(started).TotalMilliseconds);
+					throw;
+				}
+				catch (Exception) when (!token.IsCancellationRequested && IsCurrentContainer(container, item))
+				{
+					thumbnailFailures[item] = thumbnailFailures.GetValueOrDefault(item) + 1;
+					throw;
+				}
+			}, priority, (int)shellViewModel.EnabledGitProperties);
+		}
+
+		private void QueueItemMetadata(SelectorItem container, ListedItem item, ShellViewModel shellViewModel,
+			ShellViewModel.InitialThumbnailLoadResult initialThumbnail, int priority)
+		{
+			if (metadataFailures.GetValueOrDefault(item) >= 2)
+				return;
+			metadataWork ??= new ViewportWorkQueue<ListedItem>(4, 128,
+				action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => action()),
+				RefillVisibleItemWork,
+				faulted: exception => App.Logger.LogWarning(exception, "Failed to load deferred row metadata."), newestFirst: false);
+			metadataWork.SetPaused(isReloadingRealizedItems || shellViewModel.IsScrollInFlight);
+			metadataWork.Enqueue(item, async token =>
+			{
+				if (!IsCurrentContainer(container, item) || !ReferenceEquals(ParentShellPageInstance?.ShellViewModel, shellViewModel))
+					return;
+				try
+				{
+					token.ThrowIfCancellationRequested();
+					if (!item.ItemPropertiesInitialized)
+						await shellViewModel.LoadExtendedItemPropertiesAsync(item, token, initialThumbnail);
+					token.ThrowIfCancellationRequested();
+					if (!item.ItemPropertiesInitialized)
+						throw new OperationCanceledException();
+					if (shellViewModel.EnabledGitProperties is not GitProperties.None && item is IGitItem gitItem)
+						await shellViewModel.LoadGitPropertiesAsync(gitItem, token);
+					metadataFailures.Remove(item);
+				}
+				catch (Exception) when (!token.IsCancellationRequested && IsCurrentContainer(container, item))
+				{
+					metadataFailures[item] = metadataFailures.GetValueOrDefault(item) + 1;
 					throw;
 				}
 			}, priority, (int)shellViewModel.EnabledGitProperties);
@@ -1395,9 +1496,17 @@ namespace Files.App.Views.Layouts
 
 		private void RefillVisibleItemWork()
 		{
-			if (!isDisposed && viewportWork?.PendingCount == 0 &&
-				ParentShellPageInstance?.ShellViewModel is { IsScrollInFlight: false })
-				LoadVisibleItemsAfterScrollSettled();
+			if (isDisposed || viewportRefillQueued || viewportWork?.PendingCount != 0 ||
+				ParentShellPageInstance?.ShellViewModel is not { IsScrollInFlight: false })
+				return;
+			viewportRefillQueued = true;
+			if (!DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+			{
+				viewportRefillQueued = false;
+				if (!isDisposed && ParentShellPageInstance?.ShellViewModel is { IsScrollInFlight: false })
+					LoadVisibleItemsAfterScrollSettled();
+			}))
+				viewportRefillQueued = false;
 		}
 
 		protected Task ReloadRealizedItemPropertiesAsync()
@@ -1406,25 +1515,43 @@ namespace Files.App.Views.Layouts
 				return Task.CompletedTask;
 
 			viewportWork?.CancelAll();
+			metadataWork?.CancelAll();
+			viewportWork?.SetPaused(true);
+			metadataWork?.SetPaused(true);
+			viewportThumbnails.Clear();
+			metadataFailures.Clear();
+			thumbnailFailures.Clear();
 			shellViewModel.CancelExtendedPropertiesLoading();
 			foreach (var item in shellViewModel.FilesAndFolders)
 				item.ItemPropertiesInitialized = false;
 
-			var (first, last) = GetVisibleIndexRange();
-			foreach (var (container, item) in realizedItems)
+			isReloadingRealizedItems = true;
+			try
 			{
-				var index = ItemsControl.IndexFromContainer(container);
-				var priority = first >= 0 && (index < first || index > last) ? 1 : 0;
-				QueueItemProperties(container, item, shellViewModel, priority);
+				var (first, last) = GetVisibleIndexRange();
+				foreach (var (container, item) in realizedItems.OrderBy(pair => ItemsControl.IndexFromContainer(pair.Key)))
+				{
+					var index = ItemsControl.IndexFromContainer(container);
+					var priority = first >= 0 && (index < first || index > last) ? 1 : 0;
+					QueueItemProperties(container, item, shellViewModel, priority);
+				}
+				LoadVisibleItemsAfterScrollSettled();
 			}
-			LoadVisibleItemsAfterScrollSettled();
+			finally
+			{
+				isReloadingRealizedItems = false;
+				viewportWork?.SetPaused(shellViewModel.IsScrollInFlight);
+				metadataWork?.SetPaused(shellViewModel.IsScrollInFlight);
+			}
 			return Task.CompletedTask;
 		}
 
 		// Rapid successive gestures raise a final ViewChanged between steps; debouncing keeps loads parked through the whole burst
 		private void DeferScrollViewer_ViewChanged(object? sender, ScrollViewerViewChangedEventArgs e)
 		{
-			viewportWork?.CancelAll();
+			viewportWork?.SetPaused(true);
+			metadataWork?.SetPaused(true);
+			ReprioritizeViewportWork();
 			ParentShellPageInstance?.ShellViewModel?.NotifyScrollStateChanged(true);
 			AppMemoryHelper.NotifyActivity();
 
@@ -1436,7 +1563,11 @@ namespace Files.App.Views.Layouts
 				scrollSettleTimer.Tick += (_, _) =>
 				{
 					ParentShellPageInstance?.ShellViewModel?.NotifyScrollStateChanged(false);
+					metadataFailures.Clear();
+					thumbnailFailures.Clear();
 					LoadVisibleItemsAfterScrollSettled();
+					viewportWork?.SetPaused(false);
+					metadataWork?.SetPaused(false);
 				};
 			}
 
@@ -1479,6 +1610,10 @@ namespace Files.App.Views.Layouts
 				if (realizedItems.Remove(container, out var recycledItem))
 				{
 					viewportWork?.Cancel(recycledItem);
+					metadataWork?.Cancel(recycledItem);
+					viewportThumbnails.Remove(recycledItem);
+					metadataFailures.Remove(recycledItem);
+					thumbnailFailures.Remove(recycledItem);
 					var shellViewModel = ParentShellPageInstance.GetRequiredShellViewModel();
 					shellViewModel.CancelExtendedPropertiesLoadingForItem(recycledItem);
 					shellViewModel.ReleaseExtendedProperties(recycledItem);
@@ -1488,9 +1623,15 @@ namespace Files.App.Views.Layouts
 
 			if (item is ListedItem listedItem)
 			{
+				if (args.Phase == 0 && listedItem.IsRealChanges)
+					listedItem.UpdateReal();
 				if (realizedItems.TryGetValue(container, out var previous) && !ReferenceEquals(previous, listedItem))
 				{
 					viewportWork?.Cancel(previous);
+					metadataWork?.Cancel(previous);
+					viewportThumbnails.Remove(previous);
+					metadataFailures.Remove(previous);
+					thumbnailFailures.Remove(previous);
 					var shellViewModel = ParentShellPageInstance.GetRequiredShellViewModel();
 					shellViewModel.CancelExtendedPropertiesLoadingForItem(previous);
 					shellViewModel.ReleaseExtendedProperties(previous);
@@ -1514,8 +1655,10 @@ namespace Files.App.Views.Layouts
 							return;
 
 						var (first, last) = GetVisibleIndexRange();
-						var priority = first >= 0 && (c.ItemIndex < first || c.ItemIndex > last) ? 1 : 0;
-						QueueItemProperties(container, listedItem, shellViewModel, priority);
+						if (first >= 0 && last >= first)
+							RefillVisibleItemWork();
+						else
+							QueueItemProperties(container, listedItem, shellViewModel, c.ItemIndex);
 					});
 				}
 			}

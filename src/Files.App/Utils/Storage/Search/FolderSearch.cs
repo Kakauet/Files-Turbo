@@ -457,7 +457,7 @@ namespace Files.App.Utils.Storage
 				if (token.IsCancellationRequested)
 					return;
 
-				(FindCloseSafeHandle? hFile, WIN32_FIND_DATAW findData) = await Task.Run(() =>
+				var findTask = Task.Run(() =>
 				{
 					WIN32_FIND_DATAW findDataTsk = default;
 					FindCloseSafeHandle hFileTsk;
@@ -467,7 +467,9 @@ namespace Files.App.Utils.Storage
 							&findDataTsk, FINDEX_SEARCH_OPS.FindExSearchNameMatch, FIND_FIRST_EX_FLAGS.FIND_FIRST_EX_LARGE_FETCH);
 					}
 					return (hFileTsk, findDataTsk);
-				}).WithTimeoutAsync(TimeSpan.FromSeconds(5));
+				});
+				(FindCloseSafeHandle? hFile, WIN32_FIND_DATAW findData) = await StorageEnumerationTask.AwaitAsync(
+					findTask, TimeSpan.FromSeconds(5), token, abandoned => abandoned.Item1.Dispose());
 				if (token.IsCancellationRequested)
 				{
 					hFile?.Dispose();

@@ -899,7 +899,7 @@ namespace Files.App.Views.Shells
 			}
 			else if (userSettingsService.GeneralSettingsService.DateTimeFormat == DateTimeFormats.Application)
 			{
-				ShellViewModel?.UpdateDateDisplay();
+				ContentPage?.UpdateDateDisplay();
 			}
 		}
 
