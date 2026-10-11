@@ -16,6 +16,8 @@ namespace Files.App.Services
 
 		// Images have thread affinity; only the main window's thread reads or fills this map.
 		private readonly Dictionary<IconCacheKey, ImageSource> _images = new();
+		private readonly Dictionary<IconCacheKey, Lazy<Task<ImageSource?>>> _imageLoads = new();
+		private int _imageGeneration;
 
 		public Task<ShellImageData?> GetIconDataAsync(string? extension, bool isFolder, uint size)
 		{
@@ -72,18 +74,40 @@ namespace Files.App.Services
 
 		public async Task<ImageSource?> GetIconImageAsync(string? extension, bool isFolder, uint size)
 		{
+			if (!IsImageThread())
+				return null;
 			if (TryGetIconImage(extension, isFolder, size) is { } image)
 				return image;
 
+			var key = GetCacheKey(extension, isFolder, size);
+			if (!_imageLoads.TryGetValue(key, out var entry))
+			{
+				var generation = _imageGeneration;
+				entry = new(() => LoadIconImageAsync(key, extension, isFolder, size, generation));
+				_imageLoads[key] = entry;
+			}
+			try
+			{
+				return await entry.Value;
+			}
+			finally
+			{
+				if (_imageLoads.TryGetValue(key, out var current) && ReferenceEquals(current, entry))
+					_imageLoads.Remove(key);
+			}
+		}
+
+		private async Task<ImageSource?> LoadIconImageAsync(IconCacheKey key, string? extension, bool isFolder, uint size, int generation)
+		{
 			var data = await GetIconDataAsync(extension, isFolder, size);
 			if (data is null || !IsImageThread())
 				return null;
-			if (TryGetIconImage(extension, isFolder, size) is { } created)
+			if (generation == _imageGeneration && TryGetIconImage(extension, isFolder, size) is { } created)
 				return created;
 
 			var decoded = await data.CreateImageAsync(FileThumbnailHelper.GetPhysicalSize(size));
-			if (decoded is not null)
-				_images.TryAdd(GetCacheKey(extension, isFolder, size), decoded);
+			if (decoded is not null && generation == _imageGeneration)
+				_images.TryAdd(key, decoded);
 
 			return decoded;
 		}
@@ -107,7 +131,11 @@ namespace Files.App.Services
 		{
 			_data.Clear();
 			if (IsImageThread())
+			{
+				_imageGeneration++;
 				_images.Clear();
+				_imageLoads.Clear();
+			}
 		}
 
 		// An empty file of the type lets the shell scale the type icon like a real item; for paths that do not exist
