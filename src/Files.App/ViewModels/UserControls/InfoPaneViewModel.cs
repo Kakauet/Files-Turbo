@@ -222,7 +222,7 @@ namespace Files.App.ViewModels.UserControls
 				return;
 			}
 
-			var control = await GetBuiltInPreviewControlAsync(item, downloadItem);
+			var control = await GetBuiltInPreviewControlAsync(item, downloadItem, token);
 
 			if (token.IsCancellationRequested)
 				return;
@@ -246,7 +246,7 @@ namespace Files.App.ViewModels.UserControls
 			PreviewPaneState = SelectedDriveItem is not null ? PreviewPaneStates.DriveStorageDetailsAvailable : PreviewPaneStates.PreviewAndDetailsAvailable;
 		}
 
-		private async Task<UserControl?> GetBuiltInPreviewControlAsync(ListedItem item, bool downloadItem)
+		private async Task<UserControl?> GetBuiltInPreviewControlAsync(ListedItem item, bool downloadItem, CancellationToken token)
 		{
 			ShowCloudItemButton = false;
 
@@ -328,9 +328,9 @@ namespace Files.App.ViewModels.UserControls
 			if (FileExtensionHelpers.IsImagePreviewFile(ext))
 			{
 				var model = new ImagePreviewViewModel(item);
-				await model.LoadAsync();
-
-				return new ImagePreview(model);
+				var preview = new ImagePreview(model);
+				_ = LoadImagePreviewAsync(model, token);
+				return preview;
 			}
 
 			if (FileExtensionHelpers.IsTextFile(ext))
@@ -386,6 +386,23 @@ namespace Files.App.ViewModels.UserControls
 			var control = await TextPreviewViewModel.TryLoadAsTextAsync(item);
 
 			return control ?? null;
+		}
+
+		private async Task LoadImagePreviewAsync(ImagePreviewViewModel model, CancellationToken token)
+		{
+			using var registration = token.Register(model.LoadCancelledTokenSource.Cancel);
+			try
+			{
+				await model.LoadAsync();
+				await model.DetailsLoading;
+			}
+			catch (OperationCanceledException) when (token.IsCancellationRequested || model.LoadCancelledTokenSource.IsCancellationRequested) { }
+			catch (Exception ex)
+			{
+				App.Logger.LogWarning(ex, "Failed to load image preview.");
+				if (!token.IsCancellationRequested && ReferenceEquals(SelectedItem, model.Item))
+					await LoadBasicPreviewAsync(token);
+			}
 		}
 
 		public async Task UpdateSelectedItemPreviewAsync(bool downloadItem = false)

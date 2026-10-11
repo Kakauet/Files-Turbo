@@ -11,6 +11,8 @@ namespace Files.App.UserControls.FilePreviews
 		{
 			ViewModel = model;
 			InitializeComponent();
+			Loaded += (_, _) => ViewModel.SetPreviewSize(Math.Max(1, ActualWidth), Math.Max(1, ActualHeight), XamlRoot.RasterizationScale);
+			Unloaded += ViewModel.PreviewControlBase_Unloaded;
 		}
 
 		private ImagePreviewViewModel ViewModel { get; set; }

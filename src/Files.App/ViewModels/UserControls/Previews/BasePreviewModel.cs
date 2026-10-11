@@ -3,7 +3,9 @@
 
 using System.IO;
 using Files.App.ViewModels.Properties;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace Files.App.ViewModels.Previews
@@ -17,8 +19,8 @@ namespace Files.App.ViewModels.Previews
 		protected BaseStorageFile PreviewFile
 			=> Item.ItemFile ?? throw new InvalidOperationException("The preview file has not been loaded.");
 
-		private BitmapImage? fileImage;
-		public BitmapImage? FileImage
+		private ImageSource? fileImage;
+		public ImageSource? FileImage
 		{
 			get => fileImage;
 			protected set => SetProperty(ref fileImage, value);
@@ -26,20 +28,30 @@ namespace Files.App.ViewModels.Previews
 
 		public List<FileProperty>? DetailsFromPreview { get; set; }
 
+		public Task DetailsLoading { get; private set; } = Task.CompletedTask;
+
 		/// <summary>
 		/// This is cancelled when the user has selected another file or closed the pane.
 		/// </summary>
 		public CancellationTokenSource LoadCancelledTokenSource { get; } = new CancellationTokenSource();
 
 		public BasePreviewModel(ListedItem item) : base()
-			=> Item = item;
+		{
+			Item = item;
+			FileImage = item.FileImage;
+		}
 
 		public delegate void LoadedEventHandler(object? sender, EventArgs e);
 
-		public static Task LoadDetailsOnlyAsync(ListedItem item, List<FileProperty>? details = null)
+		public static async Task LoadDetailsOnlyAsync(ListedItem item, List<FileProperty>? details = null)
 		{
 			var temp = new DetailsOnlyPreviewModel(item) { DetailsFromPreview = details };
-			return temp.LoadAsync();
+			try
+			{
+				await temp.LoadAsync();
+				await temp.DetailsLoading;
+			}
+			finally { temp.LoadCancelledTokenSource.Dispose(); }
 		}
 
 		public static Task<string> ReadFileAsTextAsync(BaseStorageFile file, int maxLength = 10 * 1024 * 1024)
@@ -52,7 +64,8 @@ namespace Files.App.ViewModels.Previews
 		/// <returns>The task to run</returns>
 		public virtual async Task LoadAsync()
 		{
-			List<FileProperty> detailsFull = [];
+			var token = LoadCancelledTokenSource.Token;
+			token.ThrowIfCancellationRequested();
 
 			if (Item.ItemFile is null)
 			{
@@ -61,20 +74,29 @@ namespace Files.App.ViewModels.Previews
 				Item.ItemFile = await StorageFileExtensions.DangerousGetFileFromPathAsync(itemPath, rootItem.Result);
 			}
 
-			await Task.Run(async () =>
+			token.ThrowIfCancellationRequested();
+			DetailsFromPreview = await Task.Run(LoadPreviewAndDetailsAsync, token);
+			token.ThrowIfCancellationRequested();
+			DetailsLoading = LoadDetailsAsync(token);
+		}
+
+		private async Task LoadDetailsAsync(CancellationToken token)
+		{
+			try
 			{
-				DetailsFromPreview = await LoadPreviewAndDetailsAsync();
+				List<FileProperty> detailsFull = [];
 				if (userSettingsService.InfoPaneSettingsService.SelectedTab == InfoPaneTabs.Details)
 				{
-					// Add the details from the preview function, then the system file properties
 					DetailsFromPreview?.ForEach(i => detailsFull.Add(i));
-					List<FileProperty>? props = await GetSystemFilePropertiesAsync();
+					var props = await Task.Run(GetSystemFilePropertiesAsync, token);
 					if (props is not null)
 						detailsFull.AddRange(props);
 				}
-			});
-
-			Item.FileDetails = new System.Collections.ObjectModel.ObservableCollection<FileProperty>(detailsFull);
+				if (!token.IsCancellationRequested)
+					Item.FileDetails = new System.Collections.ObjectModel.ObservableCollection<FileProperty>(detailsFull);
+			}
+			catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+			catch (Exception ex) { App.Logger.LogWarning(ex, "Failed to load preview details."); }
 		}
 
 		/// <summary>
@@ -90,7 +112,8 @@ namespace Files.App.ViewModels.Previews
 				Item.ItemPath,
 				Constants.ShellIconSizes.Jumbo,
 				false,
-				IconOptions.None);
+				IconOptions.None,
+				LoadCancelledTokenSource.Token);
 
 			if (result is not null)
 				await MainWindow.Instance.DispatcherQueue.EnqueueOrInvokeAsync(async () => FileImage = await result.ToBitmapAsync());
