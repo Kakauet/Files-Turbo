@@ -14,8 +14,6 @@ namespace Files.App.Utils.Storage
 	{
 		private static readonly ISizeProvider folderSizeProvider = Ioc.Default.GetRequiredService<ISizeProvider>();
 
-		private static readonly IIconCacheService iconCacheService = Ioc.Default.GetRequiredService<IIconCacheService>();
-
 		public static async Task<List<ListedItem>> ListEntries(
 			BaseStorageFolder rootFolder,
 			StorageFolderWithPath currentStorageFolder,
@@ -23,13 +21,15 @@ namespace Files.App.Utils.Storage
 			int countLimit,
 			uint iconSize,
 			Func<List<ListedItem>, Task> intermediateAction,
-			Dictionary<string, BitmapImage>? defaultIconPairs = null)
+			Dictionary<string, BitmapImage>? defaultIconPairs = null,
+			long performanceOperationId = 0)
 		{
 			var sampler = new IntervalSampler(500);
 			var tempList = new List<ListedItem>();
 			uint count = 0;
 			var firstRound = true;
 			var hasPublishedFirstBatch = false;
+			var firstItemReported = false;
 
 			IUserSettingsService userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 			bool calculateFolderSizes = userSettingsService.FoldersSettingsService.CalculateFolderSizes;
@@ -97,7 +97,6 @@ namespace Files.App.Utils.Storage
 							if (folder is not null)
 							{
 								var folderPath = folder.ItemPath!;
-								folder.PreloadedIconData = await iconCacheService.GetIconAsync(folder.ItemPath, null, true, iconSize);
 
 								if (defaultIconPairs?.ContainsKey(string.Empty) ?? false)
 									folder.FileImage = defaultIconPairs[string.Empty];
@@ -123,7 +122,6 @@ namespace Files.App.Utils.Storage
 							var fileEntry = await AddFileAsync(item.AsBaseStorageFile()!, currentStorageFolder, cancellationToken);
 							if (fileEntry is not null)
 							{
-								fileEntry.PreloadedIconData = await iconCacheService.GetIconAsync(fileEntry.ItemPath, fileEntry.FileExtension, false, iconSize);
 
 								if (defaultIconPairs is not null)
 								{
@@ -142,6 +140,11 @@ namespace Files.App.Utils.Storage
 					}
 
 					cancellationToken.ThrowIfCancellationRequested();
+					if (!firstItemReported && tempList.Count > 0)
+					{
+						firstItemReported = true;
+						UiPerformanceTrace.Mark(performanceOperationId, "FirstItemAvailable", tempList.Count);
+					}
 				}
 
 				count += maxItemsToRetrieve;

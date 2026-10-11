@@ -148,6 +148,8 @@ MONITORENUMPROC
 EnumDisplayMonitors
 MONITORINFOEXW
 GetMonitorInfo
+MonitorFromWindow
+EnumDisplaySettings
 CLASS_E_CLASSNOTAVAILABLE
 E_INVALIDARG
 RoInitialize

@@ -2,12 +2,19 @@
 // Licensed under the MIT License.
 
 using Files.App.ViewModels.Previews;
-using Files.Shared.Helpers;
+using System.Collections.Frozen;
 
 namespace Files.App.Helpers
 {
 	public static class AdaptiveLayoutHelpers
 	{
+		private static readonly FrozenSet<string> MediaExtensions = new[]
+		{
+			".mp3", ".m4a", ".ogg", ".oga", ".wav", ".wma", ".aac", ".adt", ".adts", ".cda", ".flac",
+			".avi", ".mp4", ".webm", ".mov", ".qt", ".m4v", ".mp4v", ".3g2", ".3gp2", ".3gp", ".3gpp", ".mkv",
+			".png", ".bmp", ".jpg", ".jpeg", ".jfif", ".gif", ".tiff", ".tif", ".webp", ".jxr"
+		}.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+
 		private static ILayoutSettingsService LayoutSettingsService { get; } = Ioc.Default.GetRequiredService<ILayoutSettingsService>();
 		private static IContentPageContext ContentPageContext { get; } = Ioc.Default.GetRequiredService<IContentPageContext>();
 		private static IWindowsIniService WindowsIniService { get; } = Ioc.Default.GetRequiredService<IWindowsIniService>();
@@ -122,9 +129,7 @@ namespace Files.App.Helpers
 
 		private static bool IsMediaExtension(string? extension)
 			=> !string.IsNullOrEmpty(extension)
-			&& (FileExtensionHelpers.IsAudioFile(extension)
-			|| FileExtensionHelpers.IsVideoFile(extension)
-			|| FileExtensionHelpers.IsImageFile(extension));
+			&& MediaExtensions.Contains(extension);
 
 		private enum Layouts
 		{

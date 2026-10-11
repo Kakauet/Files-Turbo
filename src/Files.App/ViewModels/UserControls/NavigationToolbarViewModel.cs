@@ -49,6 +49,9 @@ namespace Files.App.ViewModels.UserControls
 		private bool _lockFlag;
 		private PointerRoutedEventArgs? _pointerRoutedEventArgs;
 		private CancellationTokenSource? _suggestSearchCTS;
+		private readonly SearchSuggestionPipeline suggestionPipeline = new();
+		private readonly LatestPathNavigationCoordinator<IShellPage> pathNavigationCoordinator = new();
+		internal long SearchSuggestionPerformanceOperationId { get; private set; }
 
 		// Events
 
@@ -553,20 +556,24 @@ namespace Files.App.ViewModels.UserControls
 		public async Task<bool> HandleItemNavigationAsync(string path)
 		{
 			var shellPage = ContentPageContext.ShellPage;
-			if (shellPage is null)
+			var request = pathNavigationCoordinator.Begin(shellPage);
+			if (_isDisposed || shellPage is null)
 				return true;
 
 			var shellViewModel = shellPage.ShellViewModel
 				?? throw new InvalidOperationException("The current shell page does not have a view model.");
 
-			var currentPath = PathComponents.LastOrDefault()?.Path;
+			bool IsCurrentRequest() => !_isDisposed
+				&& pathNavigationCoordinator.IsCurrent(request, ContentPageContext.ShellPage)
+				&& ReferenceEquals(shellViewModel, shellPage.ShellViewModel);
+
 			var isFtp = FtpHelpers.IsFtpPath(path);
 			var normalizedInput = NormalizePathInput(path, isFtp);
-			if (currentPath is not null && currentPath.Equals(normalizedInput, StringComparison.OrdinalIgnoreCase) ||
-				string.IsNullOrWhiteSpace(normalizedInput))
+			if (string.IsNullOrWhiteSpace(normalizedInput))
 				return true;
 
 			if (normalizedInput.Equals(shellViewModel.WorkingDirectory) &&
+				!shellViewModel.IsWorkingDirectoryUpdatePending &&
 				shellPage.CurrentPageType != typeof(HomePage) &&
 				!shellViewModel.IsSearchResults)
 				return true;
@@ -592,14 +599,18 @@ namespace Files.App.ViewModels.UserControls
 			else
 			{
 				normalizedInput = StorageFileExtensions.GetResolvedPath(normalizedInput, isFtp);
-				if (currentPath is not null && currentPath.Equals(normalizedInput, StringComparison.OrdinalIgnoreCase))
+				if (normalizedInput.Equals(shellViewModel.WorkingDirectory) &&
+					!shellViewModel.IsWorkingDirectoryUpdatePending &&
+					shellPage.CurrentPageType != typeof(HomePage) && !shellViewModel.IsSearchResults)
 					return true;
 
 				var item = await FilesystemTasks.Wrap(() => DriveHelpers.GetRootFromPathAsync(normalizedInput));
+				if (!IsCurrentRequest())
+					return true;
 
 				var resFolder = await FilesystemTasks.Wrap(() => StorageFileExtensions.DangerousGetFolderWithPathFromPathAsync(normalizedInput, item));
-				shellPage = ContentPageContext.ShellPage
-					?? throw new InvalidOperationException("The current shell page is no longer available.");
+				if (!IsCurrentRequest())
+					return true;
 
 				if (resFolder || FolderHelpers.CheckFolderAccessWithWin32(normalizedInput))
 				{
@@ -610,6 +621,8 @@ namespace Files.App.ViewModels.UserControls
 					{
 						var drivePath = matchingDrive.GetRequiredPath();
 						bool ejectButton = await DialogDisplayHelper.ShowDialogAsync(Strings.InsertDiscDialogTitle.GetLocalizedResource(), string.Format(Strings.InsertDiscDialogText.GetLocalizedResource(), drivePath), Strings.InsertDiscDialog_OpenDriveButton.GetLocalizedResource(), Strings.Close.GetLocalizedResource());
+						if (!IsCurrentRequest())
+							return true;
 						if (ejectButton)
 							DriveHelpers.EjectDeviceAsync(drivePath);
 						return true;
@@ -627,14 +640,16 @@ namespace Files.App.ViewModels.UserControls
 				else // Not a folder or inaccessible
 				{
 					var resFile = await FilesystemTasks.Wrap(() => StorageFileExtensions.DangerousGetFileWithPathFromPathAsync(normalizedInput, item));
-					shellPage = ContentPageContext.ShellPage
-						?? throw new InvalidOperationException("The current shell page is no longer available.");
+					if (!IsCurrentRequest())
+						return true;
 
 					if (resFile)
 					{
 						var storageFile = resFile.Result
 							?? throw new InvalidOperationException("A successful file lookup did not return a storage file.");
 						await Win32Helper.InvokeWin32ComponentAsync(storageFile.Path, shellPage);
+						if (!IsCurrentRequest())
+							return true;
 					}
 					else // Not a file or not accessible
 					{
@@ -649,7 +664,8 @@ namespace Files.App.ViewModels.UserControls
 						var pathText = PathText
 							?? throw new InvalidOperationException("The navigation path has not been initialized.");
 
-						if (await LaunchApplicationFromPath(pathText, workingDir))
+						var launched = await LaunchApplicationFromPath(pathText, workingDir);
+						if (!IsCurrentRequest() || launched)
 							return true;
 
 						var isValid = false;
@@ -660,21 +676,23 @@ namespace Files.App.ViewModels.UserControls
 						catch (Exception ex) when (ex is UriFormatException || ex is ArgumentException)
 						{
 						}
+						if (!IsCurrentRequest())
+							return true;
 
 						if (!isValid)
 						{
 							await DialogDisplayHelper.ShowDialogAsync(Strings.InvalidItemDialogTitle.GetLocalizedResource(),
 								string.Format(Strings.InvalidItemDialogContent.GetLocalizedResource(), Environment.NewLine, resFolder.ErrorCode.ToString()));
+							if (!IsCurrentRequest())
+								return true;
 							return false;
 						}
 					}
 				}
 			}
 
-			shellPage = ContentPageContext.ShellPage
-				?? throw new InvalidOperationException("The current shell page is no longer available.");
-			shellViewModel = shellPage.ShellViewModel
-				?? throw new InvalidOperationException("The current shell page does not have a view model.");
+			if (!IsCurrentRequest())
+				return true;
 			PathControlDisplayText = shellViewModel.WorkingDirectory;
 			return true;
 		}
@@ -855,8 +873,16 @@ namespace Files.App.ViewModels.UserControls
 		[Obsolete("Superseded by Omnibar.")]
 		public async Task CheckPathInputAsync(string currentInput, string? currentSelectedPath, IShellPage shellPage)
 		{
+			var request = pathNavigationCoordinator.Begin(shellPage);
+			if (_isDisposed)
+				return;
 			var shellViewModel = shellPage.ShellViewModel
 				?? throw new InvalidOperationException("The shell page does not have a view model.");
+			bool IsCurrentRequest() => !_isDisposed
+				&& pathNavigationCoordinator.IsCurrent(request, ContentPageContext.ShellPage)
+				&& ReferenceEquals(shellViewModel, shellPage.ShellViewModel);
+			if (!IsCurrentRequest())
+				return;
 
 			if (currentInput.StartsWith('>'))
 			{
@@ -879,10 +905,10 @@ namespace Files.App.ViewModels.UserControls
 
 			var normalizedInput = NormalizePathInput(currentInput, isFtp);
 
-			if (currentSelectedPath == normalizedInput || string.IsNullOrWhiteSpace(normalizedInput))
+			if (string.IsNullOrWhiteSpace(normalizedInput))
 				return;
 
-			if (normalizedInput != shellViewModel.WorkingDirectory || shellPage.CurrentPageType == typeof(HomePage))
+			if (normalizedInput != shellViewModel.WorkingDirectory || shellViewModel.IsWorkingDirectoryUpdatePending || shellPage.CurrentPageType == typeof(HomePage))
 			{
 				if (normalizedInput.Equals("Home", StringComparison.OrdinalIgnoreCase) || normalizedInput.Equals(Strings.Home.GetLocalizedResource(), StringComparison.OrdinalIgnoreCase))
 				{
@@ -902,12 +928,16 @@ namespace Files.App.ViewModels.UserControls
 				else
 				{
 					normalizedInput = StorageFileExtensions.GetResolvedPath(normalizedInput, isFtp);
-					if (currentSelectedPath == normalizedInput)
+					if (normalizedInput == shellViewModel.WorkingDirectory && !shellViewModel.IsWorkingDirectoryUpdatePending && shellPage.CurrentPageType != typeof(HomePage))
 						return;
 
 					var item = await FilesystemTasks.WrapNullable(() => DriveHelpers.GetRootFromPathAsync(normalizedInput));
+					if (!IsCurrentRequest())
+						return;
 
 					var resFolder = await FilesystemTasks.Wrap(() => StorageFileExtensions.DangerousGetFolderWithPathFromPathAsync(normalizedInput, item));
+					if (!IsCurrentRequest())
+						return;
 					if (resFolder || FolderHelpers.CheckFolderAccessWithWin32(normalizedInput))
 					{
 						var matchingDrive = drivesViewModel.Drives.Cast<DriveItem>().FirstOrDefault(x => PathNormalization.NormalizePath(normalizedInput).StartsWith(
@@ -917,6 +947,8 @@ namespace Files.App.ViewModels.UserControls
 						{
 							var drivePath = matchingDrive.GetRequiredPath();
 							bool ejectButton = await DialogDisplayHelper.ShowDialogAsync(Strings.InsertDiscDialogTitle.GetLocalizedResource(), string.Format(Strings.InsertDiscDialogText.GetLocalizedResource(), drivePath), Strings.InsertDiscDialog_OpenDriveButton.GetLocalizedResource(), Strings.Close.GetLocalizedResource());
+							if (!IsCurrentRequest())
+								return;
 							if (ejectButton)
 								DriveHelpers.EjectDeviceAsync(drivePath);
 							return;
@@ -933,11 +965,15 @@ namespace Files.App.ViewModels.UserControls
 					else // Not a folder or inaccessible
 					{
 						var resFile = await FilesystemTasks.Wrap(() => StorageFileExtensions.DangerousGetFileWithPathFromPathAsync(normalizedInput, item));
+						if (!IsCurrentRequest())
+							return;
 						if (resFile)
 						{
 							var storageFile = resFile.Result
 								?? throw new InvalidOperationException("A successful file lookup did not return a storage file.");
 							await Win32Helper.InvokeWin32ComponentAsync(storageFile.Path, shellPage);
+							if (!IsCurrentRequest())
+								return;
 						}
 						else // Not a file or not accessible
 						{
@@ -947,17 +983,23 @@ namespace Files.App.ViewModels.UserControls
 									Constants.UserEnvironmentPaths.HomePath :
 									shellViewModel.WorkingDirectory;
 
-							if (await LaunchApplicationFromPath(currentInput, workingDir))
+							var launched = await LaunchApplicationFromPath(currentInput, workingDir);
+							if (!IsCurrentRequest() || launched)
 								return;
 
 							try
 							{
-								if (!await Windows.System.Launcher.LaunchUriAsync(new Uri(currentInput)))
+								var launchedUri = await Windows.System.Launcher.LaunchUriAsync(new Uri(currentInput));
+								if (!IsCurrentRequest())
+									return;
+								if (!launchedUri)
 									await DialogDisplayHelper.ShowDialogAsync(Strings.InvalidItemDialogTitle.GetLocalizedResource(),
 										string.Format(Strings.InvalidItemDialogContent.GetLocalizedResource(), Environment.NewLine, resFolder.ErrorCode.ToString()));
 							}
 							catch (Exception ex) when (ex is UriFormatException || ex is ArgumentException)
 							{
+								if (!IsCurrentRequest())
+									return;
 								await DialogDisplayHelper.ShowDialogAsync(Strings.InvalidItemDialogTitle.GetLocalizedResource(),
 									string.Format(Strings.InvalidItemDialogContent.GetLocalizedResource(), Environment.NewLine, resFolder.ErrorCode.ToString()));
 							}
@@ -965,7 +1007,8 @@ namespace Files.App.ViewModels.UserControls
 					}
 				}
 
-				PathControlDisplayText = shellPage.ShellViewModel.WorkingDirectory;
+				if (IsCurrentRequest())
+					PathControlDisplayText = shellViewModel.WorkingDirectory;
 			}
 		}
 
@@ -1214,6 +1257,15 @@ namespace Files.App.ViewModels.UserControls
 			var token = currentSearchCTS.Token;
 			var query = OmnibarSearchModeText;
 			var folder = shellViewModel.WorkingDirectory;
+			var performanceOperation = UiPerformanceTrace.BeginOperation("SearchSuggestions", folder ?? string.Empty);
+			SearchSuggestionPerformanceOperationId = performanceOperation;
+			UiPerformanceTrace.Mark(performanceOperation, "QueryChanged", query?.Length ?? 0);
+			bool IsCurrent() => !_isDisposed && !token.IsCancellationRequested
+				&& ReferenceEquals(_suggestSearchCTS, currentSearchCTS)
+				&& (string.IsNullOrWhiteSpace(query) || OmnibarCurrentSelectedModeName == OmnibarSearchModeName)
+				&& string.Equals(query, OmnibarSearchModeText, StringComparison.Ordinal)
+				&& ReferenceEquals(ContentPageContext.ShellPage?.ShellViewModel, shellViewModel)
+				&& string.Equals(folder, shellViewModel.WorkingDirectory, StringComparison.Ordinal);
 
 			try
 			{
@@ -1226,8 +1278,6 @@ namespace Files.App.ViewModels.UserControls
 				}
 				else
 				{
-					await Task.Delay(200, token);
-
 					var search = new FolderSearch
 					{
 						Query = query,
@@ -1236,34 +1286,69 @@ namespace Files.App.ViewModels.UserControls
 					};
 
 					var results = new List<ListedItem>();
-					await search.SearchAsync(results, token);
-					newSuggestions.AddRange(results.Select(result => new SuggestionModel(result)));
+					await suggestionPipeline.RunAsync(query,
+						async () =>
+						{
+							UiPerformanceTrace.Mark(performanceOperation, "ProviderStarted");
+							await search.SearchAsync(results, token, loadSuggestionIcons: false);
+							UiPerformanceTrace.Mark(performanceOperation, "ProviderCompleted", results.Count);
+							return (IReadOnlyList<ListedItem>)results;
+						},
+						IsCurrent,
+						found =>
+						{
+							newSuggestions.AddRange(found.Select(result => new SuggestionModel(result)
+							{
+								PerformanceOperationId = performanceOperation
+							}));
+							UpdateSearchSuggestions(newSuggestions);
+							UiPerformanceTrace.Mark(performanceOperation, "DataPublished", newSuggestions.Count);
+						},
+						(found, iconToken) => search.LoadSuggestionIconsAsync(found, iconToken, item =>
+						{
+							if (IsCurrent() && results.IndexOf(item) is var index && index >= 0)
+								newSuggestions[index].FileImage = item.FileImage;
+						}),
+						token);
+					if (IsCurrent())
+						UiPerformanceTrace.Mark(performanceOperation, "IconsCompleted", newSuggestions.Count);
+					return;
 				}
 
-				if (token.IsCancellationRequested || (!string.IsNullOrWhiteSpace(query) && OmnibarCurrentSelectedModeName != OmnibarSearchModeName)
-					|| !ReferenceEquals(ContentPageContext.ShellPage?.ShellViewModel, shellViewModel)
-					|| !string.Equals(folder, shellViewModel.WorkingDirectory, StringComparison.Ordinal))
+				if (!IsCurrent())
 					return;
 
-				for (var index = 0; index < newSuggestions.Count; index++)
-				{
-					if (index >= OmnibarSearchModeSuggestionItems.Count)
-						OmnibarSearchModeSuggestionItems.Add(newSuggestions[index]);
-					else
-						OmnibarSearchModeSuggestionItems[index] = newSuggestions[index];
-				}
-
-				while (OmnibarSearchModeSuggestionItems.Count > newSuggestions.Count)
-					OmnibarSearchModeSuggestionItems.RemoveAt(OmnibarSearchModeSuggestionItems.Count - 1);
+				UpdateSearchSuggestions(newSuggestions);
+				UiPerformanceTrace.Mark(performanceOperation, "DataPublished", newSuggestions.Count);
 			}
 			catch (OperationCanceledException)
 			{
+				UiPerformanceTrace.Mark(performanceOperation, "Canceled");
+			}
+			catch (Exception ex)
+			{
+				App.Logger.LogWarning(ex, "Failed to update search suggestions");
+				UiPerformanceTrace.Mark(performanceOperation, "Failed");
 			}
 			finally
 			{
 				if (ReferenceEquals(_suggestSearchCTS, currentSearchCTS))
 					_suggestSearchCTS = null;
 			}
+		}
+
+		private void UpdateSearchSuggestions(IReadOnlyList<SuggestionModel> newSuggestions)
+		{
+			for (var index = 0; index < newSuggestions.Count; index++)
+			{
+				if (index >= OmnibarSearchModeSuggestionItems.Count)
+					OmnibarSearchModeSuggestionItems.Add(newSuggestions[index]);
+				else
+					OmnibarSearchModeSuggestionItems[index] = newSuggestions[index];
+			}
+
+			while (OmnibarSearchModeSuggestionItems.Count > newSuggestions.Count)
+				OmnibarSearchModeSuggestionItems.RemoveAt(OmnibarSearchModeSuggestionItems.Count - 1);
 		}
 
 		private void PopulateOmnibarSuggestionsForSettingsSearch()
@@ -1316,7 +1401,10 @@ namespace Files.App.ViewModels.UserControls
 		public void CancelSuggestionSearch()
 		{
 			if (!_isDisposed)
+			{
 				_suggestSearchCTS?.Cancel();
+				SearchSuggestionPerformanceOperationId = 0;
+			}
 		}
 
 		// Disposer
@@ -1327,6 +1415,7 @@ namespace Files.App.ViewModels.UserControls
 				return;
 
 			_isDisposed = true;
+			pathNavigationCoordinator.Invalidate();
 			_suggestSearchCTS?.Cancel();
 			_dragOverTimer?.Stop();
 			_dragOverTimer = null;

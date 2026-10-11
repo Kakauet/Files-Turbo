@@ -16,8 +16,6 @@ namespace Files.App.Utils.Storage
 
 		private static readonly string folderTypeTextLocalized = Strings.Folder.GetLocalizedResource();
 
-		private static readonly IIconCacheService iconCacheService = Ioc.Default.GetRequiredService<IIconCacheService>();
-
 		public static async Task<List<ListedItem>> ListEntries(
 			string path,
 			Win32PInvoke.SafeFindHandle hFile,
@@ -25,15 +23,17 @@ namespace Files.App.Utils.Storage
 			CancellationToken cancellationToken,
 			int countLimit,
 			uint iconSize,
-			Func<List<ListedItem>, Task> intermediateAction
+			Func<List<ListedItem>, Task> intermediateAction,
+			long performanceOperationId = 0
 		)
 		{
 			var sampler = new IntervalSampler(500);
-			// Intermediate flushes merge in sorted, so an early first paint costs no reshuffle later
+			// Publish a screenful before scanning the rest of a large directory.
 			var firstBatchSampler = new IntervalSampler(25);
 			var hasFlushedFirstBatch = false;
 			var tempList = new List<ListedItem>();
 			var count = 0;
+			var firstItemReported = false;
 
 			IUserSettingsService userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 			bool CalculateFolderSizes = userSettingsService.FoldersSettingsService.CalculateFolderSizes;
@@ -64,7 +64,6 @@ namespace Files.App.Utils.Storage
 							if (file is not null)
 							{
 								var filePath = file.ItemPath!;
-								file.PreloadedIconData = await iconCacheService.GetIconAsync(file.ItemPath, file.FileExtension, false, iconSize);
 								tempList.Add(file);
 								++count;
 
@@ -80,7 +79,6 @@ namespace Files.App.Utils.Storage
 								if (folder is not null)
 								{
 									var folderPath = folder.ItemPath!;
-									folder.PreloadedIconData = await iconCacheService.GetIconAsync(folder.ItemPath, null, true, iconSize);
 									tempList.Add(folder);
 									++count;
 
@@ -105,11 +103,16 @@ namespace Files.App.Utils.Storage
 					cancellationToken.ThrowIfCancellationRequested();
 					if (count == countLimit)
 						break;
+					if (!firstItemReported && tempList.Count > 0)
+					{
+						firstItemReported = true;
+						UiPerformanceTrace.Mark(performanceOperationId, "FirstItemAvailable", tempList.Count);
+					}
 
 					if (intermediateAction is not null &&
 						(hasFlushedFirstBatch
 							? sampler.CheckNow()
-							: tempList.Count > 0 && firstBatchSampler.CheckNow()))
+							: tempList.Count >= 64 || tempList.Count > 0 && firstBatchSampler.CheckNow()))
 					{
 						hasFlushedFirstBatch = true;
 						await intermediateAction(tempList);
@@ -360,9 +363,10 @@ namespace Files.App.Utils.Storage
 					};
 				}
 			}
-			else if (FileExtensionHelpers.IsShortcutOrUrlFile(findData.cFileName))
+			else if (string.Equals(itemFileExtension, ".lnk", StringComparison.OrdinalIgnoreCase) ||
+				string.Equals(itemFileExtension, ".url", StringComparison.OrdinalIgnoreCase))
 			{
-				var isUrl = FileExtensionHelpers.IsWebLinkFile(findData.cFileName);
+				var isUrl = string.Equals(itemFileExtension, ".url", StringComparison.OrdinalIgnoreCase);
 
 				// Listing only needs the data stored in the link file; resolving the target
 				// can block on moved or unreachable targets and is done when the item is opened

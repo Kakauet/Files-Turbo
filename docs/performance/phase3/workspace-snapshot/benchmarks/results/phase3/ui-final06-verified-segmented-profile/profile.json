@@ -1,0 +1,144 @@
+{
+  "TraceSource": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\results\\phase3\\manual-20261011-144943-7c81486f\\trace.jsonl",
+  "Ordinary100kOperationIds": [
+    19,
+    21
+  ],
+  "FirstFramesAndJobs": [
+    {
+      "OperationId": 19,
+      "FirstFrameElapsedMs": 105.9538,
+      "FirstFrameDurationMs": 4.1007,
+      "FirstVisibleElapsedMs": 106.2296,
+      "OwnJobsBeforeVisible": 0,
+      "AllOperationsJobsBeforeVisible": 0,
+      "OtherOperationIds": []
+    },
+    {
+      "OperationId": 21,
+      "FirstFrameElapsedMs": 111.3268,
+      "FirstFrameDurationMs": 3.9138,
+      "FirstVisibleElapsedMs": 111.589,
+      "OwnJobsBeforeVisible": 0,
+      "AllOperationsJobsBeforeVisible": 0,
+      "OtherOperationIds": []
+    }
+  ],
+  "Navigation100kFrameDurationMs": {
+    "N": 173,
+    "P50": 0.6408,
+    "P95": 33.89200000000002,
+    "StdDev": 14.742822468899632,
+    "IQR": 0.6943,
+    "Max": 112.0681,
+    "Over144HzBudget": 19
+  },
+  "Navigation100kDispatcherQueueDelayMs": {
+    "N": 1281,
+    "P50": 0.3903,
+    "P95": 6.241,
+    "StdDev": 15.959606206141677,
+    "IQR": 0.5888,
+    "Max": 328.8783
+  },
+  "Navigation100kPublicationCallbackMs": {
+    "N": 7,
+    "P50": 10.4616,
+    "P95": 15.76164,
+    "StdDev": 5.843715906223801,
+    "IQR": 8.869450000000002,
+    "Max": 16.4841
+  },
+  "Navigation100kPublicationQueueDelayMs": {
+    "N": 7,
+    "P50": 7.3992,
+    "P95": 21.61161,
+    "StdDev": 7.7666783704883935,
+    "IQR": 11.85555,
+    "Max": 22.5882
+  },
+  "WholeProcessScrollFrameDurationMs": {
+    "N": 289,
+    "P50": 0.6256,
+    "P95": 59.35357999999996,
+    "StdDev": 20.78293029321315,
+    "IQR": 26.2299,
+    "Max": 101.3412,
+    "Over144HzBudget": 94
+  },
+  "WholeProcessScrollCallbackGapMs": {
+    "N": 284,
+    "P50": 11.663250000000001,
+    "P95": 110.37257499999998,
+    "StdDev": 39.136596201565126,
+    "IQR": 34.726275,
+    "Max": 188.9906
+  },
+  "WholeProcessJobStarts": 3049,
+  "WholeProcessJobCompletions": 2967,
+  "WholeProcessJobCancellations": 82,
+  "WholeProcessActiveAtStart": [
+    {
+      "Active": "1",
+      "Samples": 8
+    },
+    {
+      "Active": "2",
+      "Samples": 20
+    },
+    {
+      "Active": "3",
+      "Samples": 57
+    },
+    {
+      "Active": "4",
+      "Samples": 2964
+    }
+  ],
+  "WholeProcessPendingAtStart": {
+    "N": 3049,
+    "P50": 41.0,
+    "P95": 79.0,
+    "StdDev": 24.876339571303756,
+    "IQR": 41.0,
+    "Max": 87.0
+  },
+  "WholeProcessManagedHeapLastBytes": 26146152,
+  "WholeProcessManagedHeapPeakBytes": 111252200.0,
+  "WholeProcessGCCounts": [
+    {
+      "Generation": "0",
+      "First": 5,
+      "Last": 166
+    },
+    {
+      "Generation": "1",
+      "First": 5,
+      "Last": 143
+    },
+    {
+      "Generation": "2",
+      "First": 5,
+      "Last": 59
+    }
+  ],
+  "FinalIdle": {
+    "SampleCount": 39,
+    "WallSeconds": 9.920265299999999,
+    "CPUSeconds": 3.328125,
+    "PrivateBytesStart": 337334272,
+    "PrivateBytesEnd": 337334272,
+    "HandlesStart": 2878,
+    "HandlesEnd": 2878
+  },
+  "Interpretation": "Navigation100kFrameDurationMs is the original bounded navigation gate for ops19/21, including overlap with the first scroll. Navigation100kBeforeScrollFrameDurationMs cuts at first scroll-session start and explicitly counts excluded overlap. Operation-tagged dispatcher samples include subsequent scroll and idle while100k remains current. Whole-process scroll includes two incomplete provider-endpoint attempts and untimed preparations. Last whole trace includes early selection, navigation, failed preparation, rapid20 and idle. No physicalFPS or individualGCpauses measured.",
+  "Navigation100kBeforeScrollFrameDurationMs": {
+    "N": 137,
+    "P50": 0.6752,
+    "P95": 38.33157999999989,
+    "Max": 112.0681,
+    "Over144HzBudget": 18,
+    "CutoffUtc": "2026-10-11T14:47:38.1796713Z",
+    "ExcludedOverlappingScrollFrames": 36
+  }
+}

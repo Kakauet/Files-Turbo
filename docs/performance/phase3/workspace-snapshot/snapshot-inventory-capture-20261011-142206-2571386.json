@@ -1,0 +1,542 @@
+{
+  "CapturedUtc": "2026-10-11T14:01:12.7356093Z",
+  "PhaseIIIStartCommit": "b18efc91ed3033081691f407a2bb7b5ee3d7d21d",
+  "OriginalBaselineCommit": "1994d9a4269f5144c70bc67d6a48de4a20616912",
+  "RepositoryHeadAtCapture": "b18efc91ed3033081691f407a2bb7b5ee3d7d21d",
+  "Scope": "Small source/script/project/contract/report files; production code recovered from containing Git commit. GUI/main/morning reports intentionally captured later by root. No SDK/binaries/packages/fixtures/CSV banks/nettrace.",
+  "FileCount": 59,
+  "OriginalTotalBytes": 382716.0,
+  "Files": [
+    {
+      "WorkspacePath": "artifacts/phase3-entry-construction-build/build-corrected.log",
+      "OriginalBytes": 360,
+      "OriginalSHA256": "0812DCB774FB8D0CE4FC9FA04FD0D7F4A326997EFD4D85FAE63B91E49EBB463D",
+      "SnapshotSHA256": "0812DCB774FB8D0CE4FC9FA04FD0D7F4A326997EFD4D85FAE63B91E49EBB463D",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/artifacts/phase3-entry-construction-build/build-corrected.log"
+    },
+    {
+      "WorkspacePath": "artifacts/phase3-entry-construction-final/entry-contracts.json",
+      "OriginalBytes": 4119,
+      "OriginalSHA256": "D878C1D00908920E7BAB0CCEDAD282D44FD2992B1088E18E51976A345833174B",
+      "SnapshotSHA256": "D878C1D00908920E7BAB0CCEDAD282D44FD2992B1088E18E51976A345833174B",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/artifacts/phase3-entry-construction-final/entry-contracts.json"
+    },
+    {
+      "WorkspacePath": "artifacts/phase3-search-verified/contracts-additional/search-pipeline-contracts.json",
+      "OriginalBytes": 1321,
+      "OriginalSHA256": "BAED4EDF2148070169A3D2DDC78C3244FEB5E859715D1772F3980770B9635B1C",
+      "SnapshotSHA256": "BAED4EDF2148070169A3D2DDC78C3244FEB5E859715D1772F3980770B9635B1C",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/artifacts/phase3-search-verified/contracts-additional/search-pipeline-contracts.json"
+    },
+    {
+      "WorkspacePath": "artifacts/phase3-search-verified/native-contracts/search-contracts.json",
+      "OriginalBytes": 2824,
+      "OriginalSHA256": "51DB8441BFD64DF07974B4656EA0832DD665429A04E3492F1242756994F3AA9A",
+      "SnapshotSHA256": "51DB8441BFD64DF07974B4656EA0832DD665429A04E3492F1242756994F3AA9A",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/artifacts/phase3-search-verified/native-contracts/search-contracts.json"
+    },
+    {
+      "WorkspacePath": "artifacts/phase3-search-verified/run-metadata.json",
+      "OriginalBytes": 1062,
+      "OriginalSHA256": "B45AD2F0CF43032F4F8701A2F789C7045B636E735672A8878DB03554F4C01A6A",
+      "SnapshotSHA256": "B45AD2F0CF43032F4F8701A2F789C7045B636E735672A8878DB03554F4C01A6A",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/artifacts/phase3-search-verified/run-metadata.json"
+    },
+    {
+      "WorkspacePath": "artifacts/phase3-search-verified/search-traversal-contracts.json",
+      "OriginalBytes": 470,
+      "OriginalSHA256": "0312EBA72FA3AC954CCCF9D9E053DBFA300A2E29895F90525C63D5D91B19F920",
+      "SnapshotSHA256": "0312EBA72FA3AC954CCCF9D9E053DBFA300A2E29895F90525C63D5D91B19F920",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/artifacts/phase3-search-verified/search-traversal-contracts.json"
+    },
+    {
+      "WorkspacePath": "benchmarks/Analyze-EventPipe.ps1",
+      "OriginalBytes": 13603,
+      "OriginalSHA256": "837F096C5BF12B5119B603165B992CD5EE80ADF8F3976F72484EE573BE1E8968",
+      "SnapshotSHA256": "837F096C5BF12B5119B603165B992CD5EE80ADF8F3976F72484EE573BE1E8968",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/benchmarks/Analyze-EventPipe.ps1"
+    },
+    {
+      "WorkspacePath": "benchmarks/Search/Program.cs",
+      "OriginalBytes": 13109,
+      "OriginalSHA256": "2D52600E4FECAFB9D2500457A5F609392D06D7F74F888C14F696BAAA6CC52D33",
+      "SnapshotSHA256": "2D52600E4FECAFB9D2500457A5F609392D06D7F74F888C14F696BAAA6CC52D33",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/benchmarks/Search/Program.cs"
+    },
+    {
+      "WorkspacePath": "benchmarks/Search/Search.csproj",
+      "OriginalBytes": 1029,
+      "OriginalSHA256": "40D0828EAF3973D196DAB75892E674E8A0A77A5A0741C06DC6F3864DE9393521",
+      "SnapshotSHA256": "40D0828EAF3973D196DAB75892E674E8A0A77A5A0741C06DC6F3864DE9393521",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/benchmarks/Search/Search.csproj"
+    },
+    {
+      "WorkspacePath": "benchmarks/Phase3/Search/Program.cs",
+      "OriginalBytes": 15797,
+      "OriginalSHA256": "E88AC4FDF353256BBF99FC53043060EDC80FB1E69AE9E6EAE67D5E04442BF094",
+      "SnapshotSHA256": "E88AC4FDF353256BBF99FC53043060EDC80FB1E69AE9E6EAE67D5E04442BF094",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/benchmarks/Phase3/Search/Program.cs"
+    },
+    {
+      "WorkspacePath": "benchmarks/Phase3/Search/SearchPipeline.csproj",
+      "OriginalBytes": 1122,
+      "OriginalSHA256": "1F1F58F3B60DC14226B41F696BB5753837026DBB95C3DE172F921F4652716086",
+      "SnapshotSHA256": "1F1F58F3B60DC14226B41F696BB5753837026DBB95C3DE172F921F4652716086",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/benchmarks/Phase3/Search/SearchPipeline.csproj"
+    },
+    {
+      "WorkspacePath": "reports/PHASE3_ENTRY_CONSTRUCTION.md",
+      "OriginalBytes": 3551,
+      "OriginalSHA256": "8708EC5B7FBE6F55C444B23A806FD9FFE83DD37BC8ABBB8682E0D3F000660FB6",
+      "SnapshotSHA256": "8708EC5B7FBE6F55C444B23A806FD9FFE83DD37BC8ABBB8682E0D3F000660FB6",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/reports/PHASE3_ENTRY_CONSTRUCTION.md"
+    },
+    {
+      "WorkspacePath": "reports/PHASE3_EVENTPIPE.md",
+      "OriginalBytes": 8830,
+      "OriginalSHA256": "A8FF5034BD87A715E1AF62739D57ECBA30F46AC7AD5CC4F283E5BC7269368CE0",
+      "SnapshotSHA256": "A8FF5034BD87A715E1AF62739D57ECBA30F46AC7AD5CC4F283E5BC7269368CE0",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/reports/PHASE3_EVENTPIPE.md"
+    },
+    {
+      "WorkspacePath": "reports/PHASE3_SCROLL.md",
+      "OriginalBytes": 11468,
+      "OriginalSHA256": "B0FEC7BD27477195028411CEF9F9E1341794D3F7F51D0E40ECD723CA7B7CD979",
+      "SnapshotSHA256": "B0FEC7BD27477195028411CEF9F9E1341794D3F7F51D0E40ECD723CA7B7CD979",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/reports/PHASE3_SCROLL.md"
+    },
+    {
+      "WorkspacePath": "reports/PHASE3_SEARCH.md",
+      "OriginalBytes": 9177,
+      "OriginalSHA256": "59DC95D04B487A922C46312B9D7EBAC594241D14C92CE59D701B83FCB921399C",
+      "SnapshotSHA256": "59DC95D04B487A922C46312B9D7EBAC594241D14C92CE59D701B83FCB921399C",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/reports/PHASE3_SEARCH.md"
+    },
+    {
+      "WorkspacePath": "reports/phase3-adaptive-contracts-final.json",
+      "OriginalBytes": 2474,
+      "OriginalSHA256": "1CE109A44FE331F784F9331119A7BC2DA27D1B20402F7C9E39D44A1824B0F5B3",
+      "SnapshotSHA256": "1CE109A44FE331F784F9331119A7BC2DA27D1B20402F7C9E39D44A1824B0F5B3",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/reports/phase3-adaptive-contracts-final.json"
+    },
+    {
+      "WorkspacePath": "reports/phase3-navigation-shell-contracts-final-02.json",
+      "OriginalBytes": 2604,
+      "OriginalSHA256": "BF6FD7E4D599F84B5A8DBE0C3AD2C50266EB980C0C419E745B8885D003F6F394",
+      "SnapshotSHA256": "BF6FD7E4D599F84B5A8DBE0C3AD2C50266EB980C0C419E745B8885D003F6F394",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/reports/phase3-navigation-shell-contracts-final-02.json"
+    },
+    {
+      "WorkspacePath": "reports/phase3-viewport-contracts-final.json",
+      "OriginalBytes": 2988,
+      "OriginalSHA256": "94CDB78A43ACF523836D1351BD707518901F7549EA2AD3D0443540F00E01D2EB",
+      "SnapshotSHA256": "94CDB78A43ACF523836D1351BD707518901F7549EA2AD3D0443540F00E01D2EB",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/reports/phase3-viewport-contracts-final.json"
+    },
+    {
+      "WorkspacePath": "tests-extra/Search/Program.cs",
+      "OriginalBytes": 9627,
+      "OriginalSHA256": "CE1EFD3B1C1BBB2B695BE705519D820B4BCAB5DFAABC95734032419081293510",
+      "SnapshotSHA256": "CE1EFD3B1C1BBB2B695BE705519D820B4BCAB5DFAABC95734032419081293510",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Search/Program.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/Search/Search.Tests.csproj",
+      "OriginalBytes": 852,
+      "OriginalSHA256": "3CAD902E9B31685578102786E4140EE985A0B88AD28046A6ECAA6FFF7EE1B974",
+      "SnapshotSHA256": "3CAD902E9B31685578102786E4140EE985A0B88AD28046A6ECAA6FFF7EE1B974",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Search/Search.Tests.csproj"
+    },
+    {
+      "WorkspacePath": "tests-extra/Adaptive/AdaptiveContracts.csproj",
+      "OriginalBytes": 797,
+      "OriginalSHA256": "9EEA4F36A82D6FDF882DBFE4EF3253D4968084DEAEE767B7E776400C14E8AA30",
+      "SnapshotSHA256": "9EEA4F36A82D6FDF882DBFE4EF3253D4968084DEAEE767B7E776400C14E8AA30",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Adaptive/AdaptiveContracts.csproj"
+    },
+    {
+      "WorkspacePath": "tests-extra/Adaptive/Program.cs",
+      "OriginalBytes": 9260,
+      "OriginalSHA256": "B52FB705D56517937BEDA0D66B36399D5E26E134B36A1DB4C6AC4CB1E96D9E09",
+      "SnapshotSHA256": "B52FB705D56517937BEDA0D66B36399D5E26E134B36A1DB4C6AC4CB1E96D9E09",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Adaptive/Program.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/Adaptive/Substitutes.cs",
+      "OriginalBytes": 2659,
+      "OriginalSHA256": "DC86C1C861EF6713881E013E6411D45991AC79979F947CA7F7E27C2912D12B9C",
+      "SnapshotSHA256": "DC86C1C861EF6713881E013E6411D45991AC79979F947CA7F7E27C2912D12B9C",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Adaptive/Substitutes.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/EntryConstruction/EntryConstruction.csproj",
+      "OriginalBytes": 644,
+      "OriginalSHA256": "A0F2D10EDAD778069BA039C1432ACAAF6E4A04D3BBBC2F26FD0072DCEA1B77A6",
+      "SnapshotSHA256": "A0F2D10EDAD778069BA039C1432ACAAF6E4A04D3BBBC2F26FD0072DCEA1B77A6",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/EntryConstruction/EntryConstruction.csproj"
+    },
+    {
+      "WorkspacePath": "tests-extra/EntryConstruction/Prepare-EntryContracts.ps1",
+      "OriginalBytes": 7291,
+      "OriginalSHA256": "53ACCC5FEDD860F8E5DFE2C0E453D9140238E0E0587115E2854AF44F9339C038",
+      "SnapshotSHA256": "53ACCC5FEDD860F8E5DFE2C0E453D9140238E0E0587115E2854AF44F9339C038",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/EntryConstruction/Prepare-EntryContracts.ps1"
+    },
+    {
+      "WorkspacePath": "tests-extra/EntryConstruction/Program.cs",
+      "OriginalBytes": 11624,
+      "OriginalSHA256": "F17492D47B4AFEE43F645213366FA5151F21D9A42B40FA0396E7E95927619C58",
+      "SnapshotSHA256": "F17492D47B4AFEE43F645213366FA5151F21D9A42B40FA0396E7E95927619C58",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/EntryConstruction/Program.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/EntryConstruction/snapshots/verified/Current-Classification.cs",
+      "OriginalBytes": 842,
+      "OriginalSHA256": "15BF0B8C24F80FB186F4C00603C4E1AFF2067F8152555F397EDD2EC53E01E65F",
+      "SnapshotSHA256": "15BF0B8C24F80FB186F4C00603C4E1AFF2067F8152555F397EDD2EC53E01E65F",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/EntryConstruction/snapshots/verified/Current-Classification.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/EntryConstruction/snapshots/verified/Current-Extensions.cs",
+      "OriginalBytes": 16072,
+      "OriginalSHA256": "6218081F63BA0B66B7C7E42D3651F98DA4AE56FB19AD77F8F3D329B1681CA058",
+      "SnapshotSHA256": "6218081F63BA0B66B7C7E42D3651F98DA4AE56FB19AD77F8F3D329B1681CA058",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/EntryConstruction/snapshots/verified/Current-Extensions.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/EntryConstruction/snapshots/verified/Current-Name.cs",
+      "OriginalBytes": 815,
+      "OriginalSHA256": "00673856D968F6F64F57BAC179B35A61CFB44CA12E6ACB0BA6B76CBADC8BE034",
+      "SnapshotSHA256": "00673856D968F6F64F57BAC179B35A61CFB44CA12E6ACB0BA6B76CBADC8BE034",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/EntryConstruction/snapshots/verified/Current-Name.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/EntryConstruction/snapshots/verified/Current-Zip.cs",
+      "OriginalBytes": 889,
+      "OriginalSHA256": "C175BA8F62AD9167F8CB241E99F1D92EE401FCE19B814E37F81E8AD8D7FB2787",
+      "SnapshotSHA256": "C175BA8F62AD9167F8CB241E99F1D92EE401FCE19B814E37F81E8AD8D7FB2787",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/EntryConstruction/snapshots/verified/Current-Zip.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/EntryConstruction/snapshots/verified/Original-Classification.cs",
+      "OriginalBytes": 721,
+      "OriginalSHA256": "3FBF451905130624881994952ADDAEE41B1600FAD09C38F9407874CF6E490939",
+      "SnapshotSHA256": "3FBF451905130624881994952ADDAEE41B1600FAD09C38F9407874CF6E490939",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/EntryConstruction/snapshots/verified/Original-Classification.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/EntryConstruction/snapshots/verified/Original-Extensions.cs",
+      "OriginalBytes": 15903,
+      "OriginalSHA256": "4E9D21833120492B1756157EDE499351C41E4CF042935FB3AEBA3CD1C36A308D",
+      "SnapshotSHA256": "4E9D21833120492B1756157EDE499351C41E4CF042935FB3AEBA3CD1C36A308D",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/EntryConstruction/snapshots/verified/Original-Extensions.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/EntryConstruction/snapshots/verified/Original-Name.cs",
+      "OriginalBytes": 816,
+      "OriginalSHA256": "901E4CCC5E31E09ECC3DF5A1E0547F026ED617517FD36C15215F362C6406B628",
+      "SnapshotSHA256": "901E4CCC5E31E09ECC3DF5A1E0547F026ED617517FD36C15215F362C6406B628",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/EntryConstruction/snapshots/verified/Original-Name.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/EntryConstruction/snapshots/verified/Original-Zip.cs",
+      "OriginalBytes": 891,
+      "OriginalSHA256": "5EF9362DB8E71B52374F62F460CB5EA07C4C2C8B86CD096A55355E2A6A7ACA67",
+      "SnapshotSHA256": "5EF9362DB8E71B52374F62F460CB5EA07C4C2C8B86CD096A55355E2A6A7ACA67",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/EntryConstruction/snapshots/verified/Original-Zip.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/EntryConstruction/snapshots/verified/source-metadata.json",
+      "OriginalBytes": 2259,
+      "OriginalSHA256": "B866352A7C4451D1F0494242E1B485B5542B545F4BC855CDE2636E435B7D0BB9",
+      "SnapshotSHA256": "B866352A7C4451D1F0494242E1B485B5542B545F4BC855CDE2636E435B7D0BB9",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/EntryConstruction/snapshots/verified/source-metadata.json"
+    },
+    {
+      "WorkspacePath": "tests-extra/Phase3Navigation/EnumerationStubs.cs",
+      "OriginalBytes": 10299,
+      "OriginalSHA256": "ACC0FAE315713EE0DD88A10AA3C66B7482C3347FC03088DB8DF8D939487DA616",
+      "SnapshotSHA256": "ACC0FAE315713EE0DD88A10AA3C66B7482C3347FC03088DB8DF8D939487DA616",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Phase3Navigation/EnumerationStubs.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "OriginalBytes": 1688,
+      "OriginalSHA256": "692FA34F9A38A2F92E7D08D0E1F8918FB6BEA985F97E37C9EF82D2E201D290D2",
+      "SnapshotSHA256": "692FA34F9A38A2F92E7D08D0E1F8918FB6BEA985F97E37C9EF82D2E201D290D2",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Phase3Navigation/NavigationContracts.csproj"
+    },
+    {
+      "WorkspacePath": "tests-extra/Phase3Navigation/Prepare-ShellContracts.ps1",
+      "OriginalBytes": 2060,
+      "OriginalSHA256": "142C3D38183596BE9465C291CF4E206622A885D39791A8C02AABE0222FDBA2D5",
+      "SnapshotSHA256": "142C3D38183596BE9465C291CF4E206622A885D39791A8C02AABE0222FDBA2D5",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Phase3Navigation/Prepare-ShellContracts.ps1"
+    },
+    {
+      "WorkspacePath": "tests-extra/Phase3Navigation/Program.cs",
+      "OriginalBytes": 19012,
+      "OriginalSHA256": "CAB8303A8ED4F4D7D42668B34B366DB3FB88F62E57137CA61CAD08A2CF71CA6B",
+      "SnapshotSHA256": "CAB8303A8ED4F4D7D42668B34B366DB3FB88F62E57137CA61CAD08A2CF71CA6B",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Phase3Navigation/Program.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/Phase3Navigation/ShellCore.generated.cs",
+      "OriginalBytes": 17425,
+      "OriginalSHA256": "C018625B6E6559D0979F92755CF2134954ECE2350EA19D478319F220C9BFCD13",
+      "SnapshotSHA256": "C018625B6E6559D0979F92755CF2134954ECE2350EA19D478319F220C9BFCD13",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Phase3Navigation/ShellCore.generated.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/Phase3Navigation/ShellStubs.cs",
+      "OriginalBytes": 8978,
+      "OriginalSHA256": "1EDE616B11CFF52D7BD5B3191B45AC54F41A97538E81B7E04CFD9F6E68AAEAD6",
+      "SnapshotSHA256": "1EDE616B11CFF52D7BD5B3191B45AC54F41A97538E81B7E04CFD9F6E68AAEAD6",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Phase3Navigation/ShellStubs.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/Phase3Navigation/source-hash.txt",
+      "OriginalBytes": 66,
+      "OriginalSHA256": "0F68CCB030725B22957458F21D10399CDA26B64096DE65B91518D079783C33C2",
+      "SnapshotSHA256": "0F68CCB030725B22957458F21D10399CDA26B64096DE65B91518D079783C33C2",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Phase3Navigation/source-hash.txt"
+    },
+    {
+      "WorkspacePath": "tests-extra/Viewport/Program.cs",
+      "OriginalBytes": 13867,
+      "OriginalSHA256": "9B0889B9753E9C1C08EAD85EC3D28DC91ECAFA1CD8437B6A0A5EDFB4CB883E4F",
+      "SnapshotSHA256": "9B0889B9753E9C1C08EAD85EC3D28DC91ECAFA1CD8437B6A0A5EDFB4CB883E4F",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Viewport/Program.cs"
+    },
+    {
+      "WorkspacePath": "tests-extra/Viewport/ViewportContracts.csproj",
+      "OriginalBytes": 399,
+      "OriginalSHA256": "7101511073D08326CC38A654494785DEF916F67B28D720F445F07458A202FCF4",
+      "SnapshotSHA256": "7101511073D08326CC38A654494785DEF916F67B28D720F445F07458A202FCF4",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tests-extra/Viewport/ViewportContracts.csproj"
+    },
+    {
+      "WorkspacePath": "tooling/Build-FilesTurbo.ps1",
+      "OriginalBytes": 2473,
+      "OriginalSHA256": "4119A3A2B7B397C677A48E4E12EEB5A5CFFA3A9E198411131438FDB806013E6C",
+      "SnapshotSHA256": "4119A3A2B7B397C677A48E4E12EEB5A5CFFA3A9E198411131438FDB806013E6C",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Build-FilesTurbo.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/Build-NativeHelpers.ps1",
+      "OriginalBytes": 6621,
+      "OriginalSHA256": "95480AD3B7E5C3AE0572E407B993A87916CE2BE5EFEAC251CD2A17C1F789C9FE",
+      "SnapshotSHA256": "95480AD3B7E5C3AE0572E407B993A87916CE2BE5EFEAC251CD2A17C1F789C9FE",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Build-NativeHelpers.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/Complete-DevelopmentPackage.ps1",
+      "OriginalBytes": 19283,
+      "OriginalSHA256": "55ABEE21056331736D399D51ECBC45945ED2586689A9679F0B1B19072DB8286D",
+      "SnapshotSHA256": "55ABEE21056331736D399D51ECBC45945ED2586689A9679F0B1B19072DB8286D",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Complete-DevelopmentPackage.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/Enter-WorkspaceEnvironment.ps1",
+      "OriginalBytes": 922,
+      "OriginalSHA256": "2AEE379EE982110F0465546353E6784D4723AE4C23FC2F9AD82489A4387D9A3E",
+      "SnapshotSHA256": "2AEE379EE982110F0465546353E6784D4723AE4C23FC2F9AD82489A4387D9A3E",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Enter-WorkspaceEnvironment.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/Install-LocalSdk.ps1",
+      "OriginalBytes": 1664,
+      "OriginalSHA256": "DB5C33312AC3D5F4D8C69428DE35655DC94AB6BE1C0E48CBA6C4666FEC5E52E2",
+      "SnapshotSHA256": "DB5C33312AC3D5F4D8C69428DE35655DC94AB6BE1C0E48CBA6C4666FEC5E52E2",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Install-LocalSdk.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/New-SyntheticDataset.ps1",
+      "OriginalBytes": 7772,
+      "OriginalSHA256": "E32F28F5CB107E04403DB10B512D9FB9556DD0F8B8460E5C1A0752B60C42D894",
+      "SnapshotSHA256": "E32F28F5CB107E04403DB10B512D9FB9556DD0F8B8460E5C1A0752B60C42D894",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/New-SyntheticDataset.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/New-ThumbnailFixtures.ps1",
+      "OriginalBytes": 2810,
+      "OriginalSHA256": "38E0C63A738CA313F82DFFA223A986480EB3C661309C7E910A0C7921924FB28B",
+      "SnapshotSHA256": "38E0C63A738CA313F82DFFA223A986480EB3C661309C7E910A0C7921924FB28B",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/New-ThumbnailFixtures.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/Run-SearchBenchmarks.ps1",
+      "OriginalBytes": 4080,
+      "OriginalSHA256": "75103571F6A4BE87E8A22239F8D7468AE54BA3CE6C91F8118A6C58E672DDCA80",
+      "SnapshotSHA256": "75103571F6A4BE87E8A22239F8D7468AE54BA3CE6C91F8118A6C58E672DDCA80",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Run-SearchBenchmarks.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/Measure-Phase3ManualSession.ps1",
+      "OriginalBytes": 5841,
+      "OriginalSHA256": "E8513DC0B9445BE027305BC5289821C4460D122F7947E5F96FDD9DE41FCC236E",
+      "SnapshotSHA256": "E8513DC0B9445BE027305BC5289821C4460D122F7947E5F96FDD9DE41FCC236E",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Measure-Phase3ManualSession.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/Measure-Phase3UiSession.ps1",
+      "OriginalBytes": 28642,
+      "OriginalSHA256": "6B7D9BAB1BB4FEA1AF6FCE7063C967A0A8BDD83B1AE889D066FC06E8C57B51A8",
+      "SnapshotSHA256": "6B7D9BAB1BB4FEA1AF6FCE7063C967A0A8BDD83B1AE889D066FC06E8C57B51A8",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Measure-Phase3UiSession.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/Register-Phase3Experimental.ps1",
+      "OriginalBytes": 3267,
+      "OriginalSHA256": "70BE8A117CC1D168D6CB27177D48A0314673063F7FDF6C9911163524273290A7",
+      "SnapshotSHA256": "3AC285284821B3949BFF495C4295CD0D06538AE3C4C10A63F1BB608BE03861DC",
+      "OriginalLineEndings": "LF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Register-Phase3Experimental.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/Run-Phase3SearchBenchmarks.ps1",
+      "OriginalBytes": 3904,
+      "OriginalSHA256": "F22DA88D336F3C2BFB7DDB45DFB2C1369ADD12748F828D2DD4DA6FDD5FFC4878",
+      "SnapshotSHA256": "F22DA88D336F3C2BFB7DDB45DFB2C1369ADD12748F828D2DD4DA6FDD5FFC4878",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Run-Phase3SearchBenchmarks.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/Summarize-Phase3Measurements.ps1",
+      "OriginalBytes": 15321,
+      "OriginalSHA256": "0CE7A63B3201953A5A272B074B8EC44BB8EE821B60CA8D6F1919D71467A24EE7",
+      "SnapshotSHA256": "0CE7A63B3201953A5A272B074B8EC44BB8EE821B60CA8D6F1919D71467A24EE7",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Summarize-Phase3Measurements.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/Test-Phase3BuildProvenance.ps1",
+      "OriginalBytes": 9293,
+      "OriginalSHA256": "8DADCDC8D2BE6EFF6FCBFF24AA0312D013FA833E4FCF2A2D1A809BE66AB706E3",
+      "SnapshotSHA256": "8DADCDC8D2BE6EFF6FCBFF24AA0312D013FA833E4FCF2A2D1A809BE66AB706E3",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Test-Phase3BuildProvenance.ps1"
+    },
+    {
+      "WorkspacePath": "tooling/Verify-Phase3Result.ps1",
+      "OriginalBytes": 19159,
+      "OriginalSHA256": "A662DA145DC338B7BB822B340C7AF32A903B94B2738FA5026B1A9B801A2D6D52",
+      "SnapshotSHA256": "A662DA145DC338B7BB822B340C7AF32A903B94B2738FA5026B1A9B801A2D6D52",
+      "OriginalLineEndings": "CRLF",
+      "UTF8BOM": false,
+      "SnapshotPath": "history/capture-20261011-142206-2571386/tooling/Verify-Phase3Result.ps1"
+    }
+  ]
+}

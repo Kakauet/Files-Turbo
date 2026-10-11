@@ -1,0 +1,13 @@
+{
+  "RecordedUtc": "2026-10-11T14:52:49.1577330Z",
+  "Identity": "FilesTurbo.Experimental_4.2.39.4_x64__ykqwq8d6ps0ag",
+  "ExactOwnInstances": 1,
+  "ProcessIds": [
+    5628
+  ],
+  "ConfigPresent": false,
+  "Path": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\artifacts\\development-layout\\managed-release-phase3-stable06\\layout\\Files.exe",
+  "StartedUtc": "2026-10-11T14:52:04.8031462Z",
+  "NormalUseDiagnosticsDisabled": true,
+  "LaunchFixtureCount": 1000
+}

@@ -15,6 +15,8 @@ namespace Files.Shared.Helpers
 	/// </summary>
 	public static class FileExtensionHelpers
 	{
+		private static readonly string[] browsableArchiveExtensions = [".zip", ".7z", ".rar", ".tar", ".gz", ".lzh", ".mrpack", ".jar"];
+
 		private static readonly FrozenSet<string> _signableTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
 		{
 			".aab", ".apk", ".application", ".appx", ".appxbundle", ".arx", ".cab", ".cat", ".cbx",
@@ -141,10 +143,16 @@ namespace Files.Shared.Helpers
 			}
 
 			// Only extensions we want to browse
-			ext = new[] { ".zip", ".7z", ".rar", ".tar", ".gz", ".lzh", ".mrpack", ".jar" }
-				.FirstOrDefault(x => filePath.Contains(x, StringComparison.OrdinalIgnoreCase));
-
-			return ext is not null;
+			foreach (var candidate in browsableArchiveExtensions)
+			{
+				if (filePath.Contains(candidate, StringComparison.OrdinalIgnoreCase))
+				{
+					ext = candidate;
+					return true;
+				}
+			}
+			ext = null;
+			return false;
 		}
 
 		/// <summary>

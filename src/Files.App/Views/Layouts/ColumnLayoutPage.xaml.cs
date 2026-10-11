@@ -254,21 +254,8 @@ namespace Files.App.Views.Layouts
 			}
 		}
 
-		private async Task ReloadItemIconsAsync()
-		{
-			if (ParentShellPageInstance is not { } parentShellPage)
-				return;
-			var shellViewModel = parentShellPage.GetRequiredShellViewModel();
-
-			shellViewModel.CancelExtendedPropertiesLoading();
-			var filesAndFolders = shellViewModel.FilesAndFolders.ToList();
-			foreach (ListedItem listedItem in filesAndFolders)
-			{
-				listedItem.ItemPropertiesInitialized = false;
-				if (FileList.ContainerFromItem(listedItem) is not null)
-					await shellViewModel.LoadExtendedItemPropertiesAsync(listedItem);
-			}
-		}
+		private Task ReloadItemIconsAsync()
+			=> ReloadRealizedItemPropertiesAsync();
 
 		override public void StartRenameItem()
 		{

@@ -467,24 +467,24 @@ namespace Files.App.Views.Shells
 				await DisplayFilesystemConsentDialogAsync();
 		}
 
-		private volatile CancellationTokenSource? cts;
+		private long pathUiRevision;
 
 		// Ensure that the path bar gets updated for user interaction
 		// whenever the path changes.We will get the individual directories from
 		// the updated, most-current path and add them to the UI.
 		public async Task UpdatePathUIToWorkingDirectoryAsync(string? newWorkingDir, string? singleItemOverride = null)
 		{
+			var revision = Interlocked.Increment(ref pathUiRevision);
+			if (isDisposed)
+				return;
 			if (string.IsNullOrWhiteSpace(singleItemOverride))
 			{
 				if (newWorkingDir is null)
 					throw new InvalidOperationException("The working directory is not available for the path bar.");
 
-				cts = new CancellationTokenSource();
-
 				var components = await StorageFileExtensions.GetDirectoryPathComponentsWithDisplayNameAsync(newWorkingDir);
 
-				// Cancel if overrided by single item
-				if (cts.IsCancellationRequested)
+				if (isDisposed || revision != pathUiRevision)
 					return;
 
 				// Guard against a rare race where a native CollectionChanged subscriber (e.g. the
@@ -493,7 +493,11 @@ namespace Files.App.Views.Shells
 				{
 					ToolbarViewModel.PathComponents.Clear();
 					foreach (var component in components)
+					{
+						if (isDisposed || revision != pathUiRevision)
+							return;
 						ToolbarViewModel.PathComponents.Add(component);
+					}
 				}
 				catch (NullReferenceException)
 				{
@@ -501,13 +505,15 @@ namespace Files.App.Views.Shells
 			}
 			else
 			{
-				cts?.Cancel();
-
 				try
 				{
 					// Clear the path UI
 					ToolbarViewModel.PathComponents.Clear();
+					if (isDisposed || revision != pathUiRevision)
+						return;
 					ToolbarViewModel.IsSingleItemOverride = true;
+					if (isDisposed || revision != pathUiRevision)
+						return;
 					ToolbarViewModel.PathComponents.Add(
 						new()
 						{

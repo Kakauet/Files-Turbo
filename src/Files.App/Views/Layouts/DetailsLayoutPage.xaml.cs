@@ -194,6 +194,7 @@ namespace Files.App.Views.Layouts
 			}
 
 			shellViewModel.EnabledGitProperties = GetEnabledGitProperties(ColumnsViewModel);
+			LoadVisibleItemsAfterScrollSettled();
 
 			folderSettings.LayoutModeChangeRequested += FolderSettings_LayoutModeChangeRequested;
 			folderSettings.SortDirectionPreferenceUpdated += FolderSettings_SortDirectionPreferenceUpdated;
@@ -619,35 +620,8 @@ namespace Files.App.Views.Layouts
 		protected override bool CanGetItemFromElement(object element)
 			=> element is ListViewItem;
 
-		private async Task ReloadItemIconsAsync()
-		{
-			if (ParentShellPageInstance is not { } parentShellPage)
-				return;
-			var shellViewModel = parentShellPage.GetRequiredShellViewModel();
-
-			shellViewModel.CancelExtendedPropertiesLoading();
-			var filesAndFolders = shellViewModel.FilesAndFolders.ToList();
-
-			await Task.WhenAll(filesAndFolders.Select(listedItem =>
-			{
-				listedItem.ItemPropertiesInitialized = false;
-				if (FileList.ContainerFromItem(listedItem) is not null)
-					return shellViewModel.LoadExtendedItemPropertiesAsync(listedItem);
-				else
-					return Task.CompletedTask;
-			}));
-
-			if (shellViewModel.EnabledGitProperties is not GitProperties.None)
-			{
-				await Task.WhenAll(filesAndFolders.Select(item =>
-				{
-					if (item is IGitItem gitItem)
-						return shellViewModel.LoadGitPropertiesAsync(gitItem);
-
-					return Task.CompletedTask;
-				}));
-			}
-		}
+		private Task ReloadItemIconsAsync()
+			=> ReloadRealizedItemPropertiesAsync();
 
 		[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
 		[DynamicWindowsRuntimeCast(typeof(ListViewItem))]
@@ -858,6 +832,7 @@ namespace Files.App.Views.Layouts
 			folderSettings.ColumnsViewModel = ColumnsViewModel;
 			var shellViewModel = ParentShellPageInstance.GetRequiredShellViewModel();
 			shellViewModel.EnabledGitProperties = GetEnabledGitProperties(ColumnsViewModel);
+			LoadVisibleItemsAfterScrollSettled();
 		}
 
 		private void GridSplitter_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)

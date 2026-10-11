@@ -332,7 +332,7 @@ namespace Files.App.Views.Shells
 			}
 			else
 			{
-				if ((string.IsNullOrEmpty(navigationPath) ||
+				if (!shellViewModel.IsWorkingDirectoryUpdatePending && (string.IsNullOrEmpty(navigationPath) ||
 					string.IsNullOrEmpty(shellViewModel.WorkingDirectory) ||
 					navigationPath.TrimEnd(Path.DirectorySeparatorChar).Equals(
 						shellViewModel.WorkingDirectory.TrimEnd(Path.DirectorySeparatorChar),

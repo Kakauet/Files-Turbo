@@ -11,13 +11,17 @@ namespace Files.App.Data.Models
 {
 	public sealed partial class SuggestionModel : ObservableObject, IOmnibarTextMemberPathProvider
 	{
+		internal long PerformanceOperationId { get; set; }
+
 		public bool IsRecentSearch { get; set; } = false;
 
 		public bool IsShortcut { get; set; } = false;
 
-		public bool LoadFileIcon { get; set; } = false;
+		[ObservableProperty]
+		public partial bool LoadFileIcon { get; set; }
 
-		public bool NeedsPlaceholderGlyph { get; set; } = true;
+		[ObservableProperty]
+		public partial bool NeedsPlaceholderGlyph { get; set; } = true;
 
 		public string? ItemPath { get; set; }
 

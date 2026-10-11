@@ -240,10 +240,10 @@ namespace Files.App.Utils
 		{
 			get
 			{
-				if (PrimaryItemAttribute == StorageItemTypes.File)
+				if (PrimaryItemAttribute == StorageItemTypes.File && !UserSettingsService.FoldersSettingsService.ShowFileExtensions)
 				{
 					var nameWithoutExtension = Path.GetFileNameWithoutExtension(itemNameRaw);
-					if (!string.IsNullOrEmpty(nameWithoutExtension) && !UserSettingsService.FoldersSettingsService.ShowFileExtensions)
+					if (!string.IsNullOrEmpty(nameWithoutExtension))
 					{
 						return nameWithoutExtension;
 					}

@@ -92,7 +92,7 @@ namespace Files.App.Utils.Storage
 			}
 		}
 
-		public async Task SearchAsync(IList<ListedItem> results, CancellationToken token)
+		public async Task SearchAsync(IList<ListedItem> results, CancellationToken token, bool loadSuggestionIcons = true)
 		{
 			HasIncompleteResults = false;
 			try
@@ -122,9 +122,9 @@ namespace Files.App.Utils.Storage
 
 			try
 			{
-				if (MaxItemCount > 0)
+				if (MaxItemCount > 0 && loadSuggestionIcons)
 					await LoadSuggestionIconsAsync(results, token);
-				else
+				else if (MaxItemCount == 0)
 					await ResolveShortcutTargetsAsync(token);
 			}
 			catch (OperationCanceledException)
@@ -186,7 +186,8 @@ namespace Files.App.Utils.Storage
 				return;
 
 			results.Add(item);
-			pendingResults.Add(item);
+			if (SearchTick is not null)
+				pendingResults.Add(item);
 			if (item is ShortcutItem shortcutItem)
 				shortcutResults.Add(shortcutItem);
 
@@ -223,8 +224,12 @@ namespace Files.App.Utils.Storage
 
 			while (items.Count > 0)
 			{
+				var processedCount = 0;
 				foreach (IStorageItem item in items)
 				{
+					if (++processedCount % 32 == 0)
+						await Task.Yield();
+
 					if (token.IsCancellationRequested)
 					{
 						return;
@@ -232,6 +237,10 @@ namespace Files.App.Utils.Storage
 
 					try
 					{
+						if (nameExpression is not null && item.IsOfType(StorageItemTypes.File)
+							&& !FileSystemName.MatchesWin32Expression(nameExpression, item.Name))
+							continue;
+
 						if (!item.Name.StartsWith('.') || UserSettingsService.FoldersSettingsService.ShowDotFiles)
 						{
 							var listedItem = await GetListedItemAsync(item);
@@ -290,7 +299,7 @@ namespace Files.App.Utils.Storage
 			});
 		}
 
-		private Task LoadSuggestionIconsAsync(IList<ListedItem> results, CancellationToken token)
+		internal Task LoadSuggestionIconsAsync(IEnumerable<ListedItem> results, CancellationToken token, Action<ListedItem>? onIconLoaded = null)
 		{
 			return Task.WhenAll(results.Where(x => x.FileImage is null).Select(async item =>
 			{
@@ -310,7 +319,10 @@ namespace Files.App.Utils.Storage
 						return;
 
 					if (await iconResult.ToBitmapAsync() is { } bitmapImage && !token.IsCancellationRequested)
+					{
 						item.FileImage = bitmapImage;
+						onIconLoaded?.Invoke(item);
+					}
 				});
 			}));
 		}
@@ -508,6 +520,7 @@ namespace Files.App.Utils.Storage
 
 		private async Task AddItemsAsync(string folder, IList<ListedItem> results, CancellationToken token)
 		{
+			token.ThrowIfCancellationRequested();
 			resultRoot = folder;
 			if (IsTagQuery(AQSQuery))
 			{
@@ -515,7 +528,8 @@ namespace Files.App.Utils.Storage
 			}
 			else
 			{
-				var workingFolder = await GetStorageFolderAsync(folder);
+				var workingFolder = await GetStorageFolderAsync(folder).WaitAsync(token);
+				token.ThrowIfCancellationRequested();
 				var storageFolder = workingFolder ? workingFolder.Result : null;
 				if (storageFolder is SystemStorageFolder && !string.IsNullOrEmpty(storageFolder.Path))
 					resultRoot = folder = storageFolder.Path;
@@ -528,7 +542,7 @@ namespace Files.App.Utils.Storage
 					return;
 				}
 
-				if (storageFolder is SystemStorageFolder && !DriveHelpers.IsMtpPath(folder) && !await IsFullyIndexedAsync(storageFolder))
+				if (storageFolder is SystemStorageFolder && !DriveHelpers.IsMtpPath(folder) && !await IsFullyIndexedAsync(storageFolder, token))
 				{
 					await SearchWithWin32Async(folder, false, results, token);
 					return;
@@ -544,13 +558,13 @@ namespace Files.App.Utils.Storage
 			}
 		}
 
-		private static async Task<bool> IsFullyIndexedAsync(BaseStorageFolder folder)
+		private static async Task<bool> IsFullyIndexedAsync(BaseStorageFolder folder, CancellationToken token)
 		{
 			try
 			{
-				return await folder.GetIndexedStateAsync() == IndexedState.FullyIndexed;
+				return await folder.GetIndexedStateAsync().AsTask(token) == IndexedState.FullyIndexed;
 			}
-			catch (Exception)
+			catch (Exception) when (!token.IsCancellationRequested)
 			{
 				return false;
 			}
@@ -951,9 +965,9 @@ namespace Files.App.Utils.Storage
 						ItemOriginalPath = binFile.OriginalPath
 					};
 				}
-				else if (FileExtensionHelpers.IsShortcutOrUrlFile(file.Path))
+				else if (IsShortcutName(file.Name))
 				{
-					var isUrl = FileExtensionHelpers.IsWebLinkFile(file.Path);
+					var isUrl = file.Name.EndsWith(".url", StringComparison.OrdinalIgnoreCase);
 					var shortcutItem = new ShortcutItem(null)
 					{
 						PrimaryItemAttribute = StorageItemTypes.File,

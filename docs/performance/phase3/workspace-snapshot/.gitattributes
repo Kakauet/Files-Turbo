@@ -1,0 +1,3 @@
+# Archived historical and verbatim evidence: preserve exact bytes and SHA256s.
+# Keep historical trailing spaces; application source attributes are unchanged.
+* -text whitespace=cr-at-eol,-blank-at-eol

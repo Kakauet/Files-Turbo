@@ -1,0 +1,12 @@
+{
+  "TraceSource": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\results\\phase3\\manual-20261011-144717-025b2d24",
+  "ProcessId": 28748,
+  "UtcAnchor": "2026-10-11T14:46:35.4201784Z",
+  "AnchorSampleDurationMs": 0.002,
+  "Rows": 8,
+  "MatchedRows": 8,
+  "Scope": "Exactly one actual navigation Requested operation of the matching final published count inside each observed setter-to-provider-completion UTC interval; ambiguous/unmatched rows remain explicit.",
+  "RequestedUtcInterpretation": "Operation origin reconstructed as SessionMs minus ElapsedMs for the Requested marker; RequestedMarkerUtc retains the marker timestamp. Relative phase times share the operation origin.",
+  "SetterToRequestedInterpretation": "Includes toolbar path/root validation and working-directory/Git work before the enumeration operation begins; UTC clock uncertainty applies.",
+  "PhysicalPresentationMeasured": false
+}
