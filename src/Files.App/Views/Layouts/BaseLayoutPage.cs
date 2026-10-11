@@ -1672,7 +1672,6 @@ namespace Files.App.Views.Layouts
 
 		private void RefreshContainer(SelectorItem container, bool inRecycleQueue)
 		{
-			container.Loaded -= FileListItem_Loaded;
 			container.PointerPressed -= FileListItem_PointerPressed;
 			container.PointerEntered -= FileListItem_PointerEntered;
 			container.PointerExited -= FileListItem_PointerExited;
@@ -1686,7 +1685,6 @@ namespace Files.App.Views.Layouts
 			}
 			else
 			{
-				container.Loaded += FileListItem_Loaded;
 				container.PointerPressed += FileListItem_PointerPressed;
 				container.PointerEntered += FileListItem_PointerEntered;
 				container.PointerExited += FileListItem_PointerExited;
@@ -1727,7 +1725,6 @@ namespace Files.App.Views.Layouts
 							"ViewportWorkRequested", realizedItems.Count, value: args.ItemIndex);
 					RefillVisibleItemWork();
 				}
-				UpdateItemToolTip(container, listedItem.ItemTooltipText);
 				InitializeDrag(container, listedItem);
 
 				if (NeedsDeferredProperties(listedItem))
@@ -1753,12 +1750,7 @@ namespace Files.App.Views.Layouts
 		[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
 		private static void UpdateItemToolTip(SelectorItem container, string? tooltipText)
 		{
-			// Apply the tooltip to both the container and the realized template root so every layout
-			// gets the same behavior, even when the DataTemplate is wrapped in a UserControl.
 			UpdateItemToolTip(container as FrameworkElement, tooltipText);
-
-			if (container.ContentTemplateRoot is FrameworkElement contentTemplateRoot)
-				UpdateItemToolTip(contentTemplateRoot, tooltipText);
 		}
 
 		private static void UpdateItemToolTip(FrameworkElement? target, string? tooltipText)
@@ -1768,14 +1760,6 @@ namespace Files.App.Views.Layouts
 
 			ToolTipService.SetToolTip(target, tooltipText);
 			target.SetValue(ToolTipService.PlacementProperty, PlacementMode.Mouse);
-		}
-
-		[DynamicWindowsRuntimeCast(typeof(SelectorItem))]
-		private void FileListItem_Loaded(object sender, RoutedEventArgs e)
-		{
-			// Set the initial tooltip before hover starts so WinUI doesn't miss the first dwell.
-			if (sender is SelectorItem container && container.Content is ListedItem listedItem)
-				UpdateItemToolTip(container, listedItem.ItemTooltipText);
 		}
 
 		[DynamicWindowsRuntimeCast(typeof(SelectorItem))]
