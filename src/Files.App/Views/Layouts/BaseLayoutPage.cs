@@ -1365,16 +1365,13 @@ namespace Files.App.Views.Layouts
 					}
 				}
 			}
-			else if (ItemsControl.ItemsPanelRoot is { } panel)
+			else
 			{
-				// Without a visible range every realized row loads
-				foreach (var child in panel.Children)
+				// A missing visible range must not restore XAML's realization order.
+				foreach (var (container, item) in realizedItems.OrderBy(pair => ItemsControl.IndexFromContainer(pair.Key)))
 				{
-					if (child is SelectorItem { Content: ListedItem item } container && NeedsDeferredProperties(item))
-					{
-						realizedItems.TryAdd(container, item);
+					if (ItemsControl.IndexFromContainer(container) >= 0 && IsCurrentContainer(container, item) && NeedsDeferredProperties(item))
 						QueueItemProperties(container, item, shellViewModel);
-					}
 				}
 			}
 		}
@@ -1496,7 +1493,7 @@ namespace Files.App.Views.Layouts
 
 		private void RefillVisibleItemWork()
 		{
-			if (isDisposed || viewportRefillQueued || viewportWork?.PendingCount != 0 ||
+			if (isDisposed || viewportRefillQueued || viewportWork is { PendingCount: > 0 } ||
 				ParentShellPageInstance?.ShellViewModel is not { IsScrollInFlight: false })
 				return;
 			viewportRefillQueued = true;
@@ -1654,11 +1651,7 @@ namespace Files.App.Views.Layouts
 						if (shellViewModel.IsScrollInFlight)
 							return;
 
-						var (first, last) = GetVisibleIndexRange();
-						if (first >= 0 && last >= first)
-							RefillVisibleItemWork();
-						else
-							QueueItemProperties(container, listedItem, shellViewModel, c.ItemIndex);
+						RefillVisibleItemWork();
 					});
 				}
 			}
