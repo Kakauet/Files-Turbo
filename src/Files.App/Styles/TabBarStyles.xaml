@@ -492,6 +492,7 @@
 								<VisualState x:Name="NotLoading" />
 								<VisualState x:Name="Loading">
 									<VisualState.Setters>
+										<Setter Target="LoadingIndicator.IsActive" Value="True" />
 										<Setter Target="LoadingIndicator.Visibility" Value="Visible" />
 										<Setter Target="LoadingIndicator.IsActive" Value="True" />
 										<Setter Target="IconBox.Visibility" Value="Collapsed" />
