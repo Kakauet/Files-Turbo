@@ -1173,12 +1173,8 @@ namespace Files.App.ViewModels
 			var performanceOperation = PerformanceOperationId;
 			try
 			{
-				// CollectionChanged will cause UI update, which may cause significant performance degradation,
-				// so suppress CollectionChanged event here while loading items heavily.
-
-				// Note that both DataGrid and GridView don't support multi-items changes notification, so here
-				// we have to call BeginBulkOperation to suppress CollectionChanged and call EndBulkOperation
-				// in the end to fire a CollectionChanged event with NotifyCollectionChangedAction.Reset
+				// Preserve realized rows for unchanged snapshots and ungrouped tail additions.
+				// Replacements, removals, reordering and grouped changes retain one bulk Reset.
 				await bulkOperationSemaphore.WaitAsync(token);
 
 				var filter = FilesAndFoldersFilter;
@@ -1205,20 +1201,23 @@ namespace Files.App.ViewModels
 							pendingSearchResults.Clear();
 							AppMemoryHelper.NotifyActivity();
 
-							FilesAndFolders.BeginBulkOperation();
-							try
+							if (!TryPublishFilesAndFoldersWithoutReset(displayedFilesAndFolders, performanceOperation))
 							{
-								FilesAndFolders.Clear();
-								FilesAndFolders.AddRange(displayedFilesAndFolders);
+								FilesAndFolders.BeginBulkOperation();
+								try
+								{
+									FilesAndFolders.Clear();
+									FilesAndFolders.AddRange(displayedFilesAndFolders);
 
-								if (folderSettings.DirectoryGroupOption != GroupOption.None)
-									OrderGroups();
-							}
-							finally
-							{
-								// Trigger CollectionChanged with NotifyCollectionChangedAction.Reset
-								// once loading is completed so that UI can be updated
-								FilesAndFolders.EndBulkOperation();
+									if (folderSettings.DirectoryGroupOption != GroupOption.None)
+										OrderGroups();
+								}
+								finally
+								{
+									FilesAndFolders.EndBulkOperation();
+								}
+								if (UiPerformanceTrace.IsEnabled)
+									UiPerformanceTrace.Mark(performanceOperation, "DataPublicationReset", FilesAndFolders.Count);
 							}
 
 							UpdateEmptyTextType();
@@ -1251,6 +1250,37 @@ namespace Files.App.ViewModels
 				if (ex is not (OperationCanceledException or ObjectDisposedException))
 					App.Logger.LogWarning(ex, ex.Message);
 			}
+		}
+
+		private bool TryPublishFilesAndFoldersWithoutReset(List<ListedItem> displayedFilesAndFolders, long performanceOperation)
+		{
+			if (FilesAndFolders.IsGrouped || folderSettings.DirectoryGroupOption != GroupOption.None)
+				return false;
+			var currentCount = FilesAndFolders.Count;
+			if (currentCount > displayedFilesAndFolders.Count)
+				return false;
+			for (var index = 0; index < currentCount; index++)
+				if (!ReferenceEquals(FilesAndFolders[index], displayedFilesAndFolders[index]))
+					return false;
+
+			if (currentCount == displayedFilesAndFolders.Count)
+			{
+				if (UiPerformanceTrace.IsEnabled)
+					UiPerformanceTrace.Mark(performanceOperation, "DataPublicationUnchanged", currentCount);
+				return true;
+			}
+			if (currentCount == 0)
+				return false;
+
+			var appendedCount = displayedFilesAndFolders.Count - currentCount;
+			// WinUI requires individual Add events; bound the event burst before falling back to Reset.
+			if (appendedCount > 128)
+				return false;
+			for (var index = currentCount; index < displayedFilesAndFolders.Count; index++)
+				FilesAndFolders.Add(displayedFilesAndFolders[index]);
+			if (UiPerformanceTrace.IsEnabled)
+				UiPerformanceTrace.Mark(performanceOperation, "DataPublicationAppended", FilesAndFolders.Count, value: appendedCount);
+			return true;
 		}
 
 		private Task RequestSelectionAsync(List<ListedItem> itemsToSelect)
@@ -1525,7 +1555,7 @@ namespace Files.App.ViewModels
 			var completed = new InitialThumbnailLoadResult(item, LayoutSizeKindHelper.GetIconSize(folderSettings.LayoutMode), token, false, false,
 				item.ItemPath, item.ItemDateModifiedReal, App.AppModel.AppWindowDPI, UserSettingsService.FoldersSettingsService.ShowThumbnails);
 			var initial = item.FileImage is null ? await ApplyCachedThumbnailOrPreloadedIconAsync(item, token) : default;
-			await LoadThumbnailAsync(item, token, awaitBackgroundLoad: true, initialThumbnail: initial);
+			await LoadThumbnailAsync(item, token, awaitBackgroundLoad: true, initialThumbnail: initial, loadOverlay: false);
 			token.ThrowIfCancellationRequested();
 			return completed with { LoadCompleted = true };
 		}
@@ -1562,7 +1592,7 @@ namespace Files.App.ViewModels
 		{
 			var started = UiPerformanceTrace.IsEnabled && performanceOperation != 0 ? Stopwatch.GetTimestamp() : 0;
 			var decodeSize = Math.Max(1, (int)Math.Ceiling(thumbnailSize * App.AppModel.AppWindowDPI));
-			var image = await data.ToBitmapAsync(decodeSize, DecodePixelType.Physical, preserveAspectRatio: true);
+			var image = await data.ToBitmapAsync(decodeSize, DecodePixelType.Physical, preserveAspectRatio: true, useSynchronousSmallThumbnail: true);
 			if (started != 0)
 				UiPerformanceTrace.Mark(performanceOperation, "ThumbnailDecodeCompleted", durationMs: Stopwatch.GetElapsedTime(started).TotalMilliseconds, value: image is null ? 0 : 1);
 			return image;
@@ -1572,7 +1602,7 @@ namespace Files.App.ViewModels
 			=> LayoutSizeKindHelper.GetIconSize(folderSettings.LayoutMode);
 
 		private async Task LoadThumbnailAsync(ListedItem item, CancellationToken cancellationToken, bool scheduleTimerRetry = true, bool awaitBackgroundLoad = false,
-			InitialThumbnailLoadResult initialThumbnail = default)
+			InitialThumbnailLoadResult initialThumbnail = default, bool loadOverlay = true)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 			var generationToken = loadPropsCTS.Token;
@@ -1720,6 +1750,13 @@ namespace Files.App.ViewModels
 					await backgroundLoad;
 			}
 
+			cancellationToken.ThrowIfCancellationRequested();
+			if (loadOverlay)
+				await LoadThumbnailOverlayAsync(item, thumbnailSize, cancellationToken, performanceOperation);
+		}
+
+		private async Task LoadThumbnailOverlayAsync(ListedItem item, uint thumbnailSize, CancellationToken cancellationToken, long performanceOperation)
+		{
 			cancellationToken.ThrowIfCancellationRequested();
 			var iconOverlay = await FileThumbnailHelper.GetIconOverlayAsync(item.ItemPath, thumbnailSize, item.IsFolder, cancellationToken, performanceOperation);
 			cancellationToken.ThrowIfCancellationRequested();
@@ -1881,6 +1918,8 @@ namespace Files.App.ViewModels
 					token.ThrowIfCancellationRequested();
 					if (!initialThumbnail.LoadCompleted || !CanReuseInitialThumbnail(item, token, initialThumbnail))
 						await LoadThumbnailAsync(item, token, initialThumbnail: initialThumbnail);
+					else
+						await LoadThumbnailOverlayAsync(item, initialThumbnail.Size, token, PerformanceOperationId);
 
 					var isItemNetwork = await DriveHelpers.IsNetworkStorageItemAsync(item.GetRequiredPath());
 
