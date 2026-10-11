@@ -25,7 +25,8 @@ namespace Files.App.Utils.Storage
 			uint iconSize,
 			Func<List<ListedItem>, Task> intermediateAction,
 			long performanceOperationId = 0,
-			Task<bool>? repositoryState = null
+			Task<bool>? repositoryState = null,
+			Func<List<Win32PInvoke.WIN32_FIND_DATA>, List<Win32PInvoke.WIN32_FIND_DATA>?>? prepareOrder = null
 		)
 		{
 			var sampler = new IntervalSampler(500);
@@ -48,9 +49,39 @@ namespace Files.App.Utils.Storage
 
 			try
 			{
-				isGitRepo = repositoryState is not null && await repositoryState.WaitAsync(cancellationToken);
-				do
+				var buffered = new List<Win32PInvoke.WIN32_FIND_DATA>();
+				var complete = false;
+				var ordered = false;
+				if (prepareOrder is not null && countLimit < 0)
 				{
+					var scanStarted = Stopwatch.GetTimestamp();
+					do
+					{
+						cancellationToken.ThrowIfCancellationRequested();
+						buffered.Add(findData);
+						if (!Win32PInvoke.FindNextFile(rawHandle, out findData))
+						{
+							complete = true;
+							break;
+						}
+					} while (buffered.Count < 200_000 && Stopwatch.GetElapsedTime(scanStarted).TotalMilliseconds < 150);
+					if (complete)
+					{
+						buffered.RemoveAll(x => x.cFileName is "." or ".." ||
+							(((FileAttributes)x.dwFileAttributes & FileAttributes.Hidden) != 0 &&
+								(!showHiddenItems || !showProtectedSystemFiles && ((FileAttributes)x.dwFileAttributes & FileAttributes.System) != 0)) ||
+							(!showDotFiles && x.cFileName.StartsWith('.')));
+						if (prepareOrder(buffered) is { } sorted)
+						{
+							buffered = sorted;
+							ordered = true;
+						}
+					}
+				}
+				isGitRepo = repositoryState is not null && await repositoryState.WaitAsync(cancellationToken);
+				foreach (var entry in ReadEntries(buffered, complete, rawHandle, findData))
+				{
+					findData = entry;
 					cancellationToken.ThrowIfCancellationRequested();
 					var isSystem = ((FileAttributes)findData.dwFileAttributes & FileAttributes.System) == FileAttributes.System;
 					var isHidden = ((FileAttributes)findData.dwFileAttributes & FileAttributes.Hidden) == FileAttributes.Hidden;
@@ -114,7 +145,7 @@ namespace Files.App.Utils.Storage
 					}
 
 					if (intermediateAction is not null &&
-						(hasFlushedFirstBatch
+						(ordered && buffered.Count > 2_000 ? tempList.Count >= 128 : hasFlushedFirstBatch
 							? sampler.CheckNow()
 							: tempList.Count > 0 && firstBatchSampler.CheckNow()))
 					{
@@ -128,7 +159,7 @@ namespace Files.App.Utils.Storage
 							await intermediateAction(batch).ConfigureAwait(false);
 						}, CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.Default).Unwrap();
 					}
-				} while (Win32PInvoke.FindNextFile(rawHandle, out findData));
+				}
 			}
 			finally
 			{
@@ -138,6 +169,19 @@ namespace Files.App.Utils.Storage
 			await publication.WaitAsync(cancellationToken);
 			cancellationToken.ThrowIfCancellationRequested();
 			return tempList;
+		}
+
+		private static IEnumerable<Win32PInvoke.WIN32_FIND_DATA> ReadEntries(List<Win32PInvoke.WIN32_FIND_DATA> buffered,
+			bool complete, nint handle, Win32PInvoke.WIN32_FIND_DATA first)
+		{
+			foreach (var entry in buffered)
+				yield return entry;
+			if (complete)
+				yield break;
+			do
+			{
+				yield return first;
+			} while (Win32PInvoke.FindNextFile(handle, out first));
 		}
 
 		private static IEnumerable<ListedItem> EnumAdsForPath(string itemPath, ListedItem main)
@@ -193,11 +237,8 @@ namespace Files.App.Utils.Storage
 
 			try
 			{
-				Win32PInvoke.FileTimeToSystemTime(in findData.ftLastWriteTime, out Win32PInvoke.SYSTEMTIME systemModifiedTimeOutput);
-				itemModifiedDate = systemModifiedTimeOutput.ToDateTime();
-
-				Win32PInvoke.FileTimeToSystemTime(in findData.ftCreationTime, out Win32PInvoke.SYSTEMTIME systemCreatedTimeOutput);
-				itemCreatedDate = systemCreatedTimeOutput.ToDateTime();
+				itemModifiedDate = Win32ListingOrder.FromFileTime(findData.ftLastWriteTime);
+				itemCreatedDate = Win32ListingOrder.FromFileTime(findData.ftCreationTime);
 			}
 			catch (ArgumentException)
 			{
@@ -280,14 +321,9 @@ namespace Files.App.Utils.Storage
 
 			try
 			{
-				Win32PInvoke.FileTimeToSystemTime(in findData.ftLastWriteTime, out Win32PInvoke.SYSTEMTIME systemModifiedDateOutput);
-				itemModifiedDate = systemModifiedDateOutput.ToDateTime();
-
-				Win32PInvoke.FileTimeToSystemTime(in findData.ftCreationTime, out Win32PInvoke.SYSTEMTIME systemCreatedDateOutput);
-				itemCreatedDate = systemCreatedDateOutput.ToDateTime();
-
-				Win32PInvoke.FileTimeToSystemTime(in findData.ftLastAccessTime, out Win32PInvoke.SYSTEMTIME systemLastAccessOutput);
-				itemLastAccessDate = systemLastAccessOutput.ToDateTime();
+				itemModifiedDate = Win32ListingOrder.FromFileTime(findData.ftLastWriteTime);
+				itemCreatedDate = Win32ListingOrder.FromFileTime(findData.ftCreationTime);
+				itemLastAccessDate = Win32ListingOrder.FromFileTime(findData.ftLastAccessTime);
 			}
 			catch (ArgumentException)
 			{

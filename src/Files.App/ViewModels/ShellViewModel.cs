@@ -1165,7 +1165,7 @@ namespace Files.App.ViewModels
 			=> string.IsNullOrEmpty(filter) || item.Name?.Contains(filter, StringComparison.OrdinalIgnoreCase) == true;
 
 		// Apply changes immediately after manipulating on filesAndFolders completed
-		public async Task ApplyFilesAndFoldersChangesAsync(CancellationToken cancellationToken = default)
+		public async Task ApplyFilesAndFoldersChangesAsync(CancellationToken cancellationToken = default, bool preserveSortedPrefix = false)
 		{
 			using var applyCTS = CancellationTokenSource.CreateLinkedTokenSource(addFilesCTS.Token, cancellationToken);
 			var token = applyCTS.Token;
@@ -1203,7 +1203,7 @@ namespace Files.App.ViewModels
 							pendingSearchResults.Clear();
 							AppMemoryHelper.NotifyActivity();
 
-							if (!TryPublishFilesAndFoldersWithoutReset(displayedFilesAndFolders, performanceOperation))
+							if (!TryPublishFilesAndFoldersWithoutReset(displayedFilesAndFolders, performanceOperation, preserveSortedPrefix))
 							{
 								FilesAndFolders.BeginBulkOperation();
 								try
@@ -1254,11 +1254,24 @@ namespace Files.App.ViewModels
 			}
 		}
 
-		private bool TryPublishFilesAndFoldersWithoutReset(List<ListedItem> displayedFilesAndFolders, long performanceOperation)
+		private bool TryPublishFilesAndFoldersWithoutReset(List<ListedItem> displayedFilesAndFolders, long performanceOperation, bool preserveSortedPrefix = false)
 		{
 			if (FilesAndFolders.IsGrouped || folderSettings.DirectoryGroupOption != GroupOption.None)
 			{
-				if (!FilesAndFolders.IsGrouped || FilesAndFolders.Count == 0 || Math.Max(FilesAndFolders.Count, displayedFilesAndFolders.Count) > 10_000)
+				if (!FilesAndFolders.IsGrouped || FilesAndFolders.Count == 0)
+					return false;
+				var count = FilesAndFolders.Count;
+				if (preserveSortedPrefix && displayedFilesAndFolders.Count >= count && displayedFilesAndFolders.Count - count <= 128 &&
+					Enumerable.Range(0, count).All(index => ReferenceEquals(FilesAndFolders[index], displayedFilesAndFolders[index])))
+				{
+					for (var index = count; index < displayedFilesAndFolders.Count; index++)
+						FilesAndFolders.Add(displayedFilesAndFolders[index]);
+					foreach (var existingGroup in FilesAndFolders.GroupedCollection!)
+						existingGroup.IsSorted = true;
+					FilesAndFolders.GroupedCollection!.IsSorted = true;
+					return true;
+				}
+				if (Math.Max(count, displayedFilesAndFolders.Count) > 10_000)
 					return false;
 				FilesAndFolders.Reconcile(displayedFilesAndFolders);
 				OrderGroups();
@@ -2536,6 +2549,19 @@ namespace Files.App.ViewModels
 				}
 				else
 				{
+					var sortOption = folderSettings.DirectorySortOption;
+					var sortDirection = folderSettings.DirectorySortDirection;
+					var alongside = folderSettings.SortDirectoriesAlongsideFiles;
+					var filesFirst = folderSettings.SortFilesFirst;
+					var groupOption = folderSettings.DirectoryGroupOption;
+					var groupDirection = folderSettings.DirectoryGroupDirection;
+					var dateUnit = folderSettings.DirectoryGroupByDateUnit;
+					var settings = UserSettingsService.FoldersSettingsService;
+					var showExtensions = settings.ShowFileExtensions;
+					var canPrepareOrder = !DriveHelpers.IsNetworkPath(path) && !settings.CalculateFolderSizes && !settings.AreAlternateStreamsVisible &&
+						sortOption is SortOption.Name or SortOption.DateModified or SortOption.DateCreated or SortOption.Size &&
+						groupOption is GroupOption.None or GroupOption.DateModified or GroupOption.DateCreated;
+					var preparedOrder = false;
 					await Task.Run(async () =>
 					{
 						List<ListedItem> fileList = await Win32StorageEnumerator.ListEntries(path, hFile, findData, cancellationToken, -1, GetPreloadIconSize(), intermediateAction: async (intermediateList) =>
@@ -2547,11 +2573,18 @@ namespace Files.App.ViewModels
 							}
 
 							// The stable sort lands new items in final position without reordering visible ones; capped for huge listings
-							if (filesAndFolders.Count <= 10_000)
+							if (!preparedOrder && filesAndFolders.Count <= 10_000)
 								await OrderFilesAndFoldersAsync(cancellationToken);
 
-							await ApplyFilesAndFoldersChangesAsync(cancellationToken);
-						}, performanceOperationId: PerformanceOperationId, repositoryState: GitRepositoryState);
+							await ApplyFilesAndFoldersChangesAsync(cancellationToken, preparedOrder);
+						}, performanceOperationId: PerformanceOperationId, repositoryState: GitRepositoryState,
+							prepareOrder: canPrepareOrder ? data =>
+							{
+								var sorted = Win32ListingOrder.TryOrder(data, sortOption, sortDirection, alongside, filesFirst,
+									groupOption, groupDirection, dateUnit, showExtensions, cancellationToken);
+								preparedOrder = sorted is not null;
+								return sorted;
+							} : null);
 
 						lock (loadCollectionSync)
 						{
@@ -2559,8 +2592,9 @@ namespace Files.App.ViewModels
 							filesAndFolders.AddRange(fileList);
 						}
 
-						await OrderFilesAndFoldersAsync(cancellationToken);
-						await ApplyFilesAndFoldersChangesAsync(cancellationToken);
+						if (!preparedOrder)
+							await OrderFilesAndFoldersAsync(cancellationToken);
+						await ApplyFilesAndFoldersChangesAsync(cancellationToken, preparedOrder);
 						// Not awaited here: with Low priority these don't run until the UI thread goes idle
 						// after the final list update, which would delay load completion and watcher setup.
 						// The desktop.ini task is awaited before applying the adaptive layout, which reads DesktopIni.
