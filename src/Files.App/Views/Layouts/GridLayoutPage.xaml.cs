@@ -351,29 +351,27 @@ namespace Files.App.Views.Layouts
 				FolderLayoutModes.CardsView => (Style)Resources["HorizontalLayoutGridView"],
 				_ => (Style)Resources["HorizontalLayoutGridView"]
 			};
+			var newTemplate = folderSettings.LayoutMode switch
+			{
+				FolderLayoutModes.ListView => ListViewBrowserTemplate,
+				FolderLayoutModes.CardsView => CardsBrowserTemplate,
+				_ => GridViewBrowserTemplate
+			};
 
 			if (FileList.Style != newFileListStyle)
 			{
 				var oldSource = FileList.ItemsSource;
 				FileList.ItemsSource = null;
 				FileList.Style = newFileListStyle;
+				FileList.ItemTemplate = newTemplate;
 				FileList.ItemsSource = oldSource;
+			}
+			else if (FileList.ItemTemplate != newTemplate)
+			{
+				FileList.ItemTemplate = newTemplate;
 			}
 
 			shouldSetVerticalScrollMode = true;
-
-			switch (folderSettings.LayoutMode)
-			{
-				case FolderLayoutModes.ListView:
-					FileList.ItemTemplate = ListViewBrowserTemplate;
-					break;
-				case FolderLayoutModes.CardsView:
-					FileList.ItemTemplate = CardsBrowserTemplate;
-					break;
-				default:
-					FileList.ItemTemplate = GridViewBrowserTemplate;
-					break;
-			}
 		}
 
 		private void SetItemContainerStyle()
