@@ -146,6 +146,55 @@ namespace Files.App.Helpers
 		private static readonly Lock _iconLock = new();
 
 		/// <summary>
+		/// Like <see cref="GetIcon"/>, but keeps the shell bitmap as pixels scaled to <paramref name="maxSide"/>, skipping the PNG round trip.
+		/// </summary>
+		public static unsafe ShellImageData? GetIconImageData(string? path, int size, bool isFolder, IconOptions iconOptions, int maxSide)
+		{
+			if (string.IsNullOrWhiteSpace(path))
+				return null;
+
+			using var shellItem = SafetyExtensions.IgnoreExceptions(()
+				=> ShellFolderExtensions.GetShellItemFromPathOrPIDL(path));
+
+			if (shellItem is not null && shellItem.IShellItem is IShellItemImageFactory shellFactory)
+			{
+				var flags = SIIGBF.SIIGBF_BIGGERSIZEOK;
+				if (iconOptions.HasFlag(IconOptions.ReturnIconOnly))
+					flags |= SIIGBF.SIIGBF_ICONONLY;
+				if (iconOptions.HasFlag(IconOptions.ReturnThumbnailOnly))
+					flags |= SIIGBF.SIIGBF_THUMBNAILONLY;
+				if (iconOptions.HasFlag(IconOptions.ReturnOnlyIfCached))
+					flags |= SIIGBF.SIIGBF_INCACHEONLY;
+
+				HBITMAP hbitmap = default;
+				var hres = shellFactory.GetImage(new(size, size), flags, &hbitmap);
+				try
+				{
+					if (hres == HRESULT.S_OK)
+					{
+						if (ShellImageData.FromHBitmap(hbitmap, maxSide) is { } pixels)
+							return pixels;
+
+						using var image = GetBitmapFromHBitmap(hbitmap);
+						if (image is not null && ShellImageData.FromGdiBitmap(image, maxSide) is { } converted)
+							return converted;
+					}
+				}
+				finally
+				{
+					if (!hbitmap.IsNull)
+						PInvoke.DeleteObject(hbitmap);
+				}
+			}
+
+			if (iconOptions.HasFlag(IconOptions.ReturnThumbnailOnly))
+				return null;
+
+			// The image-list fallback (e.g. paths that do not exist) produces encoded icons
+			return GetIcon(path, size, isFolder, iconOptions) is { } fallback ? ShellImageData.FromEncodedPixels(fallback, maxSide) : null;
+		}
+
+		/// <summary>
 		/// Returns an icon if returnIconOnly is true, otherwise a thumbnail will be returned if available.
 		/// </summary>
 		/// <param name="path"></param>

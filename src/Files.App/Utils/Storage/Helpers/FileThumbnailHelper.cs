@@ -81,12 +81,58 @@ namespace Files.App.Utils.Storage
 		}
 
 		/// <summary>
+		/// Physical pixel size an icon of <paramref name="requestedSize"/> logical pixels is displayed at.
+		/// </summary>
+		public static int GetPhysicalSize(uint requestedSize)
+			=> Math.Max(1, (int)Math.Ceiling(requestedSize * App.AppModel.AppWindowDPI));
+
+		/// <summary>
+		/// Returns an icon or thumbnail as pixels already scaled to the displayed physical size.
+		/// </summary>
+		public static Task<ShellImageData?> GetImageDataAsync(string? path, uint requestedSize, bool isFolder, IconOptions iconOptions,
+			CancellationToken cancellationToken = default, STATaskPriority priority = STATaskPriority.Fast, long performanceOperationId = 0)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+			var scaledSize = requestedSize * App.AppModel.AppWindowDPI;
+			var size = scaledSize > _standardSizes[^1]
+				? (uint)Math.Ceiling(scaledSize)
+				: _standardSizes.FirstOrDefault(s => s >= scaledSize, _standardSizes[^1]);
+			var maxSide = GetPhysicalSize(requestedSize);
+			var resolvedPath = path is not null && path.StartsWith(@"\\?\", StringComparison.Ordinal)
+				? MtpHelpers.ResolveMtpShellPath(path) ?? path
+				: path;
+
+			var trace = UiPerformanceTrace.IsEnabled && performanceOperationId != 0 && UiPerformanceTrace.IsFixturePath(path);
+			var queued = trace ? Stopwatch.GetTimestamp() : 0;
+			var stage = iconOptions.HasFlag(IconOptions.ReturnOnlyIfCached) ? "ThumbnailCache" :
+				iconOptions.HasFlag(IconOptions.ReturnIconOnly) ? "ItemIcon" : "ThumbnailNative";
+			return STATask.RunPooledUntilCompleted(() =>
+			{
+				var started = trace ? Stopwatch.GetTimestamp() : 0;
+				if (trace)
+					UiPerformanceTrace.Mark(performanceOperationId, stage + "QueueWait", durationMs: Stopwatch.GetElapsedTime(queued, started).TotalMilliseconds);
+				ShellImageData? data = null;
+				try
+				{
+					data = Win32Helper.GetIconImageData(resolvedPath, (int)size, isFolder, iconOptions, maxSide);
+					return data;
+				}
+				finally
+				{
+					if (trace)
+						UiPerformanceTrace.Mark(performanceOperationId, stage + "Completed", durationMs: Stopwatch.GetElapsedTime(started).TotalMilliseconds, value: data is null ? 0 : 1);
+				}
+			}, App.Logger, cancellationToken, priority);
+		}
+
+		/// <summary>
 		/// Returns overlay for given file or folder
 		/// /// </summary>
 		/// <param name="path"></param>
 		/// <param name="isFolder"></param>
 		/// <returns></returns>
-		public static async Task<byte[]?> GetIconOverlayAsync(string? path, uint requestedSize, bool isFolder, CancellationToken cancellationToken = default, long performanceOperationId = 0)
+		public static async Task<byte[]?> GetIconOverlayAsync(string? path, uint requestedSize, bool isFolder, CancellationToken cancellationToken = default, long performanceOperationId = 0,
+			STATaskPriority priority = STATaskPriority.Normal)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 			// Overlays render at 32px in thumbnail layouts and 16px in details/columns; scale by DPI so the badge isn't upscaled at fractional scaling
@@ -102,7 +148,7 @@ namespace Files.App.Utils.Storage
 				if (trace)
 					UiPerformanceTrace.Mark(performanceOperationId, "OverlayCompleted", durationMs: Stopwatch.GetElapsedTime(started).TotalMilliseconds, value: data is null ? 0 : 1);
 				return data;
-			}, App.Logger, cancellationToken);
+			}, App.Logger, cancellationToken, priority);
 		}
 
 		[Obsolete]
