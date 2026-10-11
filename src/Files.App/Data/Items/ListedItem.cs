@@ -311,23 +311,26 @@ namespace Files.App.Utils
 		public long FileSizeBytes { get; set; }
 
 		private string? itemDateModified;
+		private bool itemDateModifiedInitialized;
 		public string? ItemDateModified
 		{
-			get => itemDateModified;
+			get => itemDateModifiedInitialized ? itemDateModified ??= dateTimeFormatter.ToShortLabel(itemDateModifiedReal) : null;
 			private set => SetProperty(ref itemDateModified, value);
 		}
 
 		private string? itemDateCreated;
+		private bool itemDateCreatedInitialized;
 		public string? ItemDateCreated
 		{
-			get => itemDateCreated;
+			get => itemDateCreatedInitialized ? itemDateCreated ??= dateTimeFormatter.ToShortLabel(itemDateCreatedReal) : null;
 			private set => SetProperty(ref itemDateCreated, value);
 		}
 
 		private string? itemDateAccessed;
+		private bool itemDateAccessedInitialized;
 		public string? ItemDateAccessed
 		{
-			get => itemDateAccessed;
+			get => itemDateAccessedInitialized ? itemDateAccessed ??= dateTimeFormatter.ToShortLabel(itemDateAccessedReal) : null;
 			private set => SetProperty(ref itemDateAccessed, value);
 		}
 
@@ -337,8 +340,13 @@ namespace Files.App.Utils
 			get => itemDateModifiedReal;
 			set
 			{
-				ItemDateModified = dateTimeFormatter.ToShortLabel(value);
+				if (itemDateModifiedInitialized && itemDateModifiedReal == value)
+					return;
+
 				itemDateModifiedReal = value;
+				itemDateModifiedInitialized = true;
+				itemDateModified = null;
+				OnPropertyChanged(nameof(ItemDateModified));
 			}
 		}
 
@@ -348,8 +356,13 @@ namespace Files.App.Utils
 			get => itemDateCreatedReal;
 			set
 			{
-				ItemDateCreated = dateTimeFormatter.ToShortLabel(value);
+				if (itemDateCreatedInitialized && itemDateCreatedReal == value)
+					return;
+
 				itemDateCreatedReal = value;
+				itemDateCreatedInitialized = true;
+				itemDateCreated = null;
+				OnPropertyChanged(nameof(ItemDateCreated));
 			}
 		}
 
@@ -359,8 +372,13 @@ namespace Files.App.Utils
 			get => itemDateAccessedReal;
 			set
 			{
-				ItemDateAccessed = dateTimeFormatter.ToShortLabel(value);
+				if (itemDateAccessedInitialized && itemDateAccessedReal == value)
+					return;
+
 				itemDateAccessedReal = value;
+				itemDateAccessedInitialized = true;
+				itemDateAccessed = null;
+				OnPropertyChanged(nameof(ItemDateAccessed));
 			}
 		}
 
@@ -493,15 +511,18 @@ namespace Files.App.Utils
 
 		public string? Key { get; set; }
 
-		public virtual bool IsRealChanges =>  ItemDateAccessed != dateTimeFormatter.ToShortLabel(ItemDateAccessedReal)
-			|| ItemDateCreated != dateTimeFormatter.ToShortLabel(ItemDateCreatedReal)
-			|| ItemDateModified != dateTimeFormatter.ToShortLabel(ItemDateModifiedReal);
+		public virtual bool IsRealChanges => itemDateAccessed is not null && itemDateAccessed != dateTimeFormatter.ToShortLabel(ItemDateAccessedReal)
+			|| itemDateCreated is not null && itemDateCreated != dateTimeFormatter.ToShortLabel(ItemDateCreatedReal)
+			|| itemDateModified is not null && itemDateModified != dateTimeFormatter.ToShortLabel(ItemDateModifiedReal);
 
 		public virtual void UpdateReal()
 		{
-			ItemDateAccessed = dateTimeFormatter.ToShortLabel(ItemDateAccessedReal);
-			ItemDateCreated = dateTimeFormatter.ToShortLabel(ItemDateCreatedReal);
-			ItemDateModified = dateTimeFormatter.ToShortLabel(ItemDateModifiedReal);
+			if (itemDateAccessed is not null)
+				ItemDateAccessed = dateTimeFormatter.ToShortLabel(ItemDateAccessedReal);
+			if (itemDateCreated is not null)
+				ItemDateCreated = dateTimeFormatter.ToShortLabel(ItemDateCreatedReal);
+			if (itemDateModified is not null)
+				ItemDateModified = dateTimeFormatter.ToShortLabel(ItemDateModifiedReal);
 		}
 
 		/// <summary>

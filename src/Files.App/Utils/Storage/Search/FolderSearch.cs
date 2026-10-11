@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using System.IO;
 using System.IO.Enumeration;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
@@ -35,6 +36,8 @@ namespace Files.App.Utils.Storage
 
 		public uint MaxItemCount { get; set; } = 0; // 0: no limit
 
+		public bool HasIncompleteResults { get; private set; }
+
 		private uint UsedMaxItemCount => MaxItemCount > 0 ? MaxItemCount : uint.MaxValue;
 
 		public DispatcherQueue DispatcherQueue { get; set; } = MainWindow.Instance.DispatcherQueue;
@@ -45,7 +48,8 @@ namespace Files.App.Utils.Storage
 		public event EventHandler<IReadOnlyList<ListedItem>>? SearchTick;
 
 		private readonly IntervalSampler tickSampler = new(500);
-		private readonly HashSet<string> indexedResultPaths = new(StringComparer.OrdinalIgnoreCase);
+		private readonly HashSet<string> resultPaths = new(StringComparer.Ordinal);
+		private string? resultRoot;
 		private readonly List<ShortcutItem> shortcutResults = [];
 		private List<ListedItem> pendingResults = [];
 		private bool hasRaisedTick;
@@ -90,6 +94,7 @@ namespace Files.App.Utils.Storage
 
 		public async Task SearchAsync(IList<ListedItem> results, CancellationToken token)
 		{
+			HasIncompleteResults = false;
 			try
 			{
 				if (App.LibraryManager.TryGetLibrary(Folder, out var library))
@@ -111,6 +116,7 @@ namespace Files.App.Utils.Storage
 			}
 			catch (Exception e)
 			{
+				HasIncompleteResults = true;
 				App.Logger.LogWarning(e, "Search failure");
 			}
 
@@ -176,6 +182,8 @@ namespace Files.App.Utils.Storage
 		{
 			if (token.IsCancellationRequested)
 				return;
+			if (item.ItemPath is { } path && !resultPaths.Add(NativeNameSearch.GetResultPathKey(path, resultRoot)))
+				return;
 
 			results.Add(item);
 			pendingResults.Add(item);
@@ -208,6 +216,7 @@ namespace Files.App.Utils.Storage
 				return;
 
 			var options = ToQueryOptions();
+			var nameExpression = IsAQSQuery ? null : FileSystemName.TranslateWin32Expression($"*{QueryWithWildcard}");
 
 			var queryResult = folder.CreateItemQueryWithOptions(options);
 			var items = await queryResult.GetItemsAsync(0, stepSize).AsTask(token);
@@ -226,13 +235,15 @@ namespace Files.App.Utils.Storage
 						if (!item.Name.StartsWith('.') || UserSettingsService.FoldersSettingsService.ShowDotFiles)
 						{
 							var listedItem = await GetListedItemAsync(item);
+							if (nameExpression is not null && !FileSystemName.MatchesWin32Expression(nameExpression, listedItem.ItemNameRaw ?? string.Empty))
+								continue;
+
 							AddResult(results, listedItem, token);
-							if (listedItem.ItemPath is not null)
-								indexedResultPaths.Add(listedItem.ItemPath);
 						}
 					}
 					catch (Exception ex)
 					{
+						HasIncompleteResults = true;
 						App.Logger.LogWarning(ex, "Error creating ListedItem from StorageItem");
 					}
 				}
@@ -260,6 +271,9 @@ namespace Files.App.Utils.Storage
 
 			await DispatcherQueue.EnqueueOrInvokeAsync(() =>
 			{
+				if (token.IsCancellationRequested)
+					return;
+
 				for (var i = 0; i < links.Length; i++)
 				{
 					if (links[i] is not { } link)
@@ -284,14 +298,18 @@ namespace Files.App.Utils.Storage
 					item.GetRequiredPath(),
 					Constants.ShellIconSizes.Small,
 					item.PrimaryItemAttribute == StorageItemTypes.Folder,
-					IconOptions.ReturnIconOnly);
+					IconOptions.ReturnIconOnly,
+					token);
 
 				if (iconResult is null || token.IsCancellationRequested)
 					return;
 
 				await DispatcherQueue.EnqueueOrInvokeAsync(async () =>
 				{
-					if (await iconResult.ToBitmapAsync() is { } bitmapImage)
+					if (token.IsCancellationRequested)
+						return;
+
+					if (await iconResult.ToBitmapAsync() is { } bitmapImage && !token.IsCancellationRequested)
 						item.FileImage = bitmapImage;
 				});
 			}));
@@ -490,6 +508,7 @@ namespace Files.App.Utils.Storage
 
 		private async Task AddItemsAsync(string folder, IList<ListedItem> results, CancellationToken token)
 		{
+			resultRoot = folder;
 			if (IsTagQuery(AQSQuery))
 			{
 				await SearchTagsAsync(folder, results, token);
@@ -498,6 +517,8 @@ namespace Files.App.Utils.Storage
 			{
 				var workingFolder = await GetStorageFolderAsync(folder);
 				var storageFolder = workingFolder ? workingFolder.Result : null;
+				if (storageFolder is SystemStorageFolder && !string.IsNullOrEmpty(storageFolder.Path))
+					resultRoot = folder = storageFolder.Path;
 
 				if (IsAQSQuery)
 				{
@@ -513,15 +534,13 @@ namespace Files.App.Utils.Storage
 					return;
 				}
 
-				var hiddenOnlyFromWin32 = false;
 				if (storageFolder is not null)
 				{
-					var countBefore = results.Count;
 					await SearchAsync(storageFolder, results, token);
-					hiddenOnlyFromWin32 = results.Count != countBefore;
 				}
 
-				await SearchWithWin32Async(folder, hiddenOnlyFromWin32, results, token);
+				// Indexed state does not guarantee that recently renamed/created files are in the index yet.
+				await SearchWithWin32Async(folder, false, results, token);
 			}
 		}
 
@@ -563,10 +582,56 @@ namespace Files.App.Utils.Storage
 				if (token.IsCancellationRequested || results.Count >= UsedMaxItemCount)
 					return;
 
+				if (!useFindTimeout)
+				{
+					try
+					{
+						foreach (var entry in NativeNameSearch.Enumerate(folder, expression, showHiddenItems,
+							showProtectedSystemFiles, showDotFiles, hiddenOnly, token, () => HasIncompleteResults = true))
+						{
+							if (token.IsCancellationRequested || results.Count >= UsedMaxItemCount)
+								return;
+
+							if ((entry.Attributes & FileAttributes.Directory) != 0)
+							{
+								if ((entry.Attributes & FileAttributes.ReparsePoint) == 0)
+									pendingFolders.Enqueue((entry.Path, false));
+								else if (!IsNameSurrogateReparseTag(entry.ReparseTag))
+									pendingFolders.Enqueue((entry.Path, IsCloudFilesReparseTag(entry.ReparseTag)));
+							}
+
+							if (!entry.IsMatch || resultPaths.Contains(NativeNameSearch.GetResultPathKey(entry.Path, resultRoot)))
+								continue;
+
+							try
+							{
+								AddResult(results, GetListedItem(entry), token);
+							}
+							catch (Exception ex)
+							{
+								HasIncompleteResults = true;
+								App.Logger.LogWarning(ex, "Error creating ListedItem from directory entry");
+							}
+						}
+					}
+					catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+					{
+						HasIncompleteResults = true;
+						App.Logger.LogWarning(ex, "Search could not enumerate a folder");
+					}
+
+					RaiseSearchTickIfDue(token);
+					continue;
+				}
+
 				using (var findHandle = FindFirstFile(folder, useFindTimeout, out var findData, token))
 				{
 					if (findHandle is null || findHandle.IsInvalid)
+					{
+						if (!token.IsCancellationRequested)
+							HasIncompleteResults = true;
 						continue;
+					}
 
 					do
 					{
@@ -587,7 +652,7 @@ namespace Files.App.Utils.Storage
 						var isSystem = attributes.HasFlag(FileAttributes.System);
 						var isHidden = attributes.HasFlag(FileAttributes.Hidden);
 						var startWithDot = fileName.StartsWith('.');
-						var isShortcut = !isDirectory && FileExtensionHelpers.IsShortcutOrUrlFile(fileName);
+						var isShortcut = !isDirectory && IsShortcutName(fileName);
 
 						bool shouldBeListed = (hiddenOnly ?
 							(!isHidden && isShortcut) || (isHidden && showHiddenItems && (!isSystem || showProtectedSystemFiles)) :
@@ -595,7 +660,7 @@ namespace Files.App.Utils.Storage
 							(!startWithDot || showDotFiles);
 
 						var itemPath = Path.Combine(folder, fileName);
-						if (!shouldBeListed || (hiddenOnly && indexedResultPaths.Contains(itemPath)))
+						if (!shouldBeListed || resultPaths.Contains(NativeNameSearch.GetResultPathKey(itemPath, resultRoot)))
 							continue;
 
 						try
@@ -605,10 +670,13 @@ namespace Files.App.Utils.Storage
 						}
 						catch (Exception ex)
 						{
+							HasIncompleteResults = true;
 							App.Logger.LogWarning(ex, "Error creating ListedItem from Win32 find data");
 						}
 					}
 					while (!token.IsCancellationRequested && results.Count < UsedMaxItemCount && PInvoke.FindNextFile(findHandle, out findData));
+					if (!token.IsCancellationRequested && results.Count < UsedMaxItemCount && Marshal.GetLastPInvokeError() != 18)
+						HasIncompleteResults = true;
 				}
 
 				RaiseSearchTickIfDue(token);
@@ -639,9 +707,12 @@ namespace Files.App.Utils.Storage
 		}
 
 		private static unsafe FindCloseSafeHandle FindFirstFile(string folder, out WIN32_FIND_DATAW findData)
+			=> FindFirstPath(Path.Join(folder, "*"), out findData);
+
+		private static unsafe FindCloseSafeHandle FindFirstPath(string path, out WIN32_FIND_DATAW findData)
 		{
 			WIN32_FIND_DATAW data = default;
-			var handle = PInvoke.FindFirstFileEx(Path.Join(folder, "*"), FINDEX_INFO_LEVELS.FindExInfoBasic,
+			var handle = PInvoke.FindFirstFileEx(path, FINDEX_INFO_LEVELS.FindExInfoBasic,
 				&data, FINDEX_SEARCH_OPS.FindExSearchNameMatch, FIND_FIRST_EX_FLAGS.FIND_FIRST_EX_LARGE_FETCH);
 			findData = data;
 			return handle;
@@ -674,10 +745,55 @@ namespace Files.App.Utils.Storage
 		private static bool IsCloudFilesReparseTag(uint reparseTag)
 			=> (reparseTag & 0xFFFF0FFF) == 0x9000001A;
 
+		private static bool IsShortcutName(string name)
+			=> NativeNameSearch.IsShortcut(name);
+
+		private static ListedItem GetListedItem(NameSearchEntry entry)
+		{
+			var isFolder = (entry.Attributes & FileAttributes.Directory) != 0;
+			var isHidden = (entry.Attributes & FileAttributes.Hidden) != 0;
+			ListedItem item;
+			if (!isFolder && IsShortcutName(entry.Name))
+			{
+				var isUrl = entry.Name.EndsWith(".url", StringComparison.OrdinalIgnoreCase);
+				item = new ShortcutItem(null)
+				{
+					IsUrl = isUrl,
+					ItemType = isUrl ? Strings.ShortcutWebLinkFileType.GetLocalizedResource() : Strings.Shortcut.GetLocalizedResource(),
+				};
+			}
+			else
+			{
+				item = new ListedItem(null)
+				{
+					ItemType = isFolder ? folderTypeTextLocalized : null,
+				};
+			}
+
+			item.PrimaryItemAttribute = isFolder ? StorageItemTypes.Folder : StorageItemTypes.File;
+			item.ItemNameRaw = entry.Name;
+			item.ItemPath = entry.Path;
+			item.ItemDateCreatedReal = entry.Created.UtcDateTime;
+			item.ItemDateModifiedReal = entry.Modified.UtcDateTime;
+			item.IsHiddenItem = isHidden;
+			item.LoadFileIcon = false;
+			item.Opacity = isHidden ? Constants.UI.DimItemOpacity : 1;
+			if (!isFolder)
+			{
+				item.FileExtension = entry.Name.Contains('.', StringComparison.Ordinal) ? Path.GetExtension(entry.Path) : null;
+				if (item is not ShortcutItem && item.FileExtension is not null)
+					item.ItemType = item.FileExtension.Trim('.') + " ";
+				item.FileSizeBytes = entry.Length;
+				item.FileSize = entry.Length.ToSizeString();
+			}
+
+			return item;
+		}
+
 		private static ShortcutItem GetShortcutItem(string itemPath, WIN32_FIND_DATAW findData)
 		{
 			string fileName = findData.cFileName.ToString();
-			var isUrl = FileExtensionHelpers.IsWebLinkFile(fileName);
+			var isUrl = fileName.EndsWith(".url", StringComparison.OrdinalIgnoreCase);
 			var isHidden = ((FileAttributes)findData.dwFileAttributes & FileAttributes.Hidden) == FileAttributes.Hidden;
 			PInvoke.FileTimeToSystemTime(findData.ftLastWriteTime, out SYSTEMTIME modifiedTime);
 			PInvoke.FileTimeToSystemTime(findData.ftCreationTime, out SYSTEMTIME createdTime);

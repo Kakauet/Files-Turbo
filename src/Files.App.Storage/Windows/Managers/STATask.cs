@@ -1,4 +1,4 @@
-﻿// Copyright (c) Files Community
+// Copyright (c) Files Community
 // SPDX-License-Identifier: MPL-2.0
 
 using Microsoft.Extensions.Logging;
@@ -26,8 +26,11 @@ namespace Files.App.Storage
 		/// <param name="func">The work to execute on an STA pool thread.</param>
 		/// <param name="logger">A logger to capture any exception that occurs during execution.</param>
 		/// <returns>A <see cref="Task{T}"/> that represents the scheduled work.</returns>
-		public static Task<T> RunPooled<T>(Func<T> func, ILogger? logger)
+		public static Task<T> RunPooled<T>(Func<T> func, ILogger? logger, CancellationToken cancellationToken = default)
 		{
+			if (cancellationToken.IsCancellationRequested)
+				return Task.FromCanceled<T>(cancellationToken);
+
 			if (!Interlocked.CompareExchange(ref _poolStarted, true, false))
 			{
 				for (int i = 0; i < PooledThreadCount; i++)
@@ -52,17 +55,30 @@ namespace Files.App.Storage
 			}
 
 			var tcs = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
+			var registration = cancellationToken.CanBeCanceled
+				? cancellationToken.UnsafeRegister(static (state, token) => ((TaskCompletionSource<T>)state!).TrySetCanceled(token), tcs)
+				: default;
 
 			_pooledQueue.Writer.TryWrite(() =>
 			{
 				try
 				{
-					tcs.SetResult(func());
+					if (cancellationToken.IsCancellationRequested)
+					{
+						tcs.TrySetCanceled(cancellationToken);
+						return;
+					}
+
+					tcs.TrySetResult(func());
 				}
 				catch (Exception ex)
 				{
-					tcs.SetResult(default!);
+					tcs.TrySetResult(default!);
 					logger?.LogWarning(ex, "An exception was occurred during the execution within STA.");
+				}
+				finally
+				{
+					registration.Dispose();
 				}
 			});
 

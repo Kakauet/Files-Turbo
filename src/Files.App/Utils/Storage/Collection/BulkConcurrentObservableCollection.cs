@@ -410,6 +410,9 @@ namespace Files.App.Utils.Storage
 
 		public void AddRange(IEnumerable<T> items)
 		{
+			var snapshot = GetRangeSnapshot(items);
+			items = snapshot ?? items;
+
 			if (!items.Any())
 				return;
 
@@ -425,7 +428,7 @@ namespace Files.App.Utils.Storage
 				if (isBulkOperationStarted && !IsGrouped)
 					return;
 
-				e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, items.ToList(), count);
+				e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, snapshot ?? items.ToList(), count);
 				OnCollectionChanged(e);
 			}
 
@@ -434,6 +437,9 @@ namespace Files.App.Utils.Storage
 
 		public void InsertRange(int index, IEnumerable<T> items)
 		{
+			var snapshot = GetRangeSnapshot(items);
+			items = snapshot ?? items;
+
 			if (!items.Any())
 				return;
 
@@ -446,11 +452,17 @@ namespace Files.App.Utils.Storage
 				if (isBulkOperationStarted && !IsGrouped)
 					return;
 
-				e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, items.ToList(), index);
+				e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, snapshot ?? items.ToList(), index);
 				OnCollectionChanged(e);
 			}
 
 			UpdateGroups(e);
+		}
+
+		private List<T>? GetRangeSnapshot(IEnumerable<T> items)
+		{
+			// Deferred and self-referencing sources must be consumed before the collection changes.
+			return items is ICollection<T> && !ReferenceEquals(items, this) ? null : items.ToList();
 		}
 
 		public void RemoveRange(int index, int count)
@@ -475,19 +487,18 @@ namespace Files.App.Utils.Storage
 
 		public void ReplaceRange(int index, IEnumerable<T> items)
 		{
-			var count = items.Count();
+			var newItems = items.ToList();
+			var count = newItems.Count;
 
 			if (count == 0)
 				return;
 
 			List<T> oldItems;
-			List<T> newItems;
 			NotifyCollectionChangedEventArgs e;
 
 			lock (syncRoot)
 			{
 				oldItems = collection.Skip(index).Take(count).ToList();
-				newItems = items.ToList();
 				collection.RemoveRange(index, count);
 				collection.InsertRange(index, newItems);
 

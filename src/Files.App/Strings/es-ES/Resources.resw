@@ -4734,4 +4734,7 @@
   <data name="ConfirmRemoveTagsDialogContent" xml:space="preserve">
     <value>¿Está seguro de que desea eliminar las etiquetas de los elementos seleccionados?</value>
   </data>
+  <data name="SearchResultsIncomplete" xml:space="preserve">
+    <value>No se pudo buscar en algunas ubicaciones. Los resultados pueden estar incompletos.</value>
+  </data>
 </root>

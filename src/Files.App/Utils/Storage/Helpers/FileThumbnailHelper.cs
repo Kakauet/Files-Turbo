@@ -15,8 +15,9 @@ namespace Files.App.Utils.Storage
 		/// <summary>
 		/// Returns icon or thumbnail for given file or folder
 		/// </summary>
-		public static async Task<byte[]?> GetIconAsync(string? path, uint requestedSize, bool isFolder, IconOptions iconOptions)
+		public static async Task<byte[]?> GetIconAsync(string? path, uint requestedSize, bool isFolder, IconOptions iconOptions, CancellationToken cancellationToken = default)
 		{
+			cancellationToken.ThrowIfCancellationRequested();
 			var scaledSize = requestedSize * App.AppModel.AppWindowDPI;
 
 			// Snap up to the next standard size; the result is never below the displayed size, so it only ever downscales.
@@ -33,12 +34,14 @@ namespace Files.App.Utils.Storage
 				if (FileExtensionHelpers.IsFontFile(extension) && path is not null && PathHelpers.IsInSystemFontsFolder(path))
 				{
 					var winrtThumbnail = await FontFileHelper.GetWinRTThumbnailAsync(path, (uint)size);
+					cancellationToken.ThrowIfCancellationRequested();
 					if (winrtThumbnail is not null)
 						return winrtThumbnail;
 
 					if (!string.Equals(extension, ".fon", StringComparison.OrdinalIgnoreCase))
 					{
 						var fontThumbnail = await STATask.Run(() => FontFileHelper.GenerateFontThumbnail(path, (int)size), App.Logger);
+						cancellationToken.ThrowIfCancellationRequested();
 						if (fontThumbnail is not null)
 							return fontThumbnail;
 					}
@@ -49,7 +52,7 @@ namespace Files.App.Utils.Storage
 				? MtpHelpers.ResolveMtpShellPath(path) ?? path
 				: path;
 
-			return await STATask.RunPooled(() => Win32Helper.GetIcon(resolvedPath, (int)size, isFolder, iconOptions), App.Logger);
+			return await STATask.RunPooled(() => Win32Helper.GetIcon(resolvedPath, (int)size, isFolder, iconOptions), App.Logger, cancellationToken);
 		}
 
 		/// <summary>
@@ -58,11 +61,12 @@ namespace Files.App.Utils.Storage
 		/// <param name="path"></param>
 		/// <param name="isFolder"></param>
 		/// <returns></returns>
-		public static async Task<byte[]?> GetIconOverlayAsync(string? path, uint requestedSize, bool isFolder)
+		public static async Task<byte[]?> GetIconOverlayAsync(string? path, uint requestedSize, bool isFolder, CancellationToken cancellationToken = default)
 		{
+			cancellationToken.ThrowIfCancellationRequested();
 			// Overlays render at 32px in thumbnail layouts and 16px in details/columns; scale by DPI so the badge isn't upscaled at fractional scaling
 			var overlaySize = (requestedSize >= 48 ? 32u : 16u) * App.AppModel.AppWindowDPI;
-			return await STATask.RunPooled(() => Win32Helper.GetIconOverlay(path, (int)overlaySize, isFolder), App.Logger);
+			return await STATask.RunPooled(() => Win32Helper.GetIconOverlay(path, (int)overlaySize, isFolder), App.Logger, cancellationToken);
 		}
 
 		[Obsolete]

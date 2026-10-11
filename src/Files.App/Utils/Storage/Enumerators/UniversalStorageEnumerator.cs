@@ -29,12 +29,14 @@ namespace Files.App.Utils.Storage
 			var tempList = new List<ListedItem>();
 			uint count = 0;
 			var firstRound = true;
+			var hasPublishedFirstBatch = false;
 
 			IUserSettingsService userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 			bool calculateFolderSizes = userSettingsService.FoldersSettingsService.CalculateFolderSizes;
 
 			while (true)
 			{
+				cancellationToken.ThrowIfCancellationRequested();
 				IReadOnlyList<IStorageItem> items;
 
 				uint maxItemsToRetrieve = 300;
@@ -54,6 +56,7 @@ namespace Files.App.Utils.Storage
 				try
 				{
 					items = await rootFolder.GetItemsAsync(count, maxItemsToRetrieve);
+					cancellationToken.ThrowIfCancellationRequested();
 					if (items is null || items.Count == 0)
 					{
 						break;
@@ -73,7 +76,7 @@ namespace Files.App.Utils.Storage
 					(uint)ex.HResult == 0x80070490) // ERROR_NOT_FOUND
 				{
 					// If some unexpected exception is thrown - enumerate this folder file by file - just to be sure
-					items = await EnumerateFileByFile(rootFolder, count, maxItemsToRetrieve);
+					items = await EnumerateFileByFile(rootFolder, count, maxItemsToRetrieve, cancellationToken);
 				}
 				catch (Exception ex)
 				{
@@ -84,6 +87,7 @@ namespace Files.App.Utils.Storage
 
 				foreach (var item in items)
 				{
+					cancellationToken.ThrowIfCancellationRequested();
 					var startWithDot = item.Name.StartsWith('.');
 					if (!startWithDot || userSettingsService.FoldersSettingsService.ShowDotFiles)
 					{
@@ -137,8 +141,7 @@ namespace Files.App.Utils.Storage
 						}
 					}
 
-					if (cancellationToken.IsCancellationRequested)
-						break;
+					cancellationToken.ThrowIfCancellationRequested();
 				}
 
 				count += maxItemsToRetrieve;
@@ -146,28 +149,35 @@ namespace Files.App.Utils.Storage
 				if (countLimit > -1 && count >= countLimit)
 					break;
 
-				if (intermediateAction is not null && (items.Count == maxItemsToRetrieve || sampler.CheckNow()))
+				// Publish the small first page immediately; later full pages must not bypass the cadence.
+				if (intermediateAction is not null && tempList.Count > 0 && (!hasPublishedFirstBatch || sampler.CheckNow()))
 				{
 					await intermediateAction(tempList);
+					cancellationToken.ThrowIfCancellationRequested();
+					hasPublishedFirstBatch = true;
+					sampler.Reset();
 
 					// clear the temporary list every time we do an intermediate action
 					tempList.Clear();
 				}
 			}
 
+			cancellationToken.ThrowIfCancellationRequested();
 			return tempList;
 		}
 
-		private static async Task<IReadOnlyList<IStorageItem>> EnumerateFileByFile(BaseStorageFolder rootFolder, uint startFrom, uint itemsToIterate)
+		private static async Task<IReadOnlyList<IStorageItem>> EnumerateFileByFile(BaseStorageFolder rootFolder, uint startFrom, uint itemsToIterate, CancellationToken cancellationToken)
 		{
 			var tempList = new List<IStorageItem>();
 
 			for (var i = startFrom; i < startFrom + itemsToIterate; i++)
 			{
+				cancellationToken.ThrowIfCancellationRequested();
 				IStorageItem? item;
 				try
 				{
 					var results = await rootFolder.GetItemsAsync(i, 1);
+					cancellationToken.ThrowIfCancellationRequested();
 
 					item = results?.FirstOrDefault();
 					if (item is null)
@@ -176,6 +186,10 @@ namespace Files.App.Utils.Storage
 				catch (NotImplementedException)
 				{
 					break;
+				}
+				catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+				{
+					throw;
 				}
 				catch (Exception ex) when (
 					ex is UnauthorizedAccessException ||
@@ -201,6 +215,7 @@ namespace Files.App.Utils.Storage
 			StorageFolderWithPath? currentStorageFolder,
 			CancellationToken cancellationToken)
 		{
+			cancellationToken.ThrowIfCancellationRequested();
 			var basicProperties = await folder.GetBasicPropertiesAsync();
 			if (!cancellationToken.IsCancellationRequested)
 			{
@@ -275,6 +290,7 @@ namespace Files.App.Utils.Storage
 			StorageFolderWithPath? currentStorageFolder,
 			CancellationToken cancellationToken)
 		{
+			cancellationToken.ThrowIfCancellationRequested();
 			var basicProperties = await file.GetBasicPropertiesAsync();
 			// Display name does not include extension
 			var itemName = file.Name;

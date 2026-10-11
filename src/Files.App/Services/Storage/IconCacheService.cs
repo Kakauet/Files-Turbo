@@ -14,7 +14,7 @@ namespace Files.App.Services
 		private static readonly string _dummyPath = Path.Combine(Path.GetPathRoot(Environment.SystemDirectory)!, "x46696c6573");
 
 		private readonly ConcurrentDictionary<IconCacheKey, Lazy<Task<byte[]?>>> _cache = new();
-		private readonly ConcurrentDictionary<IconCacheKey, BitmapImage> _imageCache = new();
+		private ConcurrentDictionary<IconCacheKey, Lazy<Task<BitmapImage?>>> _imageCache = new();
 
 		public Task<byte[]?> GetIconAsync(string? itemPath, string? extension, bool isFolder, uint size)
 		{
@@ -57,31 +57,46 @@ namespace Files.App.Services
 			}
 		}
 
-		public async Task<BitmapImage?> GetIconImageAsync(string? itemPath, string? extension, bool isFolder, uint size)
+		public Task<BitmapImage?> GetIconImageAsync(string? itemPath, string? extension, bool isFolder, uint size)
 		{
 			// BitmapImage has thread affinity, so only the main window's dispatcher may use this cache
 			if (DispatcherQueue.GetForCurrentThread() is null)
-				return null;
+				return Task.FromResult<BitmapImage?>(null);
 
 			var key = GetCacheKey(extension, isFolder, size);
-			if (_imageCache.TryGetValue(key, out var cached))
-				return cached;
+			var imageCache = Volatile.Read(ref _imageCache);
+			if (imageCache.TryGetValue(key, out var cached))
+				return cached.Value;
 
-			var data = await GetIconAsync(itemPath, extension, isFolder, size);
-			if (data is null)
-				return null;
+			Lazy<Task<BitmapImage?>>? entry = null;
+			entry = new(() => LoadImageAsync(imageCache, key, itemPath, extension, isFolder, size, entry!));
+			return imageCache.GetOrAdd(key, entry).Value;
+		}
 
-			var image = await data.ToBitmapAsync();
-			if (image is not null)
-				_imageCache.TryAdd(key, image);
+		private async Task<BitmapImage?> LoadImageAsync(ConcurrentDictionary<IconCacheKey, Lazy<Task<BitmapImage?>>> imageCache,
+			IconCacheKey key, string? itemPath, string? extension, bool isFolder, uint size, Lazy<Task<BitmapImage?>> entry)
+		{
+			try
+			{
+				var data = await GetIconAsync(itemPath, extension, isFolder, size);
+				var image = data is null ? null : await data.ToBitmapAsync();
+				if (image is null)
+					imageCache.TryRemove(new KeyValuePair<IconCacheKey, Lazy<Task<BitmapImage?>>>(key, entry));
 
-			return image;
+				return image;
+			}
+			catch
+			{
+				imageCache.TryRemove(new KeyValuePair<IconCacheKey, Lazy<Task<BitmapImage?>>>(key, entry));
+				throw;
+			}
 		}
 
 		public void Clear()
 		{
 			_cache.Clear();
-			_imageCache.Clear();
+			// Pending decodes may complete, but cannot repopulate the current generation.
+			Interlocked.Exchange(ref _imageCache, new());
 		}
 
 		private static IconCacheKey GetCacheKey(string? extension, bool isFolder, uint size)

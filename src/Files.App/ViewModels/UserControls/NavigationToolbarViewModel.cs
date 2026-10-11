@@ -48,7 +48,7 @@ namespace Files.App.ViewModels.UserControls
 		private string? _dragOverPath;
 		private bool _lockFlag;
 		private PointerRoutedEventArgs? _pointerRoutedEventArgs;
-		private CancellationTokenSource _suggestSearchCTS = new();
+		private CancellationTokenSource? _suggestSearchCTS;
 
 		// Events
 
@@ -228,7 +228,15 @@ namespace Files.App.ViewModels.UserControls
 		private List<SettingsSearchResult>? _settingsSearchIndex;
 
 		private string _OmnibarCurrentSelectedModeName = OmnibarPathModeName;
-		public string OmnibarCurrentSelectedModeName { get => _OmnibarCurrentSelectedModeName; set => SetProperty(ref _OmnibarCurrentSelectedModeName, value); }
+		public string OmnibarCurrentSelectedModeName
+		{
+			get => _OmnibarCurrentSelectedModeName;
+			set
+			{
+				if (SetProperty(ref _OmnibarCurrentSelectedModeName, value) && value != OmnibarSearchModeName)
+					CancelSuggestionSearch();
+			}
+		}
 
 		private CurrentInstanceViewModel? _InstanceViewModel;
 		public CurrentInstanceViewModel InstanceViewModel
@@ -244,6 +252,7 @@ namespace Files.App.ViewModels.UserControls
 
 				if (SetProperty(ref _InstanceViewModel, value) && value is not null)
 				{
+					CancelSuggestionSearch();
 					FolderSettings_PropertyChanged(this, new PropertyChangedEventArgs(nameof(LayoutPreferencesManager.LayoutMode)));
 					value.FolderSettings.PropertyChanged += FolderSettings_PropertyChanged;
 					value.PropertyChanged += InstanceViewModel_PropertyChanged;
@@ -256,6 +265,7 @@ namespace Files.App.ViewModels.UserControls
 		{
 			if (e.PropertyName is nameof(CurrentInstanceViewModel.IsPageTypeSettings))
 			{
+				CancelSuggestionSearch();
 				OnPropertyChanged(nameof(OmnibarSearchModePlaceholder));
 
 				// Suggestion source differs between settings and file search — drop stale items.
@@ -1187,36 +1197,41 @@ namespace Files.App.ViewModels.UserControls
 			if (_isDisposed || ContentPageContext.ShellPage is null)
 				return;
 
+			_suggestSearchCTS?.Cancel();
+
 			if (InstanceViewModel?.IsPageTypeSettings == true)
 			{
 				PopulateOmnibarSuggestionsForSettingsSearch();
 				return;
 			}
 
-			_suggestSearchCTS.Cancel();
-			_suggestSearchCTS = new CancellationTokenSource();
-			var token = _suggestSearchCTS.Token;
+			var shellViewModel = ContentPageContext.ShellPage.ShellViewModel;
+			if (shellViewModel is null)
+				return;
 
-			List<SuggestionModel> newSuggestions = [];
+			using var currentSearchCTS = new CancellationTokenSource();
+			_suggestSearchCTS = currentSearchCTS;
+			var token = currentSearchCTS.Token;
+			var query = OmnibarSearchModeText;
+			var folder = shellViewModel.WorkingDirectory;
 
-			if (string.IsNullOrWhiteSpace(OmnibarSearchModeText))
+			try
 			{
-				var previousSearchQueries = UserSettingsService.GeneralSettingsService.PreviousSearchQueriesList;
-				if (previousSearchQueries is not null)
-					newSuggestions.AddRange(previousSearchQueries.Select(query => new SuggestionModel(query, true)));
-			}
-			else
-			{
-				try
+				List<SuggestionModel> newSuggestions = [];
+				if (string.IsNullOrWhiteSpace(query))
+				{
+					var previousSearchQueries = UserSettingsService.GeneralSettingsService.PreviousSearchQueriesList;
+					if (previousSearchQueries is not null)
+						newSuggestions.AddRange(previousSearchQueries.Take(MaxSuggestionsCount).Select(previous => new SuggestionModel(previous, true)));
+				}
+				else
 				{
 					await Task.Delay(200, token);
-					var shellViewModel = ContentPageContext.ShellPage?.ShellViewModel
-						?? throw new InvalidOperationException("The current shell page does not have a view model.");
 
 					var search = new FolderSearch
 					{
-						Query = OmnibarSearchModeText,
-						Folder = shellViewModel.WorkingDirectory,
+						Query = query,
+						Folder = folder,
 						MaxItemCount = 10,
 					};
 
@@ -1224,29 +1239,31 @@ namespace Files.App.ViewModels.UserControls
 					await search.SearchAsync(results, token);
 					newSuggestions.AddRange(results.Select(result => new SuggestionModel(result)));
 				}
-				catch (OperationCanceledException)
-				{
+
+				if (token.IsCancellationRequested || (!string.IsNullOrWhiteSpace(query) && OmnibarCurrentSelectedModeName != OmnibarSearchModeName)
+					|| !ReferenceEquals(ContentPageContext.ShellPage?.ShellViewModel, shellViewModel)
+					|| !string.Equals(folder, shellViewModel.WorkingDirectory, StringComparison.Ordinal))
 					return;
+
+				for (var index = 0; index < newSuggestions.Count; index++)
+				{
+					if (index >= OmnibarSearchModeSuggestionItems.Count)
+						OmnibarSearchModeSuggestionItems.Add(newSuggestions[index]);
+					else
+						OmnibarSearchModeSuggestionItems[index] = newSuggestions[index];
 				}
+
+				while (OmnibarSearchModeSuggestionItems.Count > newSuggestions.Count)
+					OmnibarSearchModeSuggestionItems.RemoveAt(OmnibarSearchModeSuggestionItems.Count - 1);
 			}
-
-			if (token.IsCancellationRequested)
-				return;
-
-			// Remove outdated suggestions
-			var toRemove = OmnibarSearchModeSuggestionItems
-				.Where(existing => !newSuggestions.Any(newItem => newItem.ItemPath == existing.ItemPath))
-				.ToList();
-
-			foreach (var item in toRemove)
-				OmnibarSearchModeSuggestionItems.Remove(item);
-
-			// Add new suggestions
-			var toAdd = newSuggestions
-				.Where(newItem => !OmnibarSearchModeSuggestionItems.Any(existing => existing.ItemPath == newItem.ItemPath));
-
-			foreach (var item in toAdd)
-				OmnibarSearchModeSuggestionItems.Add(item);
+			catch (OperationCanceledException)
+			{
+			}
+			finally
+			{
+				if (ReferenceEquals(_suggestSearchCTS, currentSearchCTS))
+					_suggestSearchCTS = null;
+			}
 		}
 
 		private void PopulateOmnibarSuggestionsForSettingsSearch()
@@ -1299,7 +1316,7 @@ namespace Files.App.ViewModels.UserControls
 		public void CancelSuggestionSearch()
 		{
 			if (!_isDisposed)
-				_suggestSearchCTS.Cancel();
+				_suggestSearchCTS?.Cancel();
 		}
 
 		// Disposer
@@ -1310,8 +1327,7 @@ namespace Files.App.ViewModels.UserControls
 				return;
 
 			_isDisposed = true;
-			_suggestSearchCTS.Cancel();
-			_suggestSearchCTS.Dispose();
+			_suggestSearchCTS?.Cancel();
 			_dragOverTimer?.Stop();
 			_dragOverTimer = null;
 			InstanceViewModel = null!;

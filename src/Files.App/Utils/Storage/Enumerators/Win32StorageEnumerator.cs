@@ -49,6 +49,7 @@ namespace Files.App.Utils.Storage
 			{
 				do
 				{
+					cancellationToken.ThrowIfCancellationRequested();
 					var isSystem = ((FileAttributes)findData.dwFileAttributes & FileAttributes.System) == FileAttributes.System;
 					var isHidden = ((FileAttributes)findData.dwFileAttributes & FileAttributes.Hidden) == FileAttributes.Hidden;
 					var startWithDot = findData.cFileName.StartsWith('.');
@@ -101,7 +102,8 @@ namespace Files.App.Utils.Storage
 						}
 					}
 
-					if (cancellationToken.IsCancellationRequested || count == countLimit)
+					cancellationToken.ThrowIfCancellationRequested();
+					if (count == countLimit)
 						break;
 
 					if (intermediateAction is not null &&
@@ -111,6 +113,7 @@ namespace Files.App.Utils.Storage
 					{
 						hasFlushedFirstBatch = true;
 						await intermediateAction(tempList);
+						cancellationToken.ThrowIfCancellationRequested();
 
 						// clear the temporary list every time we do an intermediate action
 						tempList.Clear();
@@ -122,6 +125,7 @@ namespace Files.App.Utils.Storage
 				hFile.Dispose();
 			}
 
+			cancellationToken.ThrowIfCancellationRequested();
 			return tempList;
 		}
 
@@ -255,6 +259,9 @@ namespace Files.App.Utils.Storage
 			CancellationToken cancellationToken
 		)
 		{
+			if (cancellationToken.IsCancellationRequested)
+				return null;
+
 			var itemPath = Path.Combine(pathRoot, findData.cFileName);
 			var itemName = findData.cFileName;
 
