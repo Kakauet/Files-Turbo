@@ -1539,7 +1539,7 @@ namespace Files.App.ViewModels
 			=> !initial.Token.IsCancellationRequested && initial.LoadCompleted && CanReuseInitialThumbnail(item, initial.Token, initial);
 
 		private async Task<bool> ApplyThumbnailImageAsync(ListedItem item, byte[] data, CancellationToken token, long performanceOperation,
-			bool onlyIfMissing = false, Microsoft.UI.Dispatching.DispatcherQueuePriority priority = Microsoft.UI.Dispatching.DispatcherQueuePriority.Low)
+			bool onlyIfMissing = false, Microsoft.UI.Dispatching.DispatcherQueuePriority priority = Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal)
 		{
 			var queued = UiPerformanceTrace.IsEnabled && performanceOperation != 0 ? Stopwatch.GetTimestamp() : 0;
 			return await dispatcherQueue.EnqueueOrInvokeAsync(async () =>
@@ -1548,7 +1548,7 @@ namespace Files.App.ViewModels
 					return false;
 				if (queued != 0)
 					UiPerformanceTrace.Mark(performanceOperation, "ThumbnailDispatcherWait", durationMs: Stopwatch.GetElapsedTime(queued).TotalMilliseconds);
-				var image = await DecodeThumbnailAsync(data, performanceOperation);
+				var image = await DecodeThumbnailAsync(data, performanceOperation, LayoutSizeKindHelper.GetIconSize(folderSettings.LayoutMode));
 				if (token.IsCancellationRequested || image is null || onlyIfMissing && item.FileImage is not null)
 					return false;
 				item.FileImage = image;
@@ -1558,10 +1558,11 @@ namespace Files.App.ViewModels
 			}, priority);
 		}
 
-		private static async Task<BitmapImage?> DecodeThumbnailAsync(byte[] data, long performanceOperation)
+		private static async Task<BitmapImage?> DecodeThumbnailAsync(byte[] data, long performanceOperation, uint thumbnailSize)
 		{
 			var started = UiPerformanceTrace.IsEnabled && performanceOperation != 0 ? Stopwatch.GetTimestamp() : 0;
-			var image = await data.ToBitmapAsync();
+			var decodeSize = Math.Max(1, (int)Math.Ceiling(thumbnailSize * App.AppModel.AppWindowDPI));
+			var image = await data.ToBitmapAsync(decodeSize, DecodePixelType.Physical, preserveAspectRatio: true);
 			if (started != 0)
 				UiPerformanceTrace.Mark(performanceOperation, "ThumbnailDecodeCompleted", durationMs: Stopwatch.GetElapsedTime(started).TotalMilliseconds, value: image is null ? 0 : 1);
 			return image;

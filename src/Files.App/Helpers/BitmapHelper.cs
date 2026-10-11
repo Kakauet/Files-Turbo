@@ -3,6 +3,7 @@
 
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
+using System.Buffers.Binary;
 using System.IO;
 using Windows.Foundation.Metadata;
 using Windows.Graphics.Imaging;
@@ -13,7 +14,8 @@ namespace Files.App.Helpers
 {
 	internal static class BitmapHelper
 	{
-		public static async Task<BitmapImage?> ToBitmapAsync(this byte[]? data, int decodeSize = -1)
+		public static async Task<BitmapImage?> ToBitmapAsync(this byte[]? data, int decodeSize = -1, DecodePixelType decodePixelType = DecodePixelType.Logical,
+			bool preserveAspectRatio = false)
 		{
 			if (data is null)
 			{
@@ -24,12 +26,8 @@ namespace Files.App.Helpers
 			{
 				using var ms = new MemoryStream(data);
 				var image = new BitmapImage();
-				if (decodeSize > 0)
-				{
-					image.DecodePixelWidth = decodeSize;
-					image.DecodePixelHeight = decodeSize;
-				}
-				image.DecodePixelType = DecodePixelType.Logical;
+				SetDecodeSize(image, data, decodeSize, preserveAspectRatio);
+				image.DecodePixelType = decodePixelType;
 				await image.SetSourceAsync(ms.AsRandomAccessStream());
 				return image;
 			}
@@ -37,6 +35,35 @@ namespace Files.App.Helpers
 			{
 				return null;
 			}
+		}
+
+		private static void SetDecodeSize(BitmapImage image, byte[] data, int decodeSize, bool preserveAspectRatio)
+		{
+			if (decodeSize <= 0)
+				return;
+
+			if (!preserveAspectRatio)
+			{
+				image.DecodePixelWidth = decodeSize;
+				image.DecodePixelHeight = decodeSize;
+				return;
+			}
+
+			// Shell bitmaps are encoded as PNG; constrain only their longer side to preserve proportions.
+			ReadOnlySpan<byte> pngSignature = [137, 80, 78, 71, 13, 10, 26, 10];
+			if (data.Length >= 33 && data.AsSpan(0, 8).SequenceEqual(pngSignature) &&
+				BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(8, 4)) == 13 && data.AsSpan(12, 4).SequenceEqual("IHDR"u8))
+			{
+				var width = BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(16, 4));
+				var height = BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(20, 4));
+				if (width > 0 && width <= int.MaxValue && height > 0 && height <= int.MaxValue && height > width)
+				{
+					image.DecodePixelHeight = decodeSize;
+					return;
+				}
+			}
+
+			image.DecodePixelWidth = decodeSize;
 		}
 
 		/// <summary>

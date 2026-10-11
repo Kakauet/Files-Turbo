@@ -1270,6 +1270,9 @@ namespace Files.App.Views.Layouts
 		}
 
 		private ScrollViewer? deferScrollViewer;
+		private double lastScrollHorizontalOffset;
+		private double lastScrollVerticalOffset;
+		private float lastScrollZoomFactor;
 
 		// Hooked lazily from the first container callback, when the list's template is guaranteed realized
 		[DynamicWindowsRuntimeCast(typeof(ScrollViewer))]
@@ -1283,7 +1286,12 @@ namespace Files.App.Views.Layouts
 
 			deferScrollViewer = ItemsControl.FindDescendant<ScrollViewer>();
 			if (deferScrollViewer is not null)
+			{
+				lastScrollHorizontalOffset = deferScrollViewer.HorizontalOffset;
+				lastScrollVerticalOffset = deferScrollViewer.VerticalOffset;
+				lastScrollZoomFactor = deferScrollViewer.ZoomFactor;
 				deferScrollViewer.ViewChanged += DeferScrollViewer_ViewChanged;
+			}
 		}
 
 		private void UnhookScrollDeferTracking()
@@ -1415,7 +1423,7 @@ namespace Files.App.Views.Layouts
 			}
 
 			viewportWork ??= new ViewportWorkQueue<ListedItem>(4, 128,
-				action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => action()),
+				action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () => action()),
 				RefillVisibleItemWork,
 				exception => App.Logger.LogWarning(exception, "Failed to load deferred row properties."), newestFirst: false);
 			viewportWork.SetPaused(isReloadingRealizedItems || shellViewModel.IsScrollInFlight);
@@ -1493,15 +1501,29 @@ namespace Files.App.Views.Layouts
 
 		private void RefillVisibleItemWork()
 		{
-			if (isDisposed || viewportRefillQueued || viewportWork is { PendingCount: > 0 } ||
-				ParentShellPageInstance?.ShellViewModel is not { IsScrollInFlight: false })
+			if (isDisposed || navigationArguments is null || viewportRefillQueued || viewportWork is { PendingCount: > 0 } ||
+				ParentShellPageInstance?.ShellViewModel is not { IsScrollInFlight: false } shellViewModel)
 				return;
 			viewportRefillQueued = true;
-			if (!DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+			var performanceOperation = shellViewModel.PerformanceOperationId;
+			var requestedAt = UiPerformanceTrace.IsEnabled ? Stopwatch.GetTimestamp() : 0;
+			if (requestedAt != 0)
+				UiPerformanceTrace.Mark(performanceOperation, "ViewportPassQueued", realizedItems.Count);
+			if (!DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () =>
 			{
 				viewportRefillQueued = false;
-				if (!isDisposed && ParentShellPageInstance?.ShellViewModel is { IsScrollInFlight: false })
+				if (!isDisposed && navigationArguments is not null && shellViewModel.IsScrollInFlight is false &&
+					ReferenceEquals(ParentShellPageInstance?.ShellViewModel, shellViewModel))
+				{
+					var startedAt = requestedAt != 0 ? Stopwatch.GetTimestamp() : 0;
+					if (startedAt != 0)
+						UiPerformanceTrace.Mark(performanceOperation, "ViewportPassStarted", realizedItems.Count,
+							durationMs: Stopwatch.GetElapsedTime(requestedAt, startedAt).TotalMilliseconds);
 					LoadVisibleItemsAfterScrollSettled();
+					if (startedAt != 0)
+						UiPerformanceTrace.Mark(performanceOperation, "ViewportPassCompleted", realizedItems.Count,
+							durationMs: Stopwatch.GetElapsedTime(startedAt).TotalMilliseconds);
+				}
 			}))
 				viewportRefillQueued = false;
 		}
@@ -1543,13 +1565,40 @@ namespace Files.App.Views.Layouts
 			return Task.CompletedTask;
 		}
 
-		// Rapid successive gestures raise a final ViewChanged between steps; debouncing keeps loads parked through the whole burst
 		private void DeferScrollViewer_ViewChanged(object? sender, ScrollViewerViewChangedEventArgs e)
 		{
+			if (isDisposed || sender is not ScrollViewer scrollViewer || !ReferenceEquals(scrollViewer, deferScrollViewer))
+				return;
+			var moved = scrollViewer.HorizontalOffset != lastScrollHorizontalOffset ||
+				scrollViewer.VerticalOffset != lastScrollVerticalOffset || scrollViewer.ZoomFactor != lastScrollZoomFactor;
+			lastScrollHorizontalOffset = scrollViewer.HorizontalOffset;
+			lastScrollVerticalOffset = scrollViewer.VerticalOffset;
+			lastScrollZoomFactor = scrollViewer.ZoomFactor;
+			var shellViewModel = ParentShellPageInstance?.ShellViewModel;
+			if (!moved)
+			{
+				if (shellViewModel?.IsScrollInFlight is true && !e.IsIntermediate)
+				{
+					// The final event may repeat the last offset; it still closes the gesture's debounce window.
+					if (UiPerformanceTrace.IsEnabled)
+						UiPerformanceTrace.Mark(shellViewModel.PerformanceOperationId, "ScrollFinalWithoutMovement", realizedItems.Count);
+					scrollSettleTimer?.Stop();
+					scrollSettleTimer?.Start();
+				}
+				else if (shellViewModel?.IsScrollInFlight is false)
+				{
+					if (UiPerformanceTrace.IsEnabled)
+						UiPerformanceTrace.Mark(shellViewModel.PerformanceOperationId, "ScrollGeometryIgnored", realizedItems.Count);
+					RefillVisibleItemWork();
+				}
+				return;
+			}
 			viewportWork?.SetPaused(true);
 			metadataWork?.SetPaused(true);
 			ReprioritizeViewportWork();
-			ParentShellPageInstance?.ShellViewModel?.NotifyScrollStateChanged(true);
+			shellViewModel?.NotifyScrollStateChanged(true);
+			if (UiPerformanceTrace.IsEnabled)
+				UiPerformanceTrace.Mark(shellViewModel?.PerformanceOperationId ?? 0, "ScrollDeferred", realizedItems.Count, value: e.IsIntermediate ? 1 : 0);
 			AppMemoryHelper.NotifyActivity();
 
 			if (scrollSettleTimer is null)
@@ -1559,7 +1608,11 @@ namespace Files.App.Views.Layouts
 				scrollSettleTimer.IsRepeating = false;
 				scrollSettleTimer.Tick += (_, _) =>
 				{
+					if (isDisposed || deferScrollViewer is null)
+						return;
 					ParentShellPageInstance?.ShellViewModel?.NotifyScrollStateChanged(false);
+					if (UiPerformanceTrace.IsEnabled)
+						UiPerformanceTrace.Mark(ParentShellPageInstance?.ShellViewModel?.PerformanceOperationId ?? 0, "ScrollSettled", realizedItems.Count);
 					metadataFailures.Clear();
 					thumbnailFailures.Clear();
 					LoadVisibleItemsAfterScrollSettled();
@@ -1568,9 +1621,11 @@ namespace Files.App.Views.Layouts
 				};
 			}
 
-			// Restarted on every change, including intermediate ones, so holding the scrollbar still also settles
+			// Debounce real movement; extent-only changes must not postpone initial image work.
 			scrollSettleTimer.Stop();
 			scrollSettleTimer.Start();
+			if (UiPerformanceTrace.IsEnabled)
+				UiPerformanceTrace.Mark(shellViewModel?.PerformanceOperationId ?? 0, "ScrollSettleScheduled", realizedItems.Count, value: e.IsIntermediate ? 1 : 0);
 		}
 
 		private void RefreshContainer(SelectorItem container, bool inRecycleQueue)
@@ -1634,6 +1689,13 @@ namespace Files.App.Views.Layouts
 					shellViewModel.ReleaseExtendedProperties(previous);
 				}
 				realizedItems[container] = listedItem;
+				if (args.Phase == 0 && NeedsDeferredProperties(listedItem))
+				{
+					if (UiPerformanceTrace.IsEnabled)
+						UiPerformanceTrace.Mark(ParentShellPageInstance?.ShellViewModel?.PerformanceOperationId ?? 0,
+							"ViewportWorkRequested", realizedItems.Count, value: args.ItemIndex);
+					RefillVisibleItemWork();
+				}
 				UpdateItemToolTip(container, listedItem.ItemTooltipText);
 				InitializeDrag(container, listedItem);
 
