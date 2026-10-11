@@ -13,11 +13,22 @@ namespace Files.App.Services
 		private static readonly string _dummyPath = Path.Combine(Path.GetPathRoot(Environment.SystemDirectory)!, "x46696c6573");
 
 		private readonly ConcurrentDictionary<IconCacheKey, Lazy<Task<ShellImageData?>>> _data = new();
+		private const long CacheBudgetBytes = 16 * 1024 * 1024;
+		private const int MaximumEntries = 256;
+		private readonly object _dataGate = new();
+		private readonly Dictionary<IconCacheKey, (Lazy<Task<ShellImageData?>> Owner, long Bytes)> _dataSizes = new();
+		private readonly Queue<IconCacheKey> _dataOrder = new();
+		private long _dataBytes;
 
 		// Images have thread affinity; only the main window's thread reads or fills this map.
 		private readonly Dictionary<IconCacheKey, ImageSource> _images = new();
 		private readonly Dictionary<IconCacheKey, Lazy<Task<ImageSource?>>> _imageLoads = new();
+		private readonly Queue<(IconCacheKey Key, long Bytes)> _imageOrder = new();
+		private long _imageBytes;
 		private int _imageGeneration;
+
+		internal long RetainedDataBytes { get { lock (_dataGate) return _dataBytes; } }
+		internal long RetainedImageBytes => _imageBytes;
 
 		public Task<ShellImageData?> GetIconDataAsync(string? extension, bool isFolder, uint size)
 		{
@@ -42,6 +53,8 @@ namespace Files.App.Services
 				var data = await FileThumbnailHelper.GetImageDataAsync(iconPath, size, isFolder, IconOptions.ReturnIconOnly, priority: STATaskPriority.Fast);
 				if (data is null)
 					_data.TryRemove(new KeyValuePair<IconCacheKey, Lazy<Task<ShellImageData?>>>(key, entry));
+				else
+					RememberData(key, entry, data.Pixels?.LongLength ?? data.Encoded?.LongLength ?? 0);
 
 				return data;
 			}
@@ -65,7 +78,7 @@ namespace Files.App.Services
 			if (_data.TryGetValue(key, out var entry) && entry.IsValueCreated && entry.Value.IsCompletedSuccessfully &&
 				entry.Value.Result?.TryCreateImage() is { } created)
 			{
-				_images[key] = created;
+				RememberImage(key, created, entry.Value.Result.GetDecodedByteCount(created, key.PhysicalSize));
 				return created;
 			}
 
@@ -107,7 +120,7 @@ namespace Files.App.Services
 
 			var decoded = await data.CreateImageAsync(FileThumbnailHelper.GetPhysicalSize(size));
 			if (decoded is not null && generation == _imageGeneration)
-				_images.TryAdd(key, decoded);
+				RememberImage(key, decoded, data.GetDecodedByteCount(decoded, key.PhysicalSize));
 
 			return decoded;
 		}
@@ -129,14 +142,70 @@ namespace Files.App.Services
 
 		public void Clear()
 		{
-			_data.Clear();
+			lock (_dataGate)
+			{
+				_data.Clear();
+				_dataSizes.Clear();
+				_dataOrder.Clear();
+				_dataBytes = 0;
+			}
 			if (IsImageThread())
 			{
 				_imageGeneration++;
 				_images.Clear();
 				_imageLoads.Clear();
+				_imageOrder.Clear();
+				_imageBytes = 0;
 			}
 		}
+
+		private void RememberData(IconCacheKey key, Lazy<Task<ShellImageData?>> owner, long bytes)
+		{
+			lock (_dataGate)
+			{
+				if (!_data.TryGetValue(key, out var current) || !ReferenceEquals(current, owner))
+					return;
+				_dataSizes[key] = (owner, bytes);
+				_dataOrder.Enqueue(key);
+				_dataBytes += bytes;
+				while (_dataBytes > CacheBudgetBytes || _dataSizes.Count > MaximumEntries)
+				{
+					var oldest = _dataOrder.Dequeue();
+					if (IsFallback(oldest) && _dataSizes.Keys.Any(candidate => !IsFallback(candidate)))
+					{
+						_dataOrder.Enqueue(oldest);
+						continue;
+					}
+					if (_dataSizes.Remove(oldest, out var entry))
+					{
+						_data.TryRemove(new KeyValuePair<IconCacheKey, Lazy<Task<ShellImageData?>>>(oldest, entry.Owner));
+						_dataBytes -= entry.Bytes;
+					}
+				}
+			}
+		}
+
+		private void RememberImage(IconCacheKey key, ImageSource image, long bytes)
+		{
+			if (_images.ContainsKey(key) || bytes > CacheBudgetBytes)
+				return;
+			_images[key] = image;
+			_imageOrder.Enqueue((key, bytes));
+			_imageBytes += bytes;
+			while (_imageBytes > CacheBudgetBytes || _images.Count > MaximumEntries)
+			{
+				var oldest = _imageOrder.Dequeue();
+				if (IsFallback(oldest.Key) && _images.Keys.Any(candidate => !IsFallback(candidate)))
+				{
+					_imageOrder.Enqueue(oldest);
+					continue;
+				}
+				_images.Remove(oldest.Key);
+				_imageBytes -= oldest.Bytes;
+			}
+		}
+
+		private static bool IsFallback(IconCacheKey key) => key.Type is ":folder:" or ":noext:";
 
 		// An empty file of the type lets the shell scale the type icon like a real item; for paths that do not exist
 		// the image-list fallback pads small icons (e.g. packaged app logos) into a corner of the jumbo cell.

@@ -41,13 +41,20 @@ namespace Files.App.Services
 		private readonly Dictionary<ThumbnailImageKey, LinkedListNode<Entry>> entries = new();
 		private readonly LinkedList<Entry> order = new();
 		private readonly ConcurrentDictionary<(string Path, long ModifiedTicks), long> missing = new();
+		private readonly Func<long> tickCount;
 
 		public static ThumbnailImageCache Default { get; } = new(DefaultBudgetBytes);
 
 		public ThumbnailImageCache(long budgetBytes)
+			: this(budgetBytes, static () => Environment.TickCount64)
+		{
+		}
+
+		internal ThumbnailImageCache(long budgetBytes, Func<long> tickCount)
 		{
 			ArgumentOutOfRangeException.ThrowIfLessThan(budgetBytes, 1);
 			BudgetBytes = budgetBytes;
+			this.tickCount = tickCount;
 		}
 
 		public long BudgetBytes { get; }
@@ -146,12 +153,12 @@ namespace Files.App.Services
 		{
 			if (missing.Count >= MaximumMissingEntries)
 				missing.Clear();
-			missing[(path.ToUpperInvariant(), modified.UtcTicks)] = Environment.TickCount64;
+			missing[(path.ToUpperInvariant(), modified.UtcTicks)] = tickCount();
 		}
 
 		public bool IsMissing(string path, DateTimeOffset modified)
 			=> !missing.IsEmpty && missing.TryGetValue((path.ToUpperInvariant(), modified.UtcTicks), out var marked) &&
-				Environment.TickCount64 - marked < MissingLifetime.TotalMilliseconds;
+				tickCount() - marked < MissingLifetime.TotalMilliseconds;
 
 		private void RemoveMissing(string path)
 		{

@@ -35,6 +35,13 @@ namespace Files.App.Utils.Storage
 		/// </summary>
 		public long ByteCount => Pixels?.LongLength ?? (long)Math.Max(1, Width) * Math.Max(1, Height) * 4;
 
+		public long GetDecodedByteCount(ImageSource image, int maxSide)
+		{
+			if (image is BitmapSource bitmap && bitmap.PixelWidth > 0 && bitmap.PixelHeight > 0)
+				return (long)bitmap.PixelWidth * bitmap.PixelHeight * 4;
+			return Pixels?.LongLength ?? (long)Math.Max(1, maxSide) * Math.Max(1, maxSide) * 4;
+		}
+
 		public static ShellImageData FromEncoded(byte[] encoded)
 			=> new(null, 0, 0, encoded);
 

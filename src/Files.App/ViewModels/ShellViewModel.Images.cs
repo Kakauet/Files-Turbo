@@ -387,7 +387,7 @@ namespace Files.App.ViewModels
 			if (image is null || !IsCurrent(pending.Request, pending.Token))
 				return;
 
-			imageCache.Add(key, image, pending.Data.ByteCount);
+			imageCache.Add(key, image, pending.Data.GetDecodedByteCount(image, pending.Request.PhysicalSize));
 			if (IsCurrent(pending.Request, pending.Token) && !IsThumbnailOf(pending.Request.Item.ImageKey, pending.Request))
 				SetItemImage(pending.Request.Item, image, key, pending.Final);
 		}
