@@ -1,8 +1,7 @@
 // Copyright (c) Files Community
 // SPDX-License-Identifier: MPL-2.0
 
-using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.UI.Xaml.Media;
 using System.Collections.Concurrent;
 using System.IO;
 
@@ -13,27 +12,23 @@ namespace Files.App.Services
 		// Dummy path to generate generic icons for folders, executables, and shortcuts.
 		private static readonly string _dummyPath = Path.Combine(Path.GetPathRoot(Environment.SystemDirectory)!, "x46696c6573");
 
-		private readonly ConcurrentDictionary<IconCacheKey, Lazy<Task<byte[]?>>> _cache = new();
-		private ConcurrentDictionary<IconCacheKey, Lazy<Task<BitmapImage?>>> _imageCache = new();
+		private readonly ConcurrentDictionary<IconCacheKey, Lazy<Task<ShellImageData?>>> _data = new();
 
-		public Task<byte[]?> GetIconAsync(string? itemPath, string? extension, bool isFolder, uint size)
+		// Images have thread affinity; only the main window's thread reads or fills this map.
+		private readonly Dictionary<IconCacheKey, ImageSource> _images = new();
+
+		public Task<ShellImageData?> GetIconDataAsync(string? extension, bool isFolder, uint size)
 		{
 			var key = GetCacheKey(extension, isFolder, size);
-
-			if (_cache.TryGetValue(key, out var cached))
+			if (_data.TryGetValue(key, out var cached))
 				return cached.Value;
 
-			return GetOrCreateIconAsync(key, extension, isFolder, size);
+			Lazy<Task<ShellImageData?>>? entry = null;
+			entry = new(() => LoadIconDataAsync(key, extension, isFolder, size, entry!));
+			return _data.GetOrAdd(key, entry).Value;
 		}
 
-		private Task<byte[]?> GetOrCreateIconAsync(IconCacheKey key, string? extension, bool isFolder, uint size)
-		{
-			Lazy<Task<byte[]?>>? entry = null;
-			entry = new(() => LoadIconAsync(key, extension, isFolder, size, entry!));
-			return _cache.GetOrAdd(key, entry).Value;
-		}
-
-		private async Task<byte[]?> LoadIconAsync(IconCacheKey key, string? extension, bool isFolder, uint size, Lazy<Task<byte[]?>> entry)
+		private async Task<ShellImageData?> LoadIconDataAsync(IconCacheKey key, string? extension, bool isFolder, uint size, Lazy<Task<ShellImageData?>> entry)
 		{
 			try
 			{
@@ -41,69 +36,108 @@ namespace Files.App.Services
 				// extension alone. This works correctly for all path types (local, MTP, FTP, network,
 				// cloud, etc.) because the cache is keyed by extension anyway, not by item identity.
 				// Folders use a real path so the exact-size extraction succeeds and matches per-item icons.
-				var iconPath = isFolder ? Environment.SystemDirectory : (string.IsNullOrEmpty(extension) ? _dummyPath : _dummyPath + extension);
+				var iconPath = isFolder ? Environment.SystemDirectory : GetProbePath(extension) ?? (string.IsNullOrEmpty(extension) ? _dummyPath : _dummyPath + extension);
+				var data = await FileThumbnailHelper.GetImageDataAsync(iconPath, size, isFolder, IconOptions.ReturnIconOnly, priority: STATaskPriority.Fast);
+				if (data is null)
+					_data.TryRemove(new KeyValuePair<IconCacheKey, Lazy<Task<ShellImageData?>>>(key, entry));
 
-				return await FileThumbnailHelper.GetIconAsync(
-					iconPath,
-					size,
-					isFolder,
-					IconOptions.ReturnIconOnly);
+				return data;
 			}
 			catch
 			{
 				// Retry failures without removing a replacement created after Clear.
-				_cache.TryRemove(new KeyValuePair<IconCacheKey, Lazy<Task<byte[]?>>>(key, entry));
+				_data.TryRemove(new KeyValuePair<IconCacheKey, Lazy<Task<ShellImageData?>>>(key, entry));
 				throw;
 			}
 		}
 
-		public Task<BitmapImage?> GetIconImageAsync(string? itemPath, string? extension, bool isFolder, uint size)
+		public ImageSource? TryGetIconImage(string? extension, bool isFolder, uint size)
 		{
-			// BitmapImage has thread affinity, so only the main window's dispatcher may use this cache
-			if (DispatcherQueue.GetForCurrentThread() is null)
-				return Task.FromResult<BitmapImage?>(null);
+			if (!IsImageThread())
+				return null;
 
 			var key = GetCacheKey(extension, isFolder, size);
-			var imageCache = Volatile.Read(ref _imageCache);
-			if (imageCache.TryGetValue(key, out var cached))
-				return cached.Value;
+			if (_images.TryGetValue(key, out var image))
+				return image;
 
-			Lazy<Task<BitmapImage?>>? entry = null;
-			entry = new(() => LoadImageAsync(imageCache, key, itemPath, extension, isFolder, size, entry!));
-			return imageCache.GetOrAdd(key, entry).Value;
+			if (_data.TryGetValue(key, out var entry) && entry.IsValueCreated && entry.Value.IsCompletedSuccessfully &&
+				entry.Value.Result?.TryCreateImage() is { } created)
+			{
+				_images[key] = created;
+				return created;
+			}
+
+			return null;
 		}
 
-		private async Task<BitmapImage?> LoadImageAsync(ConcurrentDictionary<IconCacheKey, Lazy<Task<BitmapImage?>>> imageCache,
-			IconCacheKey key, string? itemPath, string? extension, bool isFolder, uint size, Lazy<Task<BitmapImage?>> entry)
+		public async Task<ImageSource?> GetIconImageAsync(string? extension, bool isFolder, uint size)
 		{
-			try
-			{
-				var data = await GetIconAsync(itemPath, extension, isFolder, size);
-				var decodeSize = Math.Max(1, (int)Math.Ceiling(size * App.AppModel.AppWindowDPI));
-				var image = data is null ? null : await data.ToBitmapAsync(decodeSize, DecodePixelType.Physical,
-					preserveAspectRatio: true, useSynchronousSmallThumbnail: true);
-				if (image is null)
-					imageCache.TryRemove(new KeyValuePair<IconCacheKey, Lazy<Task<BitmapImage?>>>(key, entry));
-
+			if (TryGetIconImage(extension, isFolder, size) is { } image)
 				return image;
-			}
-			catch
+
+			var data = await GetIconDataAsync(extension, isFolder, size);
+			if (data is null || !IsImageThread())
+				return null;
+			if (TryGetIconImage(extension, isFolder, size) is { } created)
+				return created;
+
+			var decoded = await data.CreateImageAsync(FileThumbnailHelper.GetPhysicalSize(size));
+			if (decoded is not null)
+				_images.TryAdd(GetCacheKey(extension, isFolder, size), decoded);
+
+			return decoded;
+		}
+
+		public async Task PreloadAsync(IEnumerable<(string? Extension, bool IsFolder)> types, uint size, CancellationToken cancellationToken = default)
+		{
+			var pending = new List<Task<ShellImageData?>>();
+			foreach (var (extension, isFolder) in types)
 			{
-				imageCache.TryRemove(new KeyValuePair<IconCacheKey, Lazy<Task<BitmapImage?>>>(key, entry));
-				throw;
+				var key = GetCacheKey(extension, isFolder, size);
+				if (_data.TryGetValue(key, out var entry) && entry.IsValueCreated && entry.Value.IsCompleted)
+					continue;
+				pending.Add(GetIconDataAsync(extension, isFolder, size));
 			}
+
+			if (pending.Count > 0)
+				await Task.WhenAll(pending).WaitAsync(cancellationToken);
 		}
 
 		public void Clear()
 		{
-			_cache.Clear();
-			// Pending decodes may complete, but cannot repopulate the current generation.
-			Interlocked.Exchange(ref _imageCache, new());
+			_data.Clear();
+			if (IsImageThread())
+				_images.Clear();
 		}
 
-		private static IconCacheKey GetCacheKey(string? extension, bool isFolder, uint size)
-			=> new(isFolder ? ":folder:" : extension?.ToLowerInvariant() ?? ":noext:", size);
+		// An empty file of the type lets the shell scale the type icon like a real item; for paths that do not exist
+		// the image-list fallback pads small icons (e.g. packaged app logos) into a corner of the jumbo cell.
+		private static string? GetProbePath(string? extension)
+		{
+			try
+			{
+				var folder = Path.Combine(Windows.Storage.ApplicationData.Current.LocalCacheFolder.Path, "IconProbes");
+				var path = Path.Combine(folder, "x" + (extension ?? string.Empty).ToLowerInvariant());
+				if (!File.Exists(path))
+				{
+					Directory.CreateDirectory(folder);
+					File.WriteAllBytes(path, []);
+				}
 
-		private readonly record struct IconCacheKey(string Type, uint Size);
+				return path;
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+		}
+
+		private static bool IsImageThread()
+			=> MainWindow.Instance.DispatcherQueue.HasThreadAccess;
+
+		private static IconCacheKey GetCacheKey(string? extension, bool isFolder, uint size)
+			=> new(isFolder ? ":folder:" : extension?.ToLowerInvariant() ?? ":noext:", FileThumbnailHelper.GetPhysicalSize(size));
+
+		private readonly record struct IconCacheKey(string Type, int PhysicalSize);
 	}
 }

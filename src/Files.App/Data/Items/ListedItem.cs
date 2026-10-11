@@ -5,6 +5,7 @@ using Files.App.ViewModels.Properties;
 using Files.Shared.Helpers;
 using FluentFTP;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -170,16 +171,30 @@ namespace Files.App.Utils
 			get => string.IsNullOrEmpty(SyncStatusUI?.SyncStatusString) ? Strings.CloudDriveSyncStatus_Unknown.GetLocalizedResource() : SyncStatusUI.SyncStatusString;
 		}
 
-		private BitmapImage? fileImage;
-		public BitmapImage? FileImage
+		private ImageSource? fileImage;
+		public ImageSource? FileImage
 		{
 			get => fileImage;
 			set
 			{
-				if (SetProperty(ref fileImage, value) && value is BitmapImage)
+				if (SetProperty(ref fileImage, value) && value is not null)
 					LoadFileIcon = true;
 			}
 		}
+
+		/// <summary>
+		/// Raw Win32 attributes from enumeration, when known.
+		/// </summary>
+		public System.IO.FileAttributes? Win32Attributes { get; set; }
+
+		// Image pipeline bookkeeping, only touched on the UI thread.
+		// The token changes on every realization and recycle, so late results never reach another row's image.
+		internal int ImageToken { get; set; }
+
+		// Identity of the image the pipeline placed in FileImage; Path is null for placeholders or foreign images.
+		internal ThumbnailImageKey ImageKey { get; set; }
+
+		internal bool HasFinalImage { get; set; }
 
 		public bool IsItemPinnedToStart
 		{
@@ -194,26 +209,14 @@ namespace Files.App.Utils
 		public BitmapImage? IconOverlay
 		{
 			get => iconOverlay;
-			set
-			{
-				if (value is not null)
-				{
-					SetProperty(ref iconOverlay, value);
-				}
-			}
+			set => SetProperty(ref iconOverlay, value);
 		}
 
 		private BitmapImage? shieldIcon;
 		public BitmapImage? ShieldIcon
 		{
 			get => shieldIcon;
-			set
-			{
-				if (value is not null)
-				{
-					SetProperty(ref shieldIcon, value);
-				}
-			}
+			set => SetProperty(ref shieldIcon, value);
 		}
 
 		private string? itemPath;

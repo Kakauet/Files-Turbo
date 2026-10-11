@@ -63,6 +63,7 @@ namespace Files.App.Utils.Storage
 							var file = await GetFile(findData, path, isGitRepo, cancellationToken);
 							if (file is not null)
 							{
+								file.Win32Attributes = (FileAttributes)findData.dwFileAttributes;
 								var filePath = file.ItemPath!;
 								tempList.Add(file);
 								++count;
@@ -78,6 +79,7 @@ namespace Files.App.Utils.Storage
 								var folder = await GetFolder(findData, path, isGitRepo, cancellationToken);
 								if (folder is not null)
 								{
+									folder.Win32Attributes = (FileAttributes)findData.dwFileAttributes;
 									var folderPath = folder.ItemPath!;
 									tempList.Add(folder);
 									++count;

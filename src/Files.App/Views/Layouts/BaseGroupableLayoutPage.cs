@@ -147,6 +147,7 @@ namespace Files.App.Views.Layouts
 			shellViewModel.CancelExtendedPropertiesLoading();
 			selectedItem.ItemPropertiesInitialized = false;
 
+			_ = shellViewModel.RefreshItemImageAsync(selectedItem);
 			await shellViewModel.LoadExtendedItemPropertiesAsync(selectedItem);
 
 			if (shellViewModel.EnabledGitProperties is not GitProperties.None &&
@@ -169,6 +170,7 @@ namespace Files.App.Views.Layouts
 			foreach (var selectedItem in selectedItems)
 			{
 				selectedItem.ItemPropertiesInitialized = false;
+				_ = shellViewModel.RefreshItemImageAsync(selectedItem);
 				await shellViewModel.LoadExtendedItemPropertiesAsync(selectedItem);
 			}
 

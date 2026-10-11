@@ -67,13 +67,11 @@ namespace Files.App.Views.Layouts
 		private CancellationTokenSource? shellContextMenuItemCancellationToken;
 		private CancellationTokenSource? groupingCancellationToken;
 		private readonly Dictionary<SelectorItem, ListedItem> realizedItems = new(ReferenceEqualityComparer.Instance);
-		private readonly Dictionary<ListedItem, ShellViewModel.InitialThumbnailLoadResult> viewportThumbnails = new(ReferenceEqualityComparer.Instance);
 		private readonly Dictionary<ListedItem, int> metadataFailures = new(ReferenceEqualityComparer.Instance);
-		private readonly Dictionary<ListedItem, int> thumbnailFailures = new(ReferenceEqualityComparer.Instance);
-		private ViewportWorkQueue<ListedItem>? viewportWork;
+		private readonly Dictionary<ListedItem, ItemImageJob> imageJobs = new(ReferenceEqualityComparer.Instance);
+		private ViewportWorkQueue<ItemImageJob>? slowImageWork;
 		private ViewportWorkQueue<ListedItem>? metadataWork;
 		private bool viewportRefillQueued;
-		private bool isReloadingRealizedItems;
 		private UiPerformanceViewProbe? performanceViewProbe;
 
 		private bool shiftPressed;
@@ -1281,6 +1279,10 @@ namespace Files.App.Views.Layouts
 			if (performanceViewProbe is null && UiPerformanceTrace.IsEnabled)
 				performanceViewProbe = new UiPerformanceViewProbe(ItemsControl,
 					() => ParentShellPageInstance?.ShellViewModel?.PerformanceOperationId ?? 0, GetVisibleIndexRange);
+			// Matches the slow STA lane; tier 1 results enqueue here from background threads
+			slowImageWork ??= new ViewportWorkQueue<ItemImageJob>(8, 4096,
+				action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () => action()),
+				faulted: exception => App.Logger.LogWarning(exception, "Failed to generate a row thumbnail."), newestFirst: false);
 			if (deferScrollViewer is not null)
 				return;
 
@@ -1297,16 +1299,15 @@ namespace Files.App.Views.Layouts
 		private void UnhookScrollDeferTracking()
 		{
 			scrollSettleTimer?.Stop();
-			viewportWork?.Dispose();
-			viewportWork = null;
+			CancelAllItemImages();
+			slowImageWork?.Dispose();
+			slowImageWork = null;
 			metadataWork?.Dispose();
 			metadataWork = null;
 			performanceViewProbe?.Dispose();
 			performanceViewProbe = null;
 			realizedItems.Clear();
-			viewportThumbnails.Clear();
 			metadataFailures.Clear();
-			thumbnailFailures.Clear();
 			ParentShellPageInstance?.ShellViewModel?.NotifyScrollStateChanged(false);
 
 			if (deferScrollViewer is not null)
@@ -1327,31 +1328,138 @@ namespace Files.App.Views.Layouts
 				.Where(pair => IsCurrentContainer(pair.Key, pair.Value)).Select(pair => pair.Value));
 		}
 
-		private void ReprioritizeViewportWork()
+		/// <summary>
+		/// The image and metadata work of one realization of a row.
+		/// </summary>
+		private sealed class ItemImageJob
 		{
-			if (viewportWork is null)
-				return;
+			public CancellationTokenSource Cancellation { get; } = new();
+
+			public volatile bool Completed;
+
+			public int Attempts;
+		}
+
+		// Visible rows first, top to bottom; realized rows outside the viewport after them.
+		private int GetWorkPriority(int index)
+		{
+			if (index < 0)
+				return int.MaxValue / 2;
+
 			var (first, last) = GetVisibleIndexRange();
 			if (first < 0 || last < first)
+				return index;
+
+			return index >= first && index <= last ? index - first : 100_000 + (index < first ? first - index : index - last);
+		}
+
+		// Runs once per scroll gesture, not per scroll event, so pending work follows the new viewport.
+		private void ReprioritizeViewportWork()
+		{
+			if (slowImageWork is null && metadataWork is null)
 				return;
 
 			foreach (var (container, item) in realizedItems)
 			{
-				var index = ItemsControl.IndexFromContainer(container);
-				if (index >= first && index <= last)
-				{
-					viewportWork.SetPriority(item, index - first);
-					metadataWork?.SetPriority(item, index - first);
-				}
-				else
-				{
-					viewportWork.Cancel(item);
-					metadataWork?.Cancel(item);
-					viewportThumbnails.Remove(item);
-					metadataFailures.Remove(item);
-					thumbnailFailures.Remove(item);
-				}
+				var priority = GetWorkPriority(ItemsControl.IndexFromContainer(container));
+				if (imageJobs.TryGetValue(item, out var job))
+					slowImageWork?.SetPriority(job, priority);
+				metadataWork?.SetPriority(item, priority);
 			}
+		}
+
+		/// <summary>
+		/// Tier 0 paints the row now; tier 1 starts right away on the fast lane; tier 2 waits in the bounded slow queue.
+		/// </summary>
+		private void StartItemImage(SelectorItem container, ListedItem item, ShellViewModel shellViewModel, int index, int attempts = 0)
+		{
+			CancelItemImage(item);
+			shellViewModel.BeginItemImage(item);
+			var (work, request) = shellViewModel.ApplyImmediateImage(item);
+			if (work == ShellViewModel.ItemImageWork.None)
+				return;
+
+			var job = new ItemImageJob { Attempts = attempts };
+			imageJobs[item] = job;
+			_ = RunItemImageAsync(container, item, shellViewModel, request, work, GetWorkPriority(index), job);
+		}
+
+		private async Task RunItemImageAsync(SelectorItem container, ListedItem item, ShellViewModel shellViewModel,
+			ShellViewModel.ItemImageRequest request, ShellViewModel.ItemImageWork work, int priority, ItemImageJob job)
+		{
+			var token = job.Cancellation.Token;
+			var queued = false;
+			try
+			{
+				// Continues off the UI thread; results reach rows through the view model's batched apply
+				if (!await shellViewModel.LoadFastImageAsync(request, work, token).ConfigureAwait(false) || token.IsCancellationRequested)
+					return;
+
+				queued = slowImageWork?.Enqueue(job, async queueToken =>
+				{
+					try
+					{
+						if (token.IsCancellationRequested || !IsCurrentContainer(container, item))
+							return;
+
+						using var linked = CancellationTokenSource.CreateLinkedTokenSource(token, queueToken);
+						await shellViewModel.LoadSlowImageAsync(request, linked.Token).ConfigureAwait(false);
+					}
+					finally
+					{
+						job.Completed = true;
+					}
+				}, priority) is true;
+			}
+			finally
+			{
+				if (!queued)
+					job.Completed = true;
+			}
+		}
+
+		private void CancelItemImage(ListedItem item)
+		{
+			if (!imageJobs.Remove(item, out var job))
+				return;
+
+			job.Cancellation.Cancel();
+			slowImageWork?.Cancel(job);
+		}
+
+		private void CancelAllItemImages()
+		{
+			foreach (var job in imageJobs.Values)
+				job.Cancellation.Cancel();
+			imageJobs.Clear();
+			slowImageWork?.CancelAll();
+		}
+
+		private void ReleaseRealizedItem(ListedItem item)
+		{
+			CancelItemImage(item);
+			metadataWork?.Cancel(item);
+			metadataFailures.Remove(item);
+			if (ParentShellPageInstance?.ShellViewModel is { } shellViewModel)
+			{
+				shellViewModel.CancelExtendedPropertiesLoadingForItem(item);
+				shellViewModel.ReleaseItemImage(item);
+			}
+		}
+
+		// A visible row whose image work ended without its final image gets one more attempt.
+		private void EnsureItemImage(SelectorItem container, ListedItem item, ShellViewModel shellViewModel, int index)
+		{
+			if (item.HasFinalImage)
+				return;
+
+			if (!imageJobs.TryGetValue(item, out var job))
+			{
+				if (item.FileImage is null)
+					StartItemImage(container, item, shellViewModel, index);
+			}
+			else if (job.Completed && job.Attempts < 1)
+				StartItemImage(container, item, shellViewModel, index, job.Attempts + 1);
 		}
 
 		// Loads extended properties for the rows visible where the scroll stopped; rows scrolled past load when they next come into view
@@ -1366,10 +1474,13 @@ namespace Files.App.Views.Layouts
 			{
 				for (var i = first; i <= last; i++)
 				{
-					if (ItemsControl.ContainerFromIndex(i) is SelectorItem { Content: ListedItem item } container && NeedsDeferredProperties(item))
+					if (ItemsControl.ContainerFromIndex(i) is SelectorItem { Content: ListedItem item } container)
 					{
-						realizedItems.TryAdd(container, item);
-						QueueItemProperties(container, item, shellViewModel);
+						if (!realizedItems.ContainsKey(container))
+							continue;
+						EnsureItemImage(container, item, shellViewModel, i);
+						if (NeedsDeferredProperties(item))
+							QueueItemProperties(container, item, shellViewModel);
 					}
 				}
 			}
@@ -1378,7 +1489,11 @@ namespace Files.App.Views.Layouts
 				// A missing visible range must not restore XAML's realization order.
 				foreach (var (container, item) in realizedItems.OrderBy(pair => ItemsControl.IndexFromContainer(pair.Key)))
 				{
-					if (ItemsControl.IndexFromContainer(container) >= 0 && IsCurrentContainer(container, item) && NeedsDeferredProperties(item))
+					var index = ItemsControl.IndexFromContainer(container);
+					if (index < 0 || !IsCurrentContainer(container, item))
+						continue;
+					EnsureItemImage(container, item, shellViewModel, index);
+					if (NeedsDeferredProperties(item))
 						QueueItemProperties(container, item, shellViewModel);
 				}
 			}
@@ -1398,83 +1513,18 @@ namespace Files.App.Views.Layouts
 			=> !isDisposed && navigationArguments is not null && realizedItems.TryGetValue(container, out var current) &&
 				ReferenceEquals(current, item) && ReferenceEquals(container.Content, item);
 
-		private void QueueItemProperties(SelectorItem container, ListedItem item, ShellViewModel shellViewModel, int priority = 0)
+		// Tier 3: overlays and properties, after the images and never during a scroll gesture.
+		private void QueueItemProperties(SelectorItem container, ListedItem item, ShellViewModel shellViewModel)
 		{
-			if (!IsCurrentContainer(container, item) || shellViewModel.IsScrollInFlight)
+			if (!IsCurrentContainer(container, item) || shellViewModel.IsScrollInFlight || metadataFailures.GetValueOrDefault(item) >= 2)
 				return;
-			if (thumbnailFailures.GetValueOrDefault(item) >= 2)
-				return;
-			var (first, last) = GetVisibleIndexRange();
-			var index = ItemsControl.IndexFromContainer(container);
-			priority = index < 0 || first >= 0 && (index < first || index > last) ? int.MaxValue : index - Math.Max(0, first);
-			if (viewportThumbnails.TryGetValue(item, out var thumbnail))
-			{
-				if (shellViewModel.IsViewportThumbnailCurrent(item, thumbnail))
-				{
-					QueueItemMetadata(container, item, shellViewModel, thumbnail, priority);
-					return;
-				}
-				viewportThumbnails.Remove(item);
-				metadataFailures.Remove(item);
-				thumbnailFailures.Remove(item);
-				viewportWork?.Cancel(item);
-				metadataWork?.Cancel(item);
-				shellViewModel.CancelExtendedPropertiesLoadingForItem(item);
-			}
 
-			viewportWork ??= new ViewportWorkQueue<ListedItem>(4, 128,
-				action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () => action()),
-				RefillVisibleItemWork,
-				exception => App.Logger.LogWarning(exception, "Failed to load deferred row properties."), newestFirst: false);
-			viewportWork.SetPaused(isReloadingRealizedItems || shellViewModel.IsScrollInFlight);
-			var performanceOperation = shellViewModel.PerformanceOperationId;
-			viewportWork.Enqueue(item, async token =>
-			{
-				if (!IsCurrentContainer(container, item) ||
-					!ReferenceEquals(ParentShellPageInstance?.ShellViewModel, shellViewModel))
-					return;
-
-				var started = UiPerformanceTrace.IsEnabled ? Stopwatch.GetTimestamp() : 0;
-				if (started != 0)
-					UiPerformanceTrace.Mark(performanceOperation, "ItemJobStarted", viewportWork?.ActiveCount ?? 0,
-						value: viewportWork?.PendingCount ?? 0);
-				try
-				{
-					var initialThumbnail = item.ItemPropertiesInitialized ? default : await shellViewModel.LoadViewportThumbnailAsync(item, token);
-					token.ThrowIfCancellationRequested();
-					if (initialThumbnail.LoadCompleted)
-						viewportThumbnails[item] = initialThumbnail;
-					thumbnailFailures.Remove(item);
-					QueueItemMetadata(container, item, shellViewModel, initialThumbnail, priority);
-					if (started != 0)
-						UiPerformanceTrace.Mark(performanceOperation, "ItemJobCompleted", durationMs: Stopwatch.GetElapsedTime(started).TotalMilliseconds);
-				}
-				catch (OperationCanceledException)
-				{
-					if (!token.IsCancellationRequested && IsCurrentContainer(container, item))
-						thumbnailFailures[item] = thumbnailFailures.GetValueOrDefault(item) + 1;
-					if (started != 0)
-						UiPerformanceTrace.Mark(performanceOperation, "ItemJobCancelled", durationMs: Stopwatch.GetElapsedTime(started).TotalMilliseconds);
-					throw;
-				}
-				catch (Exception) when (!token.IsCancellationRequested && IsCurrentContainer(container, item))
-				{
-					thumbnailFailures[item] = thumbnailFailures.GetValueOrDefault(item) + 1;
-					throw;
-				}
-			}, priority, (int)shellViewModel.EnabledGitProperties);
-		}
-
-		private void QueueItemMetadata(SelectorItem container, ListedItem item, ShellViewModel shellViewModel,
-			ShellViewModel.InitialThumbnailLoadResult initialThumbnail, int priority)
-		{
-			if (metadataFailures.GetValueOrDefault(item) >= 2)
-				return;
-			metadataWork ??= new ViewportWorkQueue<ListedItem>(4, 128,
+			var priority = GetWorkPriority(ItemsControl.IndexFromContainer(container));
+			metadataWork ??= new ViewportWorkQueue<ListedItem>(4, 1024,
 				action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => action()),
 				RefillVisibleItemWork,
 				faulted: exception => App.Logger.LogWarning(exception, "Failed to load deferred row metadata."), newestFirst: false);
-			metadataWork.SetPaused(isReloadingRealizedItems || shellViewModel.IsScrollInFlight);
+			metadataWork.SetPaused(shellViewModel.IsScrollInFlight);
 			metadataWork.Enqueue(item, async token =>
 			{
 				if (!IsCurrentContainer(container, item) || !ReferenceEquals(ParentShellPageInstance?.ShellViewModel, shellViewModel))
@@ -1483,7 +1533,7 @@ namespace Files.App.Views.Layouts
 				{
 					token.ThrowIfCancellationRequested();
 					if (!item.ItemPropertiesInitialized)
-						await shellViewModel.LoadExtendedItemPropertiesAsync(item, token, initialThumbnail);
+						await shellViewModel.LoadExtendedItemPropertiesAsync(item, token);
 					token.ThrowIfCancellationRequested();
 					if (!item.ItemPropertiesInitialized)
 						throw new OperationCanceledException();
@@ -1501,7 +1551,7 @@ namespace Files.App.Views.Layouts
 
 		private void RefillVisibleItemWork()
 		{
-			if (isDisposed || navigationArguments is null || viewportRefillQueued || viewportWork is { PendingCount: > 0 } ||
+			if (isDisposed || navigationArguments is null || viewportRefillQueued || metadataWork is { PendingCount: > 0 } ||
 				ParentShellPageInstance?.ShellViewModel is not { IsScrollInFlight: false } shellViewModel)
 				return;
 			viewportRefillQueued = true;
@@ -1509,7 +1559,7 @@ namespace Files.App.Views.Layouts
 			var requestedAt = UiPerformanceTrace.IsEnabled ? Stopwatch.GetTimestamp() : 0;
 			if (requestedAt != 0)
 				UiPerformanceTrace.Mark(performanceOperation, "ViewportPassQueued", realizedItems.Count);
-			if (!DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () =>
+			if (!DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
 			{
 				viewportRefillQueued = false;
 				if (!isDisposed && navigationArguments is not null && shellViewModel.IsScrollInFlight is false &&
@@ -1533,35 +1583,17 @@ namespace Files.App.Views.Layouts
 			if (ParentShellPageInstance?.ShellViewModel is not { } shellViewModel)
 				return Task.CompletedTask;
 
-			viewportWork?.CancelAll();
+			CancelAllItemImages();
 			metadataWork?.CancelAll();
-			viewportWork?.SetPaused(true);
-			metadataWork?.SetPaused(true);
-			viewportThumbnails.Clear();
 			metadataFailures.Clear();
-			thumbnailFailures.Clear();
 			shellViewModel.CancelExtendedPropertiesLoading();
 			foreach (var item in shellViewModel.FilesAndFolders)
 				item.ItemPropertiesInitialized = false;
 
-			isReloadingRealizedItems = true;
-			try
-			{
-				var (first, last) = GetVisibleIndexRange();
-				foreach (var (container, item) in realizedItems.OrderBy(pair => ItemsControl.IndexFromContainer(pair.Key)))
-				{
-					var index = ItemsControl.IndexFromContainer(container);
-					var priority = first >= 0 && (index < first || index > last) ? 1 : 0;
-					QueueItemProperties(container, item, shellViewModel, priority);
-				}
-				LoadVisibleItemsAfterScrollSettled();
-			}
-			finally
-			{
-				isReloadingRealizedItems = false;
-				viewportWork?.SetPaused(shellViewModel.IsScrollInFlight);
-				metadataWork?.SetPaused(shellViewModel.IsScrollInFlight);
-			}
+			// The current images stay until each row's image for the new size is ready
+			foreach (var (container, item) in realizedItems.OrderBy(pair => ItemsControl.IndexFromContainer(pair.Key)).ToList())
+				StartItemImage(container, item, shellViewModel, ItemsControl.IndexFromContainer(container));
+			LoadVisibleItemsAfterScrollSettled();
 			return Task.CompletedTask;
 		}
 
@@ -1594,9 +1626,10 @@ namespace Files.App.Views.Layouts
 				}
 				return;
 			}
-			viewportWork?.SetPaused(true);
+
+			// Rows keep painting from memory and the fast lane; only generation and metadata wait for calm
+			slowImageWork?.SetPaused(true);
 			metadataWork?.SetPaused(true);
-			ReprioritizeViewportWork();
 			shellViewModel?.NotifyScrollStateChanged(true);
 			if (UiPerformanceTrace.IsEnabled)
 				UiPerformanceTrace.Mark(shellViewModel?.PerformanceOperationId ?? 0, "ScrollDeferred", realizedItems.Count, value: e.IsIntermediate ? 1 : 0);
@@ -1605,7 +1638,7 @@ namespace Files.App.Views.Layouts
 			if (scrollSettleTimer is null)
 			{
 				scrollSettleTimer = DispatcherQueue.CreateTimer();
-				scrollSettleTimer.Interval = TimeSpan.FromMilliseconds(200);
+				scrollSettleTimer.Interval = TimeSpan.FromMilliseconds(100);
 				scrollSettleTimer.IsRepeating = false;
 				scrollSettleTimer.Tick += (_, _) =>
 				{
@@ -1615,9 +1648,9 @@ namespace Files.App.Views.Layouts
 					if (UiPerformanceTrace.IsEnabled)
 						UiPerformanceTrace.Mark(ParentShellPageInstance?.ShellViewModel?.PerformanceOperationId ?? 0, "ScrollSettled", realizedItems.Count);
 					metadataFailures.Clear();
-					thumbnailFailures.Clear();
+					ReprioritizeViewportWork();
 					LoadVisibleItemsAfterScrollSettled();
-					viewportWork?.SetPaused(false);
+					slowImageWork?.SetPaused(false);
 					metadataWork?.SetPaused(false);
 				};
 			}
@@ -1661,16 +1694,7 @@ namespace Files.App.Views.Layouts
 			{
 				UpdateItemToolTip(container, null);
 				if (realizedItems.Remove(container, out var recycledItem))
-				{
-					viewportWork?.Cancel(recycledItem);
-					metadataWork?.Cancel(recycledItem);
-					viewportThumbnails.Remove(recycledItem);
-					metadataFailures.Remove(recycledItem);
-					thumbnailFailures.Remove(recycledItem);
-					var shellViewModel = ParentShellPageInstance.GetRequiredShellViewModel();
-					shellViewModel.CancelExtendedPropertiesLoadingForItem(recycledItem);
-					shellViewModel.ReleaseExtendedProperties(recycledItem);
-				}
+					ReleaseRealizedItem(recycledItem);
 				return;
 			}
 
@@ -1678,18 +1702,16 @@ namespace Files.App.Views.Layouts
 			{
 				if (args.Phase == 0 && listedItem.IsRealChanges)
 					listedItem.UpdateReal();
-				if (realizedItems.TryGetValue(container, out var previous) && !ReferenceEquals(previous, listedItem))
-				{
-					viewportWork?.Cancel(previous);
-					metadataWork?.Cancel(previous);
-					viewportThumbnails.Remove(previous);
-					metadataFailures.Remove(previous);
-					thumbnailFailures.Remove(previous);
-					var shellViewModel = ParentShellPageInstance.GetRequiredShellViewModel();
-					shellViewModel.CancelExtendedPropertiesLoadingForItem(previous);
-					shellViewModel.ReleaseExtendedProperties(previous);
-				}
+				realizedItems.TryGetValue(container, out var previous);
+				if (previous is not null && !ReferenceEquals(previous, listedItem))
+					ReleaseRealizedItem(previous);
 				realizedItems[container] = listedItem;
+
+				// Tier 0 also runs mid-scroll: a row never appears without an image
+				if (args.Phase == 0 && ParentShellPageInstance?.ShellViewModel is { } imageShellViewModel &&
+					(!ReferenceEquals(previous, listedItem) || listedItem.FileImage is null || !listedItem.HasFinalImage && !imageJobs.ContainsKey(listedItem)))
+					StartItemImage(container, listedItem, imageShellViewModel, args.ItemIndex);
+
 				if (args.Phase == 0 && NeedsDeferredProperties(listedItem))
 				{
 					if (UiPerformanceTrace.IsEnabled)

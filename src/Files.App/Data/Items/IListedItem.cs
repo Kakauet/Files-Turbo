@@ -19,7 +19,7 @@ namespace Files.App.Utils
 		ObservableCollection<FileProperty>? FileDetails { get; set; }
 		string? FileExtension { get; set; }
 		ulong? FileFRN { get; set; }
-		BitmapImage? FileImage { get; set; }
+		Microsoft.UI.Xaml.Media.ImageSource? FileImage { get; set; }
 		string? FileSize { get; set; }
 		long FileSizeBytes { get; set; }
 		string FileSizeDisplay { get; }

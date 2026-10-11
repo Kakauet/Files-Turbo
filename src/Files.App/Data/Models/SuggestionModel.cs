@@ -1,4 +1,4 @@
-﻿// Copyright (c) Files Community
+// Copyright (c) Files Community
 // Licensed under the MIT License.
 
 using Files.App.Controls;
@@ -33,8 +33,8 @@ namespace Files.App.Data.Models
 
 		public SettingsSearchResult? SettingsResult { get; set; }
 
-		private BitmapImage? fileImage;
-		public BitmapImage? FileImage
+		private Microsoft.UI.Xaml.Media.ImageSource? fileImage;
+		public Microsoft.UI.Xaml.Media.ImageSource? FileImage
 		{
 			get => fileImage;
 			set
@@ -56,6 +56,12 @@ namespace Files.App.Data.Models
 						{
 							img.ImageOpened += Img_ImageOpened;
 						}
+					}
+					else if (value is not null)
+					{
+						// Pixel images are ready as soon as they exist
+						LoadFileIcon = true;
+						NeedsPlaceholderGlyph = false;
 					}
 				}
 			}
