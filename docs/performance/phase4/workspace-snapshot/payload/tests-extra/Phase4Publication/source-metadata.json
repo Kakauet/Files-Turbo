@@ -1,0 +1,39 @@
+{
+  "SourcePath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\ViewModels\\ShellViewModel.cs",
+  "SourceSha256": "270CC6DB226256E8C5D40E169E8D1339EE4AE02130025C1086AE1C1879FFB3ED",
+  "GeneratedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\tests-extra\\Phase4Publication\\PublicationCore.generated.cs",
+  "GeneratedSha256": "EDECDD20E0F7F1AB45796D2CE085AA35AAA789C7B3B94FC4123669E944641FE7",
+  "LinkedFiles": [
+    {
+      "Path": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Utils\\Storage\\Collection\\BulkConcurrentObservableCollection.cs",
+      "Sha256": "27A648EFA8409C2BC9F019972430F26DB795666786126A8EA02A70B7E8E0E83F"
+    },
+    {
+      "Path": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Utils\\Storage\\Collection\\ConcurrentCollection.cs",
+      "Sha256": "24CB73D77940F36CA2F33B6B8A60A765048E5B23DA32665E64DDA0A5CD828734"
+    },
+    {
+      "Path": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Utils\\Storage\\Collection\\BlockingListEnumerator.cs",
+      "Sha256": "DDD83B7C5B24014F7004DAE5412B7E2EBBF18AB9C429FA2E2C920F3CA932DAE6"
+    },
+    {
+      "Path": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Utils\\Storage\\Collection\\GroupedCollection.cs",
+      "Sha256": "478E9AA822732953B2C4A20B30BD677BB806AF04FE18CF3F3BDDE1FDFB632B49"
+    },
+    {
+      "Path": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Utils\\Storage\\Collection\\IGroupableItem.cs",
+      "Sha256": "06A2E68637323933DAD586C68B43C11CB62F86C89F530E99BF68E7C44C8256D1"
+    },
+    {
+      "Path": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Utils\\Storage\\Collection\\IGroupedCollectionHeader.cs",
+      "Sha256": "4C51F2594A3458FFBF1F4E7744F53FC9D09F8145FDBDB66A85B081D2129FB2B2"
+    },
+    {
+      "Path": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Helpers\\CollectionDebugView.cs",
+      "Sha256": "29CDACF408D3533591F91C2610812C1C72627DA1C45AAC0D7E381727661BF176"
+    }
+  ],
+  "LinkedFingerprint": "28EB2E9EA698C32636CF6C0CADDB1D4E6A7AF6D3F27C7D32C033DDD5E8420BA8",
+  "SourceRevision": "bf4390ee0a2eed6cece0e99d1a021ce7fd255574",
+  "Scope": "Literal ApplyFilesAndFoldersChangesAsync, TryPublishFilesAndFoldersWithoutReset and MatchesFilter; real bulk/concurrent/grouped collections, enumerator, nested EventArgsCache and debug view. Controlled dispatcher and app/model doubles. No WinUI rendering."
+}

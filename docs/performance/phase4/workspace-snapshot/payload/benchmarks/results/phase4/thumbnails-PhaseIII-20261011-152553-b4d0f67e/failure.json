@@ -1,0 +1,5 @@
+{
+  "FailedUtc": "2026-10-11T15:25:53.8882532Z",
+  "Message": "Experimental HWND is not foreground; capture stopped before reading screen pixels.",
+  "ScriptLine": 106
+}

@@ -1,0 +1,21 @@
+{
+  "ConcurrentBuildObserved": false,
+  "Checks": [
+    {
+      "CheckedUtc": "2026-10-11T17:58:50.3516094Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T17:58:56.4292539Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T17:58:59.4354124Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    }
+  ],
+  "Scope": "Active MSBuild excluding node servers, and dotnet build/msbuild/publish; snapshots before/after repetitions, not a complete CPU-isolation proof"
+}

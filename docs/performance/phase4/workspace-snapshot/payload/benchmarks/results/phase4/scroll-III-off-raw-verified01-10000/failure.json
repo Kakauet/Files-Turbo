@@ -1,0 +1,6 @@
+{
+  "FailedUtc": "2026-10-11T16:27:58.5364714Z",
+  "Message": "Jump preparation did not reach the starting endpoint; observed percent=3.09958125980674",
+  "ScriptLine": 401,
+  "LastScrollPreparationPercent": 3.0995812598067447
+}

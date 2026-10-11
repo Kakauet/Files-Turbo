@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <WindowsSdkPackageVersion>10.0.26100.67-preview</WindowsSdkPackageVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>FilesTurbo.SearchBench</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="../../source/src/Files.App/Utils/Storage/Search/NativeNameSearch.cs" Link="NativeNameSearch.cs" />
+    <Compile Include="../../source/src/Files.Shared/Helpers/FileExtensionHelpers.cs" Link="FileExtensionHelpers.cs" />
+    <Reference Include="Files.App.CsWin32">
+      <HintPath>../../source/src/Files.App.CsWin32/bin/x64/Release/net10.0-windows10.0.26100.0/win-x64/Files.App.CsWin32.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,47 @@
+{
+  "Status": "Completed",
+  "SourceCommit": "081841c996fd02bc24d901ce3092764dd545bc08",
+  "TotalContracts": 130,
+  "Failed": 0,
+  "Evidence": [
+    {
+      "Name": "viewport",
+      "Path": "reports/phase4-viewport-contracts-speed-ready.json",
+      "Sha256": "E7A9AC7E1881B035798BD276E272B737AE07BA2EC71D60EE63C7C5A56D31E397",
+      "Passed": 21
+    },
+    {
+      "Name": "thumbnails",
+      "Path": "reports/phase4-thumbnail-contracts-speed-ready.json",
+      "Sha256": "5862BFCE14633D867295C25D29A1AE5F3989450E084508F6D7463FAAD46E3A15",
+      "Passed": 46
+    },
+    {
+      "Name": "publication",
+      "Path": "reports/phase4-publication-contracts-speed-ready.json",
+      "Sha256": "464E178E4ADB99A8B42B3D4ACF482BA7642FFF85BDBD9570BEC4C073227658BC",
+      "Passed": 24
+    },
+    {
+      "Name": "integration",
+      "Path": "reports/phase4-viewport-integration-contracts-speed-ready.json",
+      "Sha256": "3528253E3F5FB18B184395B0D96C8B6A1CEB66D5B59D8DAB9815747C161898C6",
+      "Passed": 26
+    },
+    {
+      "Name": "dates",
+      "Path": "reports/phase4-date-contracts-and-benchmark-speed-ready.json",
+      "Sha256": "E940049B86B022E4650AD7982CCF8995C33E245EBD0399A9C2CF68BFE04C314B",
+      "Passed": 8
+    },
+    {
+      "Name": "search-resource",
+      "Path": "reports/phase4-search-resource-contracts-speed-ready.json",
+      "Sha256": "998217774222B83C06A89359DBFD4B340F0853EE271CD9B951719D39317C135B",
+      "Passed": 5
+    }
+  ],
+  "InteropSha256": "9240A280516BC5FC8454A8072A96C2D55F14559AEA86A0ACDAF9F2752510F350",
+  "Scope": "Fresh sequential Release rebuilds over current extracted/linked production source; controlled WinUI doubles, native STA and physical decode sizing contracts. No actual WinUI rendering claim.",
+  "CapturedUtc": "2026-10-11T17:53:31.3507395Z"
+}

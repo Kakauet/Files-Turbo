@@ -1,0 +1,312 @@
+{
+  "Status": "CompletedWithPending",
+  "UiExecuted": true,
+  "StartedUtc": "2026-10-11T17:03:21.2857659Z",
+  "CompletedUtc": "2026-10-11T17:03:28.8845802Z",
+  "Fixture": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01",
+  "FixtureManifest": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\manifest.json",
+  "Package": {
+    "FullName": "FilesTurbo.Experimental_4.2.39.6_x64__ykqwq8d6ps0ag",
+    "InstallLocation": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\artifacts\\development-layout\\managed-release-phase4-final03\\layout",
+    "ProcessId": 19736,
+    "ProcessStartedUtc": "2026-10-11T16:58:27.9157595Z",
+    "Assemblies": [
+      {
+        "Name": "Files.dll",
+        "Sha256": "D615236EE4E44566AFCA5B027B3E4BB6D9A413CF9F4D5B03B4FE900065AB730E"
+      },
+      {
+        "Name": "Files.App.Storage.dll",
+        "Sha256": "84EC344B208A27F10ABF3392AF54DFAB155EBF9649F609549632D3E4A6263DB7"
+      },
+      {
+        "Name": "Files.App.CsWin32.dll",
+        "Sha256": "9DDDC7BC0E06106BC23638E320C3AD6C5775BF0179CD090017C1C268D8FBBB98"
+      }
+    ]
+  },
+  "Results": [
+    {
+      "Name": "single_selection",
+      "Status": "Passed",
+      "StartedUtc": "2026-10-11T17:03:22.5705427Z",
+      "CompletedUtc": "2026-10-11T17:03:22.7862174Z"
+    },
+    {
+      "Name": "multiselection",
+      "Status": "Passed",
+      "StartedUtc": "2026-10-11T17:03:22.7903602Z",
+      "CompletedUtc": "2026-10-11T17:03:23.1304928Z"
+    },
+    {
+      "Name": "copy_paste",
+      "Status": "Passed",
+      "StartedUtc": "2026-10-11T17:03:23.1329964Z",
+      "CompletedUtc": "2026-10-11T17:03:24.4950284Z"
+    },
+    {
+      "Name": "cut_paste",
+      "Status": "Passed",
+      "StartedUtc": "2026-10-11T17:03:24.4988422Z",
+      "CompletedUtc": "2026-10-11T17:03:26.0107101Z"
+    },
+    {
+      "Name": "rename",
+      "Status": "Passed",
+      "StartedUtc": "2026-10-11T17:03:26.0117511Z",
+      "CompletedUtc": "2026-10-11T17:03:26.9091832Z"
+    },
+    {
+      "Name": "back_forward",
+      "Status": "Passed",
+      "StartedUtc": "2026-10-11T17:03:26.9105380Z",
+      "CompletedUtc": "2026-10-11T17:03:28.0497676Z"
+    },
+    {
+      "Name": "preview_toggle",
+      "Status": "Passed",
+      "StartedUtc": "2026-10-11T17:03:28.0512501Z",
+      "CompletedUtc": "2026-10-11T17:03:28.8001325Z"
+    },
+    {
+      "Name": "create_folder",
+      "Status": "Pending",
+      "Reason": "No complete deterministic UIA confirmation route has been inspected at runtime; no guessed menu or keyboard action performed."
+    },
+    {
+      "Name": "new_tab",
+      "Status": "Pending",
+      "Reason": "No complete deterministic UIA confirmation route has been inspected at runtime; no guessed menu or keyboard action performed."
+    },
+    {
+      "Name": "sort",
+      "Status": "Pending",
+      "Reason": "No complete deterministic UIA confirmation route has been inspected at runtime; no guessed menu or keyboard action performed."
+    },
+    {
+      "Name": "layout",
+      "Status": "Pending",
+      "Reason": "No complete deterministic UIA confirmation route has been inspected at runtime; no guessed menu or keyboard action performed."
+    }
+  ],
+  "UiActions": [
+    {
+      "Action": "Navigate",
+      "Control": "CurrentPathSet",
+      "Pattern": "ValuePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:22.1279974Z"
+    },
+    {
+      "Action": "Select",
+      "Control": "SyntheticRow",
+      "Name": "multi-a.txt",
+      "Pattern": "SelectionItemPattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:22.7860792Z"
+    },
+    {
+      "Action": "Select",
+      "Control": "SyntheticRow",
+      "Name": "multi-a.txt",
+      "Pattern": "SelectionItemPattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:22.9938139Z"
+    },
+    {
+      "Action": "AddToSelection",
+      "Control": "SyntheticRow",
+      "Name": "multi-b.txt",
+      "Pattern": "SelectionItemPattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:23.1295667Z"
+    },
+    {
+      "Action": "Navigate",
+      "Control": "CurrentPathSet",
+      "Pattern": "ValuePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:23.1943562Z"
+    },
+    {
+      "Action": "Select",
+      "Control": "SyntheticRow",
+      "Name": "copy-source.txt",
+      "Pattern": "SelectionItemPattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:23.6350182Z"
+    },
+    {
+      "Action": "Invoke",
+      "Control": "InnerNavigationToolbarCopyButton",
+      "Pattern": "InvokePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:23.7346287Z"
+    },
+    {
+      "Action": "Navigate",
+      "Control": "CurrentPathSet",
+      "Pattern": "ValuePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\copy-destination",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:23.8226583Z"
+    },
+    {
+      "Action": "Invoke",
+      "Control": "InnerNavigationToolbarPasteButton",
+      "Pattern": "InvokePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\copy-destination",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:24.3180398Z"
+    },
+    {
+      "Action": "Navigate",
+      "Control": "CurrentPathSet",
+      "Pattern": "ValuePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:24.6239763Z"
+    },
+    {
+      "Action": "Select",
+      "Control": "SyntheticRow",
+      "Name": "move-source.txt",
+      "Pattern": "SelectionItemPattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:25.2538659Z"
+    },
+    {
+      "Action": "Invoke",
+      "Control": "InnerNavigationToolbarCutButton",
+      "Pattern": "InvokePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:25.3471709Z"
+    },
+    {
+      "Action": "Navigate",
+      "Control": "CurrentPathSet",
+      "Pattern": "ValuePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\move-destination",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:25.4197148Z"
+    },
+    {
+      "Action": "Invoke",
+      "Control": "InnerNavigationToolbarPasteButton",
+      "Pattern": "InvokePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\move-destination",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:25.9231090Z"
+    },
+    {
+      "Action": "Navigate",
+      "Control": "CurrentPathSet",
+      "Pattern": "ValuePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:26.0701706Z"
+    },
+    {
+      "Action": "Select",
+      "Control": "SyntheticRow",
+      "Name": "rename-source.txt",
+      "Pattern": "SelectionItemPattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:26.5582289Z"
+    },
+    {
+      "Action": "Invoke",
+      "Control": "InnerNavigationToolbarRenameButton",
+      "Pattern": "InvokePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:26.6472937Z"
+    },
+    {
+      "Action": "RenameValue",
+      "Control": "ItemNameTextBox",
+      "Pattern": "ValuePattern",
+      "SyntheticNewName": "renamed-via-app.txt",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:26.8248544Z"
+    },
+    {
+      "Action": "ConfirmRenameLostFocus",
+      "Control": "Back",
+      "Pattern": "SetFocus",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:26.8287694Z"
+    },
+    {
+      "Action": "Navigate",
+      "Control": "CurrentPathSet",
+      "Pattern": "ValuePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:26.9675748Z"
+    },
+    {
+      "Action": "Navigate",
+      "Control": "CurrentPathSet",
+      "Pattern": "ValuePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\copy-destination",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:27.2898585Z"
+    },
+    {
+      "Action": "Invoke",
+      "Control": "Back",
+      "Pattern": "InvokePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\copy-destination",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:27.7956540Z"
+    },
+    {
+      "Action": "Invoke",
+      "Control": "Forward",
+      "Pattern": "InvokePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:27.9766232Z"
+    },
+    {
+      "Action": "Navigate",
+      "Control": "CurrentPathSet",
+      "Pattern": "ValuePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:28.1278441Z"
+    },
+    {
+      "Action": "Select",
+      "Control": "SyntheticRow",
+      "Name": "copy-source.txt",
+      "Pattern": "SelectionItemPattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:28.6776299Z"
+    },
+    {
+      "Action": "TogglePreviewAndRestore",
+      "Control": "PreviewPane",
+      "Pattern": "TogglePattern",
+      "ExpectedPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final01\\source",
+      "ProcessId": 19736,
+      "Utc": "2026-10-11T17:03:28.7998370Z",
+      "Limit": "Toggle state verified; preview decoding/content is not verified."
+    }
+  ],
+  "Scope": "UIA patterns on one exact registered experimental PID and confirmed synthetic paths. Filesystem reads only corroborate requested app operations. Fixture creation is setup, not an app operation. No global keyboard, foreground forcing, private-name inventory, performance or broad file-operation safety claim."
+}

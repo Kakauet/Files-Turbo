@@ -1,0 +1,809 @@
+{
+  "CreatedUtc": "2026-10-11T15:20:18.6954915Z",
+  "FixturePath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\media-phase4",
+  "Images": 96,
+  "Videos": 3,
+  "Pattern": "Square TL=(220,30,60), TR=(25,195,70), BL=(40,80,220), BR=(225,205,25), narrow white inset border",
+  "Ffmpeg": "C:\\Users\\guill\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.0.1-full_build\\bin\\ffmpeg.exe",
+  "Scope": "New synthetic media only; no user media and no Shell cache manipulation",
+  "Files": [
+    {
+      "Name": "pattern-000.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1703,
+      "SHA256": "4A503177A8926161833D6AE0BABB60371C4B846800CA7C8DB216A598FD9E3A5F"
+    },
+    {
+      "Name": "pattern-001.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 32566,
+      "SHA256": "7F7F92673A9E2C7B88C7D5E99430CBF3DBE6304FBE7945A9DFD48208D2861B45"
+    },
+    {
+      "Name": "pattern-002.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "FDB7A8B033A67F033B05612CF3652CF4530133D45690DEFD8D250EB884A25465"
+    },
+    {
+      "Name": "pattern-003.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "3543445AE6ACEB7B1A311FF72A322B601BAD6D040BEB90E0E67DF3245E47C1A9"
+    },
+    {
+      "Name": "pattern-004.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 32005,
+      "SHA256": "A044579C21FD2FEE6EBC5D3FCC58F661474F957639883FC27F01AB7EB69E62D2"
+    },
+    {
+      "Name": "pattern-005.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "9B537893A7442679BE10DAFA0D302F13C127316F2D7904F858631A5F80ACB388"
+    },
+    {
+      "Name": "pattern-006.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1731,
+      "SHA256": "4350C0D0F51620D7531B5E0A41ACD1BA01FB30B1AD39F191988F5C6769E9FE0C"
+    },
+    {
+      "Name": "pattern-007.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 35987,
+      "SHA256": "3184657183DB7EDFA7DB0826C3C5DE36BBCEFF186251B6A5D886FE8CB9089138"
+    },
+    {
+      "Name": "pattern-008.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "0A242B2067E16723EE9419CD52DC706F6601A6357528635A69D504DC0366AD68"
+    },
+    {
+      "Name": "pattern-009.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1703,
+      "SHA256": "70AFC5299231C03509740D4A969BA223CB7F24595E214E64EC7C2C8E530AFC3D"
+    },
+    {
+      "Name": "pattern-010.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 39796,
+      "SHA256": "33DC5493C139CCE8E33DD26B62051E6464D651F7F74A066F186495D36839A20C"
+    },
+    {
+      "Name": "pattern-011.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "DEBAB42CFC06E738825A4F65535968A334DB0EE4E1CAADCC2975AE3C8CD8CD48"
+    },
+    {
+      "Name": "pattern-012.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "D813CEB996DEA1EA59726FEBD17C270D0DE1D09FB022AA2C2217028C6DBD104E"
+    },
+    {
+      "Name": "pattern-013.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 39098,
+      "SHA256": "33B5F2B5E3506392C8DBF0DB16F9C32C9AE3FA80F38F739FC32D753C85967407"
+    },
+    {
+      "Name": "pattern-014.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "8B9F8F965FBFF0059F1A19955FA0661957E0A5340A198AE7E964F48DF62A2DC7"
+    },
+    {
+      "Name": "pattern-015.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "0E739DB5233D604D4D0E7B127BA4A1E66D47D687E739FB3E6B6815557F96FBAE"
+    },
+    {
+      "Name": "pattern-016.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 40565,
+      "SHA256": "72973872276DADBD371513326E24F667D79B6FBE99E775E986843918D2FAB695"
+    },
+    {
+      "Name": "pattern-017.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "A3787E3A2F630795249E5A01C9B96B3ED8CBD416150E0E39B4F998E73D7FC49D"
+    },
+    {
+      "Name": "pattern-018.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1703,
+      "SHA256": "8CBA1A3D48181DB8A459AC2793BF673AC2B5C3E8A311A135107CCC18F5D6AB7B"
+    },
+    {
+      "Name": "pattern-019.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 39822,
+      "SHA256": "C0C0EA67E15CC5E465614A6A75F568BA2AD2004FB9C2911414A69399EFBD47C6"
+    },
+    {
+      "Name": "pattern-020.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "56600ED52E3508F1619F8003DF7EB2AE896C98D7364DE55D5E99A7FAAA1FE700"
+    },
+    {
+      "Name": "pattern-021.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "7D52E491177EA1A4D29900532488200FF0BD79144FCC6C74BFC6CDA217844C90"
+    },
+    {
+      "Name": "pattern-022.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 40897,
+      "SHA256": "37774B504FEF934C84E94314A0990913FEF741D92745DBD7F0C9A496FD4D4DCF"
+    },
+    {
+      "Name": "pattern-023.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "6EBB864A9C8D9852828EB635B44F5FE23632B0EA84A5107EE87FAE8D09ED6A8E"
+    },
+    {
+      "Name": "pattern-024.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1703,
+      "SHA256": "4A503177A8926161833D6AE0BABB60371C4B846800CA7C8DB216A598FD9E3A5F"
+    },
+    {
+      "Name": "pattern-025.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 32566,
+      "SHA256": "7F7F92673A9E2C7B88C7D5E99430CBF3DBE6304FBE7945A9DFD48208D2861B45"
+    },
+    {
+      "Name": "pattern-026.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "FDB7A8B033A67F033B05612CF3652CF4530133D45690DEFD8D250EB884A25465"
+    },
+    {
+      "Name": "pattern-027.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "3543445AE6ACEB7B1A311FF72A322B601BAD6D040BEB90E0E67DF3245E47C1A9"
+    },
+    {
+      "Name": "pattern-028.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 32005,
+      "SHA256": "A044579C21FD2FEE6EBC5D3FCC58F661474F957639883FC27F01AB7EB69E62D2"
+    },
+    {
+      "Name": "pattern-029.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "9B537893A7442679BE10DAFA0D302F13C127316F2D7904F858631A5F80ACB388"
+    },
+    {
+      "Name": "pattern-030.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1731,
+      "SHA256": "4350C0D0F51620D7531B5E0A41ACD1BA01FB30B1AD39F191988F5C6769E9FE0C"
+    },
+    {
+      "Name": "pattern-031.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 35987,
+      "SHA256": "3184657183DB7EDFA7DB0826C3C5DE36BBCEFF186251B6A5D886FE8CB9089138"
+    },
+    {
+      "Name": "pattern-032.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "0A242B2067E16723EE9419CD52DC706F6601A6357528635A69D504DC0366AD68"
+    },
+    {
+      "Name": "pattern-033.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1703,
+      "SHA256": "70AFC5299231C03509740D4A969BA223CB7F24595E214E64EC7C2C8E530AFC3D"
+    },
+    {
+      "Name": "pattern-034.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 39796,
+      "SHA256": "33DC5493C139CCE8E33DD26B62051E6464D651F7F74A066F186495D36839A20C"
+    },
+    {
+      "Name": "pattern-035.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "DEBAB42CFC06E738825A4F65535968A334DB0EE4E1CAADCC2975AE3C8CD8CD48"
+    },
+    {
+      "Name": "pattern-036.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "D813CEB996DEA1EA59726FEBD17C270D0DE1D09FB022AA2C2217028C6DBD104E"
+    },
+    {
+      "Name": "pattern-037.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 39098,
+      "SHA256": "33B5F2B5E3506392C8DBF0DB16F9C32C9AE3FA80F38F739FC32D753C85967407"
+    },
+    {
+      "Name": "pattern-038.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "8B9F8F965FBFF0059F1A19955FA0661957E0A5340A198AE7E964F48DF62A2DC7"
+    },
+    {
+      "Name": "pattern-039.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "0E739DB5233D604D4D0E7B127BA4A1E66D47D687E739FB3E6B6815557F96FBAE"
+    },
+    {
+      "Name": "pattern-040.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 40565,
+      "SHA256": "72973872276DADBD371513326E24F667D79B6FBE99E775E986843918D2FAB695"
+    },
+    {
+      "Name": "pattern-041.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "A3787E3A2F630795249E5A01C9B96B3ED8CBD416150E0E39B4F998E73D7FC49D"
+    },
+    {
+      "Name": "pattern-042.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1703,
+      "SHA256": "8CBA1A3D48181DB8A459AC2793BF673AC2B5C3E8A311A135107CCC18F5D6AB7B"
+    },
+    {
+      "Name": "pattern-043.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 39822,
+      "SHA256": "C0C0EA67E15CC5E465614A6A75F568BA2AD2004FB9C2911414A69399EFBD47C6"
+    },
+    {
+      "Name": "pattern-044.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "56600ED52E3508F1619F8003DF7EB2AE896C98D7364DE55D5E99A7FAAA1FE700"
+    },
+    {
+      "Name": "pattern-045.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "7D52E491177EA1A4D29900532488200FF0BD79144FCC6C74BFC6CDA217844C90"
+    },
+    {
+      "Name": "pattern-046.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 40897,
+      "SHA256": "37774B504FEF934C84E94314A0990913FEF741D92745DBD7F0C9A496FD4D4DCF"
+    },
+    {
+      "Name": "pattern-047.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "6EBB864A9C8D9852828EB635B44F5FE23632B0EA84A5107EE87FAE8D09ED6A8E"
+    },
+    {
+      "Name": "pattern-048.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1703,
+      "SHA256": "4A503177A8926161833D6AE0BABB60371C4B846800CA7C8DB216A598FD9E3A5F"
+    },
+    {
+      "Name": "pattern-049.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 32566,
+      "SHA256": "7F7F92673A9E2C7B88C7D5E99430CBF3DBE6304FBE7945A9DFD48208D2861B45"
+    },
+    {
+      "Name": "pattern-050.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "FDB7A8B033A67F033B05612CF3652CF4530133D45690DEFD8D250EB884A25465"
+    },
+    {
+      "Name": "pattern-051.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "3543445AE6ACEB7B1A311FF72A322B601BAD6D040BEB90E0E67DF3245E47C1A9"
+    },
+    {
+      "Name": "pattern-052.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 32005,
+      "SHA256": "A044579C21FD2FEE6EBC5D3FCC58F661474F957639883FC27F01AB7EB69E62D2"
+    },
+    {
+      "Name": "pattern-053.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "9B537893A7442679BE10DAFA0D302F13C127316F2D7904F858631A5F80ACB388"
+    },
+    {
+      "Name": "pattern-054.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1731,
+      "SHA256": "4350C0D0F51620D7531B5E0A41ACD1BA01FB30B1AD39F191988F5C6769E9FE0C"
+    },
+    {
+      "Name": "pattern-055.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 35987,
+      "SHA256": "3184657183DB7EDFA7DB0826C3C5DE36BBCEFF186251B6A5D886FE8CB9089138"
+    },
+    {
+      "Name": "pattern-056.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "0A242B2067E16723EE9419CD52DC706F6601A6357528635A69D504DC0366AD68"
+    },
+    {
+      "Name": "pattern-057.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1703,
+      "SHA256": "70AFC5299231C03509740D4A969BA223CB7F24595E214E64EC7C2C8E530AFC3D"
+    },
+    {
+      "Name": "pattern-058.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 39796,
+      "SHA256": "33DC5493C139CCE8E33DD26B62051E6464D651F7F74A066F186495D36839A20C"
+    },
+    {
+      "Name": "pattern-059.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "DEBAB42CFC06E738825A4F65535968A334DB0EE4E1CAADCC2975AE3C8CD8CD48"
+    },
+    {
+      "Name": "pattern-060.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "D813CEB996DEA1EA59726FEBD17C270D0DE1D09FB022AA2C2217028C6DBD104E"
+    },
+    {
+      "Name": "pattern-061.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 39098,
+      "SHA256": "33B5F2B5E3506392C8DBF0DB16F9C32C9AE3FA80F38F739FC32D753C85967407"
+    },
+    {
+      "Name": "pattern-062.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "8B9F8F965FBFF0059F1A19955FA0661957E0A5340A198AE7E964F48DF62A2DC7"
+    },
+    {
+      "Name": "pattern-063.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "0E739DB5233D604D4D0E7B127BA4A1E66D47D687E739FB3E6B6815557F96FBAE"
+    },
+    {
+      "Name": "pattern-064.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 40565,
+      "SHA256": "72973872276DADBD371513326E24F667D79B6FBE99E775E986843918D2FAB695"
+    },
+    {
+      "Name": "pattern-065.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "A3787E3A2F630795249E5A01C9B96B3ED8CBD416150E0E39B4F998E73D7FC49D"
+    },
+    {
+      "Name": "pattern-066.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1703,
+      "SHA256": "8CBA1A3D48181DB8A459AC2793BF673AC2B5C3E8A311A135107CCC18F5D6AB7B"
+    },
+    {
+      "Name": "pattern-067.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 39822,
+      "SHA256": "C0C0EA67E15CC5E465614A6A75F568BA2AD2004FB9C2911414A69399EFBD47C6"
+    },
+    {
+      "Name": "pattern-068.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "56600ED52E3508F1619F8003DF7EB2AE896C98D7364DE55D5E99A7FAAA1FE700"
+    },
+    {
+      "Name": "pattern-069.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "7D52E491177EA1A4D29900532488200FF0BD79144FCC6C74BFC6CDA217844C90"
+    },
+    {
+      "Name": "pattern-070.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 40897,
+      "SHA256": "37774B504FEF934C84E94314A0990913FEF741D92745DBD7F0C9A496FD4D4DCF"
+    },
+    {
+      "Name": "pattern-071.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "6EBB864A9C8D9852828EB635B44F5FE23632B0EA84A5107EE87FAE8D09ED6A8E"
+    },
+    {
+      "Name": "pattern-072.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1703,
+      "SHA256": "4A503177A8926161833D6AE0BABB60371C4B846800CA7C8DB216A598FD9E3A5F"
+    },
+    {
+      "Name": "pattern-073.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 32566,
+      "SHA256": "7F7F92673A9E2C7B88C7D5E99430CBF3DBE6304FBE7945A9DFD48208D2861B45"
+    },
+    {
+      "Name": "pattern-074.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "FDB7A8B033A67F033B05612CF3652CF4530133D45690DEFD8D250EB884A25465"
+    },
+    {
+      "Name": "pattern-075.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "3543445AE6ACEB7B1A311FF72A322B601BAD6D040BEB90E0E67DF3245E47C1A9"
+    },
+    {
+      "Name": "pattern-076.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 32005,
+      "SHA256": "A044579C21FD2FEE6EBC5D3FCC58F661474F957639883FC27F01AB7EB69E62D2"
+    },
+    {
+      "Name": "pattern-077.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "9B537893A7442679BE10DAFA0D302F13C127316F2D7904F858631A5F80ACB388"
+    },
+    {
+      "Name": "pattern-078.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1731,
+      "SHA256": "4350C0D0F51620D7531B5E0A41ACD1BA01FB30B1AD39F191988F5C6769E9FE0C"
+    },
+    {
+      "Name": "pattern-079.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 35987,
+      "SHA256": "3184657183DB7EDFA7DB0826C3C5DE36BBCEFF186251B6A5D886FE8CB9089138"
+    },
+    {
+      "Name": "pattern-080.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "0A242B2067E16723EE9419CD52DC706F6601A6357528635A69D504DC0366AD68"
+    },
+    {
+      "Name": "pattern-081.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1703,
+      "SHA256": "70AFC5299231C03509740D4A969BA223CB7F24595E214E64EC7C2C8E530AFC3D"
+    },
+    {
+      "Name": "pattern-082.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 39796,
+      "SHA256": "33DC5493C139CCE8E33DD26B62051E6464D651F7F74A066F186495D36839A20C"
+    },
+    {
+      "Name": "pattern-083.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "DEBAB42CFC06E738825A4F65535968A334DB0EE4E1CAADCC2975AE3C8CD8CD48"
+    },
+    {
+      "Name": "pattern-084.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "D813CEB996DEA1EA59726FEBD17C270D0DE1D09FB022AA2C2217028C6DBD104E"
+    },
+    {
+      "Name": "pattern-085.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 39098,
+      "SHA256": "33B5F2B5E3506392C8DBF0DB16F9C32C9AE3FA80F38F739FC32D753C85967407"
+    },
+    {
+      "Name": "pattern-086.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "8B9F8F965FBFF0059F1A19955FA0661957E0A5340A198AE7E964F48DF62A2DC7"
+    },
+    {
+      "Name": "pattern-087.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "0E739DB5233D604D4D0E7B127BA4A1E66D47D687E739FB3E6B6815557F96FBAE"
+    },
+    {
+      "Name": "pattern-088.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 40565,
+      "SHA256": "72973872276DADBD371513326E24F667D79B6FBE99E775E986843918D2FAB695"
+    },
+    {
+      "Name": "pattern-089.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "A3787E3A2F630795249E5A01C9B96B3ED8CBD416150E0E39B4F998E73D7FC49D"
+    },
+    {
+      "Name": "pattern-090.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1703,
+      "SHA256": "8CBA1A3D48181DB8A459AC2793BF673AC2B5C3E8A311A135107CCC18F5D6AB7B"
+    },
+    {
+      "Name": "pattern-091.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 39822,
+      "SHA256": "C0C0EA67E15CC5E465614A6A75F568BA2AD2004FB9C2911414A69399EFBD47C6"
+    },
+    {
+      "Name": "pattern-092.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "56600ED52E3508F1619F8003DF7EB2AE896C98D7364DE55D5E99A7FAAA1FE700"
+    },
+    {
+      "Name": "pattern-093.png",
+      "Kind": "Image",
+      "Width": 256,
+      "Height": 256,
+      "Bytes": 1730,
+      "SHA256": "7D52E491177EA1A4D29900532488200FF0BD79144FCC6C74BFC6CDA217844C90"
+    },
+    {
+      "Name": "pattern-094.jpg",
+      "Kind": "Image",
+      "Width": 1024,
+      "Height": 1024,
+      "Bytes": 40897,
+      "SHA256": "37774B504FEF934C84E94314A0990913FEF741D92745DBD7F0C9A496FD4D4DCF"
+    },
+    {
+      "Name": "pattern-095.bmp",
+      "Kind": "Image",
+      "Width": 2048,
+      "Height": 2048,
+      "Bytes": 16777270,
+      "SHA256": "6EBB864A9C8D9852828EB635B44F5FE23632B0EA84A5107EE87FAE8D09ED6A8E"
+    },
+    {
+      "Name": "pattern-video-000.mp4",
+      "Kind": "Video",
+      "Width": 640,
+      "Height": 640,
+      "DurationSeconds": 2,
+      "Codec": "H264",
+      "Bytes": 6236,
+      "SHA256": "233527C478A3E71A249912BA519D4CBBDA307CEA88B28C84A69EBB1BC1E80DB6"
+    },
+    {
+      "Name": "pattern-video-001.mp4",
+      "Kind": "Video",
+      "Width": 640,
+      "Height": 640,
+      "DurationSeconds": 2,
+      "Codec": "H264",
+      "Bytes": 6236,
+      "SHA256": "233527C478A3E71A249912BA519D4CBBDA307CEA88B28C84A69EBB1BC1E80DB6"
+    },
+    {
+      "Name": "pattern-video-002.mp4",
+      "Kind": "Video",
+      "Width": 640,
+      "Height": 640,
+      "DurationSeconds": 2,
+      "Codec": "H264",
+      "Bytes": 6236,
+      "SHA256": "233527C478A3E71A249912BA519D4CBBDA307CEA88B28C84A69EBB1BC1E80DB6"
+    }
+  ]
+}

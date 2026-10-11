@@ -1,0 +1,2 @@
+"Variant","Repetition","StartedUtc","CompletedUtc","Metric","FirstDetectedMs","FirstDetectionLowerBoundMs","ViewportAllDetectedMs","ViewportDetectionLowerBoundMs","SetValueCallMs","VisiblePictures","DetectedRealThumbnails","Polls","TimedOut","PrivateBytes","WorkingSetBytes","WindowBounds"
+"PhaseIV","0","2026-10-11T16:54:51.8713065Z","2026-10-11T16:54:53.4924625Z","WindowSample_RealPatternThumbnail","748,9213","670,1796","1191,6851","1120,0515","1,5246","52","52","13","False","286023680","476524544","26;26;1440;753"

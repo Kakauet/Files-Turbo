@@ -1,0 +1,128 @@
+{
+  "Scope": "Actual source thumbnail methods, FileThumbnailHelper, STA pool and viewport queue. Real STA apartments; Shell/GDI, WinUI dispatcher and bitmap decoding are doubles. No UI latency/FPS claim.",
+  "Sources": [
+    {
+      "Path": "source/src/Files.App/ViewModels/ShellViewModel.cs",
+      "SHA256": "D94A9D00DE2ED417DE67E60058E8E637953959B6143A01B223B5E6DC831E953D"
+    },
+    {
+      "Path": "source/src/Files.App/Utils/Storage/Helpers/FileThumbnailHelper.cs",
+      "SHA256": "D1AFB73B74B4F39CF38B8398A6CF6FD1E58FD7B7510CAA5FAF0FD2246B946884"
+    },
+    {
+      "Path": "source/src/Files.App.Storage/Windows/Managers/STATask.cs",
+      "SHA256": "DF132C791F4043A85974EDE9623699CD0131C838B952F8DCF855F0209F0E8216"
+    },
+    {
+      "Path": "source/src/Files.App/Helpers/ViewportWorkQueue.cs",
+      "SHA256": "50FFB3A7BC883DEEE7C540093EF25D985035101C70A722616265D82260B1C9AF"
+    }
+  ],
+  "Results": [
+    {
+      "Name": "cached_first_paint_is_one_extraction_and_one_decode",
+      "Passed": true
+    },
+    {
+      "Name": "direct_cached_load_does_not_generate_again",
+      "Passed": true
+    },
+    {
+      "Name": "failed_cached_decode_retries_with_full_thumbnail",
+      "Passed": true
+    },
+    {
+      "Name": "cache_miss_is_shared_with_full_load_and_generates_once",
+      "Passed": true
+    },
+    {
+      "Name": "size_change_invalidates_first_paint_result",
+      "Passed": true
+    },
+    {
+      "Name": "dpi_change_invalidates_first_paint_result",
+      "Passed": true
+    },
+    {
+      "Name": "high_dpi_thumbnail_requests_full_physical_resolution",
+      "Passed": true
+    },
+    {
+      "Name": "above_largest_bucket_rounds_up_without_undersampling",
+      "Passed": true
+    },
+    {
+      "Name": "standard_buckets_and_small_icon_rounding_are_preserved",
+      "Passed": true
+    },
+    {
+      "Name": "modified_time_invalidates_first_paint_result",
+      "Passed": true
+    },
+    {
+      "Name": "renamed_path_invalidates_first_paint_result",
+      "Passed": true
+    },
+    {
+      "Name": "navigation_generation_invalidates_first_paint_result",
+      "Passed": true
+    },
+    {
+      "Name": "different_item_cannot_reuse_first_paint_result",
+      "Passed": true
+    },
+    {
+      "Name": "thumbnail_preference_change_restores_final_icon",
+      "Passed": true
+    },
+    {
+      "Name": "image_is_applied_before_slow_overlay_finishes",
+      "Passed": true
+    },
+    {
+      "Name": "recycling_while_decode_runs_rejects_assignment",
+      "Passed": true
+    },
+    {
+      "Name": "shortcut_and_embedded_icon_paths_remain_per_file",
+      "Passed": true
+    },
+    {
+      "Name": "viewport_waits_for_generated_thumbnail_and_marks_completed",
+      "Passed": true
+    },
+    {
+      "Name": "cold_thumbnail_starts_and_applies_before_blocked_overlay",
+      "Passed": true
+    },
+    {
+      "Name": "failed_generation_keeps_event_retry_and_canceled_delay_cleans_up",
+      "Passed": true
+    },
+    {
+      "Name": "native_thumbnail_cancellation_waits_for_started_call",
+      "Passed": true
+    },
+    {
+      "Name": "legacy_sta_cancellation_still_completes_promptly",
+      "Passed": true
+    },
+    {
+      "Name": "queued_thumbnail_cancellation_remains_prompt_and_never_executes",
+      "Passed": true
+    },
+    {
+      "Name": "four_viewport_slots_survive_cancel_until_native_calls_return",
+      "Passed": true
+    },
+    {
+      "Name": "stage_markers_are_opt_in_and_fixture_scoped",
+      "Passed": true
+    },
+    {
+      "Name": "provider_exception_is_timed_and_pool_remains_available",
+      "Passed": true
+    }
+  ],
+  "Passed": 26
+}

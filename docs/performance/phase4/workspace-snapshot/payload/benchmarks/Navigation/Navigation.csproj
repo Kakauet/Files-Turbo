@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Variant Condition="'$(Variant)' == ''">phase2</Variant>
+    <SourceRoot>../../source</SourceRoot>
+    <CollectionRoot Condition="'$(Variant)' == 'baseline'">../../source-baseline</CollectionRoot>
+    <CollectionRoot Condition="'$(Variant)' != 'baseline'">../../source</CollectionRoot>
+    <EnumeratorFile Condition="'$(Variant)' == 'baseline'">../../source-baseline/src/Files.App/Utils/Storage/Enumerators/UniversalStorageEnumerator.cs</EnumeratorFile>
+    <EnumeratorFile Condition="'$(Variant)' == 'phase1'">phase1/UniversalStorageEnumerator.cs</EnumeratorFile>
+    <EnumeratorFile Condition="'$(Variant)' == 'phase2'">../../source/src/Files.App/Utils/Storage/Enumerators/UniversalStorageEnumerator.cs</EnumeratorFile>
+    <OutputPath>bin/$(Variant)/</OutputPath>
+    <IntermediateOutputPath>obj/$(Variant)/</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Stubs.cs" />
+    <Compile Include="$(EnumeratorFile)" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Helpers/IntervalSampler.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Utils/Storage/Collection/SortingHelper.cs" />
+    <Compile Condition="'$(Variant)' != 'phase1'" Include="$(CollectionRoot)/src/Files.App/Utils/Storage/Collection/BulkConcurrentObservableCollection.cs" />
+    <Compile Condition="'$(Variant)' == 'phase1'" Include="phase1/BulkConcurrentObservableCollection.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Utils/Storage/Collection/BlockingListEnumerator.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Utils/Storage/Collection/GroupedCollection.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Utils/Storage/Collection/IGroupableItem.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Utils/Storage/Collection/IGroupedCollectionHeader.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Helpers/CollectionDebugView.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.Shared/Extensions/LinqExtensions.cs" />
+  </ItemGroup>
+</Project>

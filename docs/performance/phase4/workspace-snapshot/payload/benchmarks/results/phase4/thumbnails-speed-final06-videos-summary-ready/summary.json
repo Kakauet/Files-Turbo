@@ -1,0 +1,326 @@
+{
+  "GeneratedUtc": "2026-10-11T17:56:02.0619117Z",
+  "Quantiles": "Linear interpolation of ordered samples; n=10 does not establish tail guarantees",
+  "Sessions": [
+    {
+      "Session": "benchmarks\\results\\phase4\\thumbnails-III-video-off-primary-corrected",
+      "Variant": "PhaseIII",
+      "Package": "FilesTurbo.Experimental_4.2.39.4_x64__ykqwq8d6ps0ag",
+      "CaptureMode": "Window",
+      "DiagnosticState": "Off",
+      "SessionPurpose": "Comparison",
+      "ConcurrentBuild": false,
+      "EligibleForComparison": true,
+      "SampleCount": 10,
+      "Timeouts": 0,
+      "VisiblePictures": [
+        "3"
+      ],
+      "FirstDetectedMs": {
+        "Count": 10,
+        "Min": 245.3053,
+        "P50": 305.45535,
+        "P95": 349.68308500000006,
+        "P99": 360.679177,
+        "Max": 363.4282,
+        "Mean": 302.71402
+      },
+      "ViewportAllDetectedMs": {
+        "Count": 10,
+        "Min": 260.1213,
+        "P50": 307.27575,
+        "P95": 355.562515,
+        "P99": 361.85506300000003,
+        "Max": 363.4282,
+        "Mean": 314.00985
+      },
+      "FirstObserverIntervalMs": {
+        "Count": 10,
+        "Min": 66.1833,
+        "P50": 85.19485000000002,
+        "P95": 119.59096500000004,
+        "P99": 133.902513,
+        "Max": 137.4804,
+        "Mean": 90.29316
+      },
+      "ViewportObserverIntervalMs": {
+        "Count": 10,
+        "Min": 66.1833,
+        "P50": 84.04670000000002,
+        "P95": 119.59096500000004,
+        "P99": 133.902513,
+        "Max": 137.4804,
+        "Mean": 88.65809
+      },
+      "QueryMs": {
+        "Count": 30,
+        "Min": 0.5238,
+        "P50": 4.5594,
+        "P95": 65.370385,
+        "P99": 92.13986800000004,
+        "Max": 102.3481,
+        "Mean": 19.636050000000004
+      },
+      "CaptureMs": {
+        "Count": 30,
+        "Min": 12.4933,
+        "P50": 18.9828,
+        "P95": 37.77705500000001,
+        "P99": 71.25868200000004,
+        "Max": 82.2625,
+        "Mean": 22.408700000000003
+      },
+      "DetectorMs": {
+        "Count": 30,
+        "Min": 0.2241,
+        "P50": 0.3802,
+        "P95": 0.59912,
+        "P99": 1.0609460000000006,
+        "Max": 1.2473,
+        "Mean": 0.4163633333333333
+      },
+      "PhysicalPresentationMeasured": false,
+      "Interpretation": "Synthetic thumbnail pattern observed in captured app surface; observer-induced rendering, UIA and polling costs remain included. Warm/uncontrolled caches, no FPS or exact scanout claim."
+    },
+    {
+      "Session": "benchmarks\\results\\phase4\\thumbnails-IV-off-final03-primary-videos",
+      "Variant": "PhaseIV",
+      "Package": "FilesTurbo.Experimental_4.2.39.6_x64__ykqwq8d6ps0ag",
+      "CaptureMode": "Window",
+      "DiagnosticState": "Off",
+      "SessionPurpose": "Comparison",
+      "ConcurrentBuild": false,
+      "EligibleForComparison": true,
+      "SampleCount": 10,
+      "Timeouts": 0,
+      "VisiblePictures": [
+        "3"
+      ],
+      "FirstDetectedMs": {
+        "Count": 10,
+        "Min": 222.9858,
+        "P50": 271.8637,
+        "P95": 314.23455,
+        "P99": 315.48915,
+        "Max": 315.8028,
+        "Mean": 273.03695999999997
+      },
+      "ViewportAllDetectedMs": {
+        "Count": 10,
+        "Min": 222.9858,
+        "P50": 271.8637,
+        "P95": 314.23455,
+        "P99": 315.48915,
+        "Max": 315.8028,
+        "Mean": 273.03695999999997
+      },
+      "FirstObserverIntervalMs": {
+        "Count": 10,
+        "Min": 60.838600000000014,
+        "P50": 73.4313,
+        "P95": 102.13617000000002,
+        "P99": 113.80859400000003,
+        "Max": 116.72670000000002,
+        "Mean": 76.59755000000001
+      },
+      "ViewportObserverIntervalMs": {
+        "Count": 10,
+        "Min": 60.838600000000014,
+        "P50": 73.4313,
+        "P95": 102.13617000000002,
+        "P99": 113.80859400000003,
+        "Max": 116.72670000000002,
+        "Mean": 76.59755000000001
+      },
+      "QueryMs": {
+        "Count": 27,
+        "Min": 0.5259,
+        "P50": 9.4755,
+        "P95": 67.48507,
+        "P99": 69.594538,
+        "Max": 69.7216,
+        "Mean": 21.115788888888886
+      },
+      "CaptureMs": {
+        "Count": 27,
+        "Min": 12.3899,
+        "P50": 17.3066,
+        "P95": 31.99873999999999,
+        "P99": 40.86593399999999,
+        "Max": 42.6454,
+        "Mean": 18.437362962962965
+      },
+      "DetectorMs": {
+        "Count": 27,
+        "Min": 0.2303,
+        "P50": 0.2402,
+        "P95": 0.34291999999999995,
+        "P99": 0.38873599999999997,
+        "Max": 0.3995,
+        "Mean": 0.2563037037037037
+      },
+      "PhysicalPresentationMeasured": false,
+      "Interpretation": "Synthetic thumbnail pattern observed in captured app surface; observer-induced rendering, UIA and polling costs remain included. Warm/uncontrolled caches, no FPS or exact scanout claim."
+    },
+    {
+      "Session": "benchmarks\\results\\phase4\\thumbnails-IV-off-final05-primary-videos",
+      "Variant": "PhaseIV",
+      "Package": "FilesTurbo.Experimental_4.2.39.7_x64__ykqwq8d6ps0ag",
+      "CaptureMode": "Window",
+      "DiagnosticState": "Off",
+      "SessionPurpose": "Comparison",
+      "ConcurrentBuild": false,
+      "EligibleForComparison": true,
+      "SampleCount": 10,
+      "Timeouts": 0,
+      "VisiblePictures": [
+        "3"
+      ],
+      "FirstDetectedMs": {
+        "Count": 10,
+        "Min": 196.1759,
+        "P50": 243.06119999999999,
+        "P95": 280.06260000000003,
+        "P99": 281.03388,
+        "Max": 281.2767,
+        "Mean": 244.23745999999997
+      },
+      "ViewportAllDetectedMs": {
+        "Count": 10,
+        "Min": 196.1759,
+        "P50": 243.06119999999999,
+        "P95": 280.06260000000003,
+        "P99": 281.03388,
+        "Max": 281.2767,
+        "Mean": 244.23745999999997
+      },
+      "FirstObserverIntervalMs": {
+        "Count": 10,
+        "Min": 54.75570000000002,
+        "P50": 71.27355,
+        "P95": 116.94244500000003,
+        "P99": 128.11104900000004,
+        "Max": 130.90320000000003,
+        "Mean": 80.20612000000001
+      },
+      "ViewportObserverIntervalMs": {
+        "Count": 10,
+        "Min": 54.75570000000002,
+        "P50": 71.27355,
+        "P95": 116.94244500000003,
+        "P99": 128.11104900000004,
+        "Max": 130.90320000000003,
+        "Mean": 80.20612000000001
+      },
+      "QueryMs": {
+        "Count": 21,
+        "Min": 0.5713,
+        "P50": 17.3301,
+        "P95": 52.0867,
+        "P99": 62.58710000000001,
+        "Max": 65.2122,
+        "Mean": 19.79932857142857
+      },
+      "CaptureMs": {
+        "Count": 21,
+        "Min": 12.7074,
+        "P50": 16.5166,
+        "P95": 37.1049,
+        "P99": 61.67586000000003,
+        "Max": 67.8186,
+        "Mean": 21.323228571428576
+      },
+      "DetectorMs": {
+        "Count": 21,
+        "Min": 0.2258,
+        "P50": 0.2409,
+        "P95": 0.452,
+        "P99": 0.45928,
+        "Max": 0.4611,
+        "Mean": 0.28010952380952375
+      },
+      "PhysicalPresentationMeasured": false,
+      "Interpretation": "Synthetic thumbnail pattern observed in captured app surface; observer-induced rendering, UIA and polling costs remain included. Warm/uncontrolled caches, no FPS or exact scanout claim."
+    },
+    {
+      "Session": "benchmarks\\results\\phase4\\thumbnails-IV-off-final06-primary-videos",
+      "Variant": "PhaseIV",
+      "Package": "FilesTurbo.Experimental_4.2.39.8_x64__ykqwq8d6ps0ag",
+      "CaptureMode": "Window",
+      "DiagnosticState": "Off",
+      "SessionPurpose": "Comparison",
+      "ConcurrentBuild": false,
+      "EligibleForComparison": true,
+      "SampleCount": 10,
+      "Timeouts": 0,
+      "VisiblePictures": [
+        "3"
+      ],
+      "FirstDetectedMs": {
+        "Count": 10,
+        "Min": 163.129,
+        "P50": 197.32015,
+        "P95": 225.74072,
+        "P99": 226.98862400000002,
+        "Max": 227.3006,
+        "Mean": 199.27662
+      },
+      "ViewportAllDetectedMs": {
+        "Count": 10,
+        "Min": 163.129,
+        "P50": 197.32015,
+        "P95": 225.74072,
+        "P99": 226.98862400000002,
+        "Max": 227.3006,
+        "Mean": 199.27662
+      },
+      "FirstObserverIntervalMs": {
+        "Count": 10,
+        "Min": 54.81539999999998,
+        "P50": 66.23375,
+        "P95": 206.12774500000003,
+        "P99": 215.989549,
+        "Max": 218.455,
+        "Mean": 92.13939
+      },
+      "ViewportObserverIntervalMs": {
+        "Count": 10,
+        "Min": 54.81539999999998,
+        "P50": 66.23375,
+        "P95": 206.12774500000003,
+        "P99": 215.989549,
+        "Max": 218.455,
+        "Mean": 92.13939
+      },
+      "QueryMs": {
+        "Count": 18,
+        "Min": 0.6021,
+        "P50": 29.27665,
+        "P95": 69.71655999999999,
+        "P99": 75.22891199999998,
+        "Max": 76.607,
+        "Mean": 26.69237777777778
+      },
+      "CaptureMs": {
+        "Count": 18,
+        "Min": 12.9617,
+        "P50": 14.870049999999999,
+        "P95": 29.595174999999998,
+        "P99": 31.435594999999996,
+        "Max": 31.8957,
+        "Mean": 17.61333333333333
+      },
+      "DetectorMs": {
+        "Count": 18,
+        "Min": 0.2316,
+        "P50": 0.28935,
+        "P95": 2.171259999999986,
+        "P99": 8.688651999999983,
+        "Max": 10.318,
+        "Mean": 0.8689611111111112
+      },
+      "PhysicalPresentationMeasured": false,
+      "Interpretation": "Synthetic thumbnail pattern observed in captured app surface; observer-induced rendering, UIA and polling costs remain included. Warm/uncontrolled caches, no FPS or exact scanout claim."
+    }
+  ]
+}

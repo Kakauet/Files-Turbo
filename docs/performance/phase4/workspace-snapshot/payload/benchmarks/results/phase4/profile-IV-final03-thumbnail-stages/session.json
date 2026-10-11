@@ -1,0 +1,35 @@
+{
+  "ExperimentalInstanceCountAtStart": 1,
+  "ExperimentalInstanceCountAtEnd": 1,
+  "ExperimentalProcessIdsAtStart": [
+    3800
+  ],
+  "ExperimentalProcessIdsAtEnd": [
+    3800
+  ],
+  "DiagnosticTraceRequired": true,
+  "Package": "FilesTurbo.Experimental_4.2.39.6_x64__ykqwq8d6ps0ag",
+  "ProcessId": 3800,
+  "ProcessStartedUtc": "2026-10-11T16:52:51.5648567Z",
+  "StartedUtc": "2026-10-11T16:54:54.3853420Z",
+  "CompletedUtc": "2026-10-11T16:55:00.0135249Z",
+  "Seconds": 5.6281344,
+  "Culture": "es-ES",
+  "Samples": 20,
+  "TraceFound": true,
+  "TraceSource": "C:\\Users\\guill\\AppData\\Local\\Packages\\FilesTurbo.Experimental_ykqwq8d6ps0ag\\LocalState\\Phase3Performance\\session-20261011-165252-3800-dd439e80c39f496594fb1ac5c9406db9.jsonl",
+  "TraceCreatedUtc": "2026-10-11T16:52:52.5415566Z",
+  "TraceScope": "Opt-in XAML callbacks, input delivery, dispatcher queue delay, GC counts and managed memory; names and paths omitted. Trace includes whole app process; process.csv covers only capture interval.",
+  "PhysicalPresentationMeasured": false,
+  "GCPausesMeasured": false,
+  "CPUInterpretation": "Total process CPU seconds; multicore CPU time can exceed wall time",
+  "RetainedMemoryInterpretation": "End private bytes/working set without forced GC; does not prove a leak",
+  "SuggestedManualScenarios": [
+    "Navigate between 1k/10k/50k/100k and empty fixture",
+    "Scroll slowly, rapidly, jump to beginning/end",
+    "Type exact/partial/Unicode/wildcard/no-result queries; rapidly replace query",
+    "Navigate away during search and enumerate",
+    "Repeat 20 navigation cycles; wait 10 seconds idle; sample memory",
+    "Select visible rows with pointer and keyboard while loading"
+  ]
+}

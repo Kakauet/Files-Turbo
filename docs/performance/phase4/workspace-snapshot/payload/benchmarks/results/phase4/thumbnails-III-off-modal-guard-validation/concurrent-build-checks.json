@@ -1,0 +1,41 @@
+{
+  "ConcurrentBuildObserved": false,
+  "Checks": [
+    {
+      "CheckedUtc": "2026-10-11T15:42:45.3986575Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T15:42:47.4387895Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T15:42:54.5486690Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T15:42:55.3881614Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T15:43:02.2985511Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T15:43:03.1005440Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T15:43:09.6598655Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    }
+  ],
+  "Scope": "Active MSBuild excluding node servers, and dotnet build/msbuild/publish; snapshots before/after repetitions, not a complete CPU-isolation proof"
+}

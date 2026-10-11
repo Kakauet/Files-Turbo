@@ -1,0 +1,111 @@
+{
+  "ConcurrentBuildObserved": false,
+  "Checks": [
+    {
+      "CheckedUtc": "2026-10-11T16:58:32.4900429Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:58:38.8074442Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:58:41.9136257Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:58:42.6772055Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:58:45.5240047Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:58:46.3176243Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:58:49.2613778Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:58:50.0125209Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:58:52.7896187Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:58:53.5811625Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:58:56.3829873Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:58:57.1507944Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:59:00.1449300Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:59:00.8639877Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:59:04.0790331Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:59:04.7625378Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:59:07.8368293Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:59:08.5141417Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:59:11.2682961Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:59:11.9383511Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    },
+    {
+      "CheckedUtc": "2026-10-11T16:59:14.6830681Z",
+      "ActiveBuildCount": 0,
+      "ProcessIds": []
+    }
+  ],
+  "Scope": "Active MSBuild excluding node servers, and dotnet build/msbuild/publish; snapshots before/after repetitions, not a complete CPU-isolation proof"
+}

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WindowsSdkPackageVersion>10.0.26100.67-preview</WindowsSdkPackageVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../source/src/Files.App.Storage/Windows/Managers/STATask.cs" Link="Production/STATask.cs" />
+    <Compile Include="../../source/src/Files.App/Utils/Storage/Helpers/FileThumbnailHelper.cs" Link="Production/FileThumbnailHelper.cs" />
+    <Compile Include="../../source/src/Files.App/Data/Enums/IconOptions.cs" Link="Production/IconOptions.cs" />
+    <Compile Include="../../source/src/Files.App/Helpers/ViewportWorkQueue.cs" Link="Production/ViewportWorkQueue.cs" />
+    <Reference Include="Files.App.CsWin32">
+      <HintPath>../../source/src/Files.App.CsWin32/bin/x64/Release/net10.0-windows10.0.26100.0/win-x64/Files.App.CsWin32.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

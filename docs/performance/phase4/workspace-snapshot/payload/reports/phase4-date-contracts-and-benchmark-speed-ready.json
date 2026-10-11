@@ -1,0 +1,1130 @@
+{
+  "Source": {
+    "ShellPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\ViewModels\\ShellViewModel.cs",
+    "ShellSha256": "3A68AD18E014C7C420614D93804667105F1E5699041F41D6F960407939555540",
+    "ListedItemPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Data\\Items\\ListedItem.cs",
+    "ListedItemSha256": "FB3CD3F911F170758874EFAF4D365D7F55300D080BFD20982A181A8E706C4B86",
+    "LayoutPath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Views\\Layouts\\BaseLayoutPage.cs",
+    "LayoutSha256": "033EA86E897B877298FA6F5AC4B714A8F16FACDEBE68D39A7B02F1459ADBF300",
+    "GeneratedSha256": "C3FB96ECBE31D1911337759FC9274523318EAF9ACDC2D1090056D837401CD4DA",
+    "Baseline": "files-turbo-phase3",
+    "Scope": "Exact production date methods, container guard, realization refresh block and collection; resource strings and app services substituted."
+  },
+  "Contracts": [
+    {
+      "Name": "explicit_rows_refresh_cached_labels_without_touching_hidden_rows",
+      "Passed": true
+    },
+    {
+      "Name": "empty_visible_collection_does_not_fall_back_to_full_folder",
+      "Passed": true
+    },
+    {
+      "Name": "unread_date_labels_remain_lazy",
+      "Passed": true
+    },
+    {
+      "Name": "unchanged_labels_do_not_emit_notifications",
+      "Passed": true
+    },
+    {
+      "Name": "recycled_row_label_updates_when_realized_again",
+      "Passed": true
+    },
+    {
+      "Name": "layout_tick_skips_recycled_and_rebound_containers",
+      "Passed": true
+    },
+    {
+      "Name": "disposed_layout_and_missing_navigation_do_not_refresh_rows",
+      "Passed": true
+    },
+    {
+      "Name": "date_notification_can_recycle_another_row_during_tick",
+      "Passed": true
+    }
+  ],
+  "Samples": [
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 0,
+      "DurationMs": 3.324,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 0,
+      "DurationMs": 0.0953,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 0,
+      "DurationMs": 0.0586,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 1,
+      "DurationMs": 0.0543,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 1,
+      "DurationMs": 0.0698,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 1,
+      "DurationMs": 3.6655,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 2,
+      "DurationMs": 3.6464,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 2,
+      "DurationMs": 0.066,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 2,
+      "DurationMs": 0.0693,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 3,
+      "DurationMs": 0.0579,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 3,
+      "DurationMs": 0.0511,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 3,
+      "DurationMs": 3.7418,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 4,
+      "DurationMs": 3.7156,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 4,
+      "DurationMs": 0.0652,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 4,
+      "DurationMs": 0.0716,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 5,
+      "DurationMs": 0.0599,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 5,
+      "DurationMs": 0.0494,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 5,
+      "DurationMs": 3.546,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 6,
+      "DurationMs": 3.6317,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 6,
+      "DurationMs": 0.0628,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 6,
+      "DurationMs": 0.0699,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 7,
+      "DurationMs": 0.0578,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 7,
+      "DurationMs": 0.0557,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 7,
+      "DurationMs": 3.9139,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 8,
+      "DurationMs": 3.5067,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 8,
+      "DurationMs": 2.7316,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 8,
+      "DurationMs": 0.0651,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 9,
+      "DurationMs": 0.0595,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 9,
+      "DurationMs": 0.0464,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 9,
+      "DurationMs": 3.4978,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 10,
+      "DurationMs": 4.4206,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 10,
+      "DurationMs": 0.0782,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 10,
+      "DurationMs": 0.0682,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 11,
+      "DurationMs": 0.0593,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 11,
+      "DurationMs": 0.0497,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 11,
+      "DurationMs": 3.7488,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 12,
+      "DurationMs": 3.3238,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 12,
+      "DurationMs": 0.0615,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 12,
+      "DurationMs": 0.0562,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 13,
+      "DurationMs": 0.0469,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 13,
+      "DurationMs": 0.0434,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 13,
+      "DurationMs": 3.0937,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 14,
+      "DurationMs": 3.1137,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 14,
+      "DurationMs": 0.0643,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 14,
+      "DurationMs": 0.0568,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 15,
+      "DurationMs": 0.0521,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 15,
+      "DurationMs": 0.0452,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 15,
+      "DurationMs": 3.5549,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 16,
+      "DurationMs": 3.6709,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 16,
+      "DurationMs": 0.0709,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 16,
+      "DurationMs": 0.0596,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 17,
+      "DurationMs": 0.0544,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 17,
+      "DurationMs": 0.0474,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 17,
+      "DurationMs": 3.9342,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 18,
+      "DurationMs": 4.1339,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 18,
+      "DurationMs": 0.0731,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 18,
+      "DurationMs": 0.0842,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 19,
+      "DurationMs": 0.0631,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 19,
+      "DurationMs": 0.0603,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100,
+      "TotalRows": 100000,
+      "Iteration": 19,
+      "DurationMs": 4.0691,
+      "AllocatedBytes": 20944,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 0,
+      "DurationMs": 39.0912,
+      "AllocatedBytes": 20800144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 0,
+      "DurationMs": 0.0485,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 0,
+      "DurationMs": 0.0573,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 1,
+      "DurationMs": 0.0765,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 1,
+      "DurationMs": 0.0436,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 1,
+      "DurationMs": 38.6577,
+      "AllocatedBytes": 20800144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 2,
+      "DurationMs": 74.5295,
+      "AllocatedBytes": 20800144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 2,
+      "DurationMs": 0.0786,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 2,
+      "DurationMs": 0.0976,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 3,
+      "DurationMs": 0.0762,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 3,
+      "DurationMs": 0.0652,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 3,
+      "DurationMs": 68.5009,
+      "AllocatedBytes": 20800144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 4,
+      "DurationMs": 64.6441,
+      "AllocatedBytes": 20800144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 4,
+      "DurationMs": 0.0659,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 4,
+      "DurationMs": 0.075,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 5,
+      "DurationMs": 0.0659,
+      "AllocatedBytes": 22600,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 5,
+      "DurationMs": 0.0572,
+      "AllocatedBytes": 20832,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 5,
+      "DurationMs": 55.0694,
+      "AllocatedBytes": 15645904,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 6,
+      "DurationMs": 24.5368,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 6,
+      "DurationMs": 0.0379,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 6,
+      "DurationMs": 0.0384,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 7,
+      "DurationMs": 0.0251,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 7,
+      "DurationMs": 0.0197,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 7,
+      "DurationMs": 20.5735,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 8,
+      "DurationMs": 21.9009,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 8,
+      "DurationMs": 0.0264,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 8,
+      "DurationMs": 0.0314,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 9,
+      "DurationMs": 0.0211,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 9,
+      "DurationMs": 0.0192,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 9,
+      "DurationMs": 22.9255,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 10,
+      "DurationMs": 22.9463,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 10,
+      "DurationMs": 0.0291,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 10,
+      "DurationMs": 0.0331,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 11,
+      "DurationMs": 0.0316,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 11,
+      "DurationMs": 0.0519,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 11,
+      "DurationMs": 25.4893,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 12,
+      "DurationMs": 23.8845,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 12,
+      "DurationMs": 0.0295,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 12,
+      "DurationMs": 0.0322,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 13,
+      "DurationMs": 0.0234,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 13,
+      "DurationMs": 0.0218,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 13,
+      "DurationMs": 23.2292,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 14,
+      "DurationMs": 21.4301,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 14,
+      "DurationMs": 0.0305,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 14,
+      "DurationMs": 0.0315,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 15,
+      "DurationMs": 0.023,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 15,
+      "DurationMs": 0.0205,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 15,
+      "DurationMs": 25.1316,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 16,
+      "DurationMs": 21.1683,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 16,
+      "DurationMs": 0.0339,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 16,
+      "DurationMs": 0.052,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 17,
+      "DurationMs": 0.0283,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 17,
+      "DurationMs": 0.0251,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 17,
+      "DurationMs": 22.4974,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 18,
+      "DurationMs": 23.5225,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 18,
+      "DurationMs": 0.0452,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 18,
+      "DurationMs": 0.0314,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVRealized100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 19,
+      "DurationMs": 0.0232,
+      "AllocatedBytes": 13000,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIVVisible100",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 19,
+      "DurationMs": 0.0214,
+      "AllocatedBytes": 11232,
+      "FormatterCalls": 100
+    },
+    {
+      "Variant": "PhaseIII",
+      "CachedRows": 100000,
+      "TotalRows": 100000,
+      "Iteration": 19,
+      "DurationMs": 22.7455,
+      "AllocatedBytes": 11200144,
+      "FormatterCalls": 100000
+    }
+  ],
+  "Scope": "Managed method benchmark. Actual date methods, ConcurrentCollection and application formatter; resources/app services substituted. Excludes WinUI/rendering and physical frames."
+}

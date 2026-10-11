@@ -1,0 +1,6 @@
+{
+  "Plan": "benchmarks\\media-phase4-firstvisit-PhaseIV-18884aec\\plan.json",
+  "Purpose": "Three fresh paths for final07 OFF first app navigation; no global cache reset",
+  "SourceCommit": "bf4390ee0a2eed6cece0e99d1a021ce7fd255574",
+  "CreatedUtc": "2026-10-11T18:12:19.4493393Z"
+}

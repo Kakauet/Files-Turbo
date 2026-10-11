@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Variant Condition="'$(Variant)' == ''">baseline</Variant>
+    <SourceRoot Condition="'$(Variant)' == 'baseline'">../baseline/Collections</SourceRoot>
+    <SourceRoot Condition="'$(Variant)' == 'turbo'">../../source</SourceRoot>
+    <SourceRoot Condition="'$(Variant)' == 'phase1'">../../artifacts/phase2-collections/phase1-source</SourceRoot>
+    <OutputPath>bin/$(Variant)/</OutputPath>
+    <IntermediateOutputPath>obj/$(Variant)/</IntermediateOutputPath>
+    <DefineConstants Condition="'$(Variant)' == 'baseline'">$(DefineConstants);BASELINE</DefineConstants>
+    <DefineConstants Condition="'$(Variant)' == 'phase1'">$(DefineConstants);PHASE1</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Stubs.cs" />
+    <Compile Include="../../tests-extra/Collections/RangeContracts.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Utils/Storage/Collection/BulkConcurrentObservableCollection.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Utils/Storage/Collection/BlockingListEnumerator.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Utils/Storage/Collection/GroupedCollection.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Utils/Storage/Collection/IGroupableItem.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Utils/Storage/Collection/IGroupedCollectionHeader.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.App/Helpers/CollectionDebugView.cs" />
+    <Compile Include="$(SourceRoot)/src/Files.Shared/Extensions/LinqExtensions.cs" />
+  </ItemGroup>
+</Project>

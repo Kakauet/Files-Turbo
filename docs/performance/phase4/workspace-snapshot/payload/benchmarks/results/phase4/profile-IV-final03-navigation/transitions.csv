@@ -1,0 +1,2 @@
+"Scenario","Repetition","StartedUtc","CompletedUtc","EmptyNamesObservedMs","PathUpdatedMs","SetValueCallMs","PatternQueryMs","PathReadMaxMs","NamesQueryMaxMs","TimedOut"
+"100000","0","2026-10-11T16:57:17.1102354Z","2026-10-11T16:57:17.3821456Z","259,6961","112,4678","17,9859","2,211","17,6094","146,6186","False"

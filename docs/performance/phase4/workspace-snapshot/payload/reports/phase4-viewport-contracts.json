@@ -1,0 +1,128 @@
+{
+  "generatedAtUtc": "2026-10-11T15:23:39.5030073Z",
+  "measurementKind": "Production-linked scheduler contracts; no WinUI rendering or native thumbnail measurements",
+  "productionSource": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Helpers\\ViewportWorkQueue.cs",
+  "productionSourceSha256": "4A55C6151DE272439EEC9E4B9FE10AA313776D04728905F89EDC27A4B12133AC",
+  "contracts": [
+    {
+      "Name": "ConcurrencyAndPendingCapacity",
+      "Passed": true,
+      "ContractDurationMs": 9.132,
+      "Failure": null
+    },
+    {
+      "Name": "VisiblePriorityAndRecentViewport",
+      "Passed": true,
+      "ContractDurationMs": 0.5689,
+      "Failure": null
+    },
+    {
+      "Name": "DuplicateRealizationCoalesces",
+      "Passed": true,
+      "ContractDurationMs": 0.3436,
+      "Failure": null
+    },
+    {
+      "Name": "RecycleBeforeDispatcherSkipsWork",
+      "Passed": true,
+      "ContractDurationMs": 2.2316,
+      "Failure": null
+    },
+    {
+      "Name": "RecycleCancelsRunningNativeWait",
+      "Passed": true,
+      "ContractDurationMs": 0.1996,
+      "Failure": null
+    },
+    {
+      "Name": "SameItemGenerationsNeverOverlap",
+      "Passed": true,
+      "ContractDurationMs": 0.1665,
+      "Failure": null
+    },
+    {
+      "Name": "CompletedLifetimeCancelsDetachedRetry",
+      "Passed": true,
+      "ContractDurationMs": 0.4392,
+      "Failure": null
+    },
+    {
+      "Name": "NavigationDropsOldRequests",
+      "Passed": true,
+      "ContractDurationMs": 0.2108,
+      "Failure": null
+    },
+    {
+      "Name": "VisibleRequestEvictsCachedRequest",
+      "Passed": true,
+      "ContractDurationMs": 0.1971,
+      "Failure": null
+    },
+    {
+      "Name": "CachedRequestCannotEvictVisibleRequest",
+      "Passed": true,
+      "ContractDurationMs": 0.2823,
+      "Failure": null
+    },
+    {
+      "Name": "RejectedDispatcherDoesNotLeakActiveSlots",
+      "Passed": true,
+      "ContractDurationMs": 0.228,
+      "Failure": null
+    },
+    {
+      "Name": "FailureIsObservedAndQueueContinues",
+      "Passed": true,
+      "ContractDurationMs": 0.295,
+      "Failure": null
+    },
+    {
+      "Name": "DisposeCancelsCompletedAndRunningLifetimes",
+      "Passed": true,
+      "ContractDurationMs": 0.2812,
+      "Failure": null
+    },
+    {
+      "Name": "RepeatedScrollGenerationsRemainBounded",
+      "Passed": true,
+      "ContractDurationMs": 50.2339,
+      "Failure": null
+    },
+    {
+      "Name": "FailedJobCanRetrySameVersion",
+      "Passed": true,
+      "ContractDurationMs": 0.4024,
+      "Failure": null
+    },
+    {
+      "Name": "ChangedGitRequestVersionRestartsCompletedWork",
+      "Passed": true,
+      "ContractDurationMs": 0.215,
+      "Failure": null
+    },
+    {
+      "Name": "DisposedQueueReleasesRealizedItem",
+      "Passed": true,
+      "ContractDurationMs": 1.9478,
+      "Failure": null
+    },
+    {
+      "Name": "PausedViewportPreservesVisibleWork",
+      "Passed": true,
+      "ContractDurationMs": 0.2411,
+      "Failure": null
+    },
+    {
+      "Name": "ReprioritizedViewportStartsBeforeCachedRows",
+      "Passed": true,
+      "ContractDurationMs": 0.3152,
+      "Failure": null
+    },
+    {
+      "Name": "DisposeWhilePausedCancelsPending",
+      "Passed": true,
+      "ContractDurationMs": 0.0754,
+      "Failure": null
+    }
+  ]
+}

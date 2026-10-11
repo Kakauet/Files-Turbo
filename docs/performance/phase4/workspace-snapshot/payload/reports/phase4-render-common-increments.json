@@ -1,0 +1,150 @@
+{
+  "GeneratedUtc": "2026-10-11T17:08:51.9371796Z",
+  "Method": "Union of eight equivalent UIA Small/Large increment request-to-readiness windows, each extended250ms for trailing XAML callbacks. Overlaps deduplicated; navigation and jump preparations excluded.",
+  "ReferenceHz": 144,
+  "ReferenceBudgetMs": 6.944444444444445,
+  "PhysicalPresentationMeasured": false,
+  "Limitations": "One instrumented session per variant; callbacks are framework observations, not physical FPS. UIA, profiler and diagnostics overhead are included. Increments do not cover wheel input, scrollbar drag, jump ends or media scrolling.",
+  "Sessions": [
+    {
+      "Variant": "PhaseIII",
+      "ProcessId": 37640,
+      "SourceSession": "baseline-III-profile-scroll-b",
+      "Trace": "baseline-III-profile-capture",
+      "CallCount": 8,
+      "Windows": [
+        {
+          "Start": "2026-10-11T15:18:50.7627873Z",
+          "End": "2026-10-11T15:18:51.0467794Z"
+        },
+        {
+          "Start": "2026-10-11T15:18:50.9045899Z",
+          "End": "2026-10-11T15:18:51.1573585Z"
+        },
+        {
+          "Start": "2026-10-11T15:18:51.026935Z",
+          "End": "2026-10-11T15:18:51.2796749Z"
+        },
+        {
+          "Start": "2026-10-11T15:18:51.1380642Z",
+          "End": "2026-10-11T15:18:51.3904284Z"
+        },
+        {
+          "Start": "2026-10-11T15:18:51.2488541Z",
+          "End": "2026-10-11T15:18:51.5019734Z"
+        },
+        {
+          "Start": "2026-10-11T15:18:51.3582225Z",
+          "End": "2026-10-11T15:18:51.6102777Z"
+        },
+        {
+          "Start": "2026-10-11T15:18:51.4676877Z",
+          "End": "2026-10-11T15:18:51.7431992Z"
+        },
+        {
+          "Start": "2026-10-11T15:18:51.5937804Z",
+          "End": "2026-10-11T15:18:51.8635546Z"
+        }
+      ],
+      "XamlRenderDurationMs": {
+        "Count": 34,
+        "Min": 0.1525,
+        "Max": 34.2788,
+        "P50": 0.2517,
+        "P95": 20.30212000000001,
+        "P99": 30.915143000000015,
+        "AboveReferenceBudget": 3
+      },
+      "RenderCallbackGapMs": {
+        "Count": 33,
+        "Min": 1.3491,
+        "Max": 128.159,
+        "P50": 6.9297,
+        "P95": 115.22542,
+        "P99": 124.514136,
+        "AboveReferenceBudget": 15
+      },
+      "DispatcherQueueDelayMs": {
+        "Count": 11,
+        "Min": 0.0567,
+        "Max": 26.9628,
+        "P50": 0.1322,
+        "P95": 17.69005,
+        "P99": 25.108250000000012,
+        "AboveReferenceBudget": 2
+      },
+      "AnchorUncertaintyMs": 0.0015,
+      "TraceSha256": "91E0F649ECF78E1123CD0D24BE591102CE1E84646E51EE77CB492903D50D67CF"
+    },
+    {
+      "Variant": "PhaseIV",
+      "ProcessId": 3800,
+      "SourceSession": "profile-IV-final03-scroll-increments",
+      "Trace": "profile-IV-final03-render-capture",
+      "CallCount": 8,
+      "Windows": [
+        {
+          "Start": "2026-10-11T16:57:21.2178158Z",
+          "End": "2026-10-11T16:57:21.4965592Z"
+        },
+        {
+          "Start": "2026-10-11T16:57:21.3696663Z",
+          "End": "2026-10-11T16:57:21.6234511Z"
+        },
+        {
+          "Start": "2026-10-11T16:57:21.4945855Z",
+          "End": "2026-10-11T16:57:21.749359Z"
+        },
+        {
+          "Start": "2026-10-11T16:57:21.6181969Z",
+          "End": "2026-10-11T16:57:21.8709879Z"
+        },
+        {
+          "Start": "2026-10-11T16:57:21.7307634Z",
+          "End": "2026-10-11T16:57:21.9844041Z"
+        },
+        {
+          "Start": "2026-10-11T16:57:21.8526578Z",
+          "End": "2026-10-11T16:57:22.112224Z"
+        },
+        {
+          "Start": "2026-10-11T16:57:21.9631915Z",
+          "End": "2026-10-11T16:57:22.2385468Z"
+        },
+        {
+          "Start": "2026-10-11T16:57:22.1030591Z",
+          "End": "2026-10-11T16:57:22.3698856Z"
+        }
+      ],
+      "XamlRenderDurationMs": {
+        "Count": 36,
+        "Min": 0.1525,
+        "Max": 23.7426,
+        "P50": 0.3051,
+        "P95": 10.017325,
+        "P99": 20.933464999999988,
+        "AboveReferenceBudget": 3
+      },
+      "RenderCallbackGapMs": {
+        "Count": 35,
+        "Min": 1.2168,
+        "Max": 169.1261,
+        "P50": 7.0034,
+        "P95": 115.85850999999997,
+        "P99": 154.70261999999985,
+        "AboveReferenceBudget": 19
+      },
+      "DispatcherQueueDelayMs": {
+        "Count": 11,
+        "Min": 0.0798,
+        "Max": 18.8423,
+        "P50": 0.4695,
+        "P95": 9.961400000000001,
+        "P99": 17.06612000000001,
+        "AboveReferenceBudget": 1
+      },
+      "AnchorUncertaintyMs": 0.0017,
+      "TraceSha256": "83DBC8B046C87EE5CA0F789C521812813939BED198BD66A656C3445FF9EE8C14"
+    }
+  ]
+}

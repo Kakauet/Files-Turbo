@@ -1,0 +1,225 @@
+{
+  "capturedUtc": "2026-10-11T16:47:58.3224946Z",
+  "sourceMethods": "SetWorkingDirectoryAsync, IsWorkingDirectoryUpdatePending, UpdateFolderThumbnailImageSource, UpdatePathUIToWorkingDirectoryAsync and ModernShellPage.NavigateToPath captured verbatim by Prepare-WorkingDirectoryContracts.ps1",
+  "sources": {
+    "PreparedUtc": "2026-10-11T16:47:53.8604766Z",
+    "Sources": [
+      {
+        "Source": "source/src/Files.App/ViewModels/ShellViewModel.cs",
+        "Signature": "public async Task SetWorkingDirectoryAsync(string? value)",
+        "SourceSha256": "D94A9D00DE2ED417DE67E60058E8E637953959B6143A01B223B5E6DC831E953D",
+        "MethodUtf8Sha256": "25B85CFF5092B16E8FFC8DA0A022539B6C444DD0DE575349C4C4D581C8DABB6D",
+        "Generated": "WorkingDirectoryCore.generated.cs",
+        "GeneratedSha256": "46A599616681E1FB3DD1F69D43E9F2A3F3957EE35B88FB3B9B8B97C3D97C2FFE",
+        "Verbatim": true
+      },
+      {
+        "Source": "source/src/Files.App/ViewModels/ShellViewModel.cs",
+        "Signature": "public async Task UpdateFolderThumbnailImageSource()",
+        "SourceSha256": "D94A9D00DE2ED417DE67E60058E8E637953959B6143A01B223B5E6DC831E953D",
+        "MethodUtf8Sha256": "0C49E17A7D2F66F0A72992C5BC4CB11B2EB3583E0924AEA9C1B9065F22D93DF5",
+        "Generated": "FolderThumbnailCore.generated.cs",
+        "GeneratedSha256": "94F05C303AB1FFA29D4333AEFDE192D16F052AC4BE0C01469C2681B1A7FFC130",
+        "Verbatim": true
+      },
+      {
+        "Source": "source/src/Files.App/ViewModels/ShellViewModel.cs",
+        "Signature": "public bool IsWorkingDirectoryUpdatePending =\u003E",
+        "SourceSha256": "D94A9D00DE2ED417DE67E60058E8E637953959B6143A01B223B5E6DC831E953D",
+        "MethodUtf8Sha256": "7D2EF4F92937F8D824378BAB3D2F23A2EA1C19B21FE8C5231EA8922A0A3F5496",
+        "Generated": "WorkingDirectoryPending.generated.cs",
+        "GeneratedSha256": "C70C18AE43912E762591BF770D2C347E03CCD411F37BA1AA11251B5D7B096FAC",
+        "Verbatim": true
+      },
+      {
+        "Source": "source/src/Files.App/Views/Shells/BaseShellPage.cs",
+        "Signature": "public async Task UpdatePathUIToWorkingDirectoryAsync(string? newWorkingDir, string? singleItemOverride = null)",
+        "SourceSha256": "3D6E9B7B2814EC2B6A15DBE2752E975425401575E60826890B380E4E13756A22",
+        "MethodUtf8Sha256": "B853CFD71226E9F85A06C7225FE2858F16F3982359A4DECEB844C3C230592FEA",
+        "Generated": "BreadcrumbCore.generated.cs",
+        "GeneratedSha256": "83AA4030986C8093CB3850D118706D00935A87884948CF2EC486B5BE073A9C5E",
+        "Verbatim": true
+      },
+      {
+        "Source": "source/src/Files.App/Views/Shells/ModernShellPage.xaml.cs",
+        "Signature": "public override void NavigateToPath(string? navigationPath, Type? sourcePageType, NavigationArguments? navArgs = null)",
+        "SourceSha256": "4201CFC25076F1BBB4DA55AC9BB022F8CB40767D24B26B317B5864F7BDA94D74",
+        "MethodUtf8Sha256": "BE942071BDD6BD3743F03429674890388D31042012449E2E6EFD4688A13857E5",
+        "Generated": "ModernRouteCore.generated.cs",
+        "GeneratedSha256": "0F6D0BE35B8855407967302F92AC5BEEDEDADE7FED626A7B52BF665823FDBC9E",
+        "Verbatim": true
+      }
+    ],
+    "Scope": "Actual method bodies compiled verbatim against deterministic substitutes; no WinUI runtime, filesystem, registry or package operations"
+  },
+  "dependencies": "Deterministic root/Git/head/icon/breadcrumb/frame substitutes; no WinUI runtime or real filesystem operations",
+  "passed": true,
+  "total": 41,
+  "failures": 0,
+  "results": [
+    {
+      "name": "pending_root_flag_becomes_false_when_latest_A_invalidates_B",
+      "passed": true
+    },
+    {
+      "name": "blank_latest_invalidates_B_and_clears_pending_flag",
+      "passed": true
+    },
+    {
+      "name": "Git_only_await_after_path_commit_is_not_pending_root",
+      "passed": true
+    },
+    {
+      "name": "delayed_cross_drive_root_cannot_overwrite_latest_C",
+      "passed": true
+    },
+    {
+      "name": "delayed_cross_drive_root_cannot_overwrite_latest_A",
+      "passed": true
+    },
+    {
+      "name": "latest_empty_invalidates_delayed_root",
+      "passed": true
+    },
+    {
+      "name": "latest_whitespace_invalidates_delayed_root",
+      "passed": true
+    },
+    {
+      "name": "latest_home_invalidates_delayed_root",
+      "passed": true
+    },
+    {
+      "name": "reentrant_modified_event_preserves_newer_location",
+      "passed": true
+    },
+    {
+      "name": "reentrant_modified_event_disposal_stops_root_lookup",
+      "passed": true
+    },
+    {
+      "name": "disposal_during_root_await_prevents_commit",
+      "passed": true
+    },
+    {
+      "name": "delayed_git_lookup_same_path_ABA_cannot_overwrite_new_repository",
+      "passed": true
+    },
+    {
+      "name": "delayed_head_same_path_ABA_cannot_overwrite_new_validity",
+      "passed": true
+    },
+    {
+      "name": "disposal_during_head_await_prevents_UI_notifications",
+      "passed": true
+    },
+    {
+      "name": "normal_cross_drive_update_preserves_root_git_and_notifications",
+      "passed": true
+    },
+    {
+      "name": "library_update_clears_storage_root_and_retains_event_metadata",
+      "passed": true
+    },
+    {
+      "name": "disposed_entry_does_not_invoke_modified_event_or_git",
+      "passed": true
+    },
+    {
+      "name": "delayed_breadcrumb_B_cannot_replace_latest_C",
+      "passed": true
+    },
+    {
+      "name": "delayed_breadcrumb_same_path_ABA_is_rejected",
+      "passed": true
+    },
+    {
+      "name": "single_override_invalidates_delayed_regular_breadcrumbs",
+      "passed": true
+    },
+    {
+      "name": "null_latest_breadcrumb_request_invalidates_older_before_throw",
+      "passed": true
+    },
+    {
+      "name": "breadcrumb_disposal_after_await_preserves_existing_components",
+      "passed": true
+    },
+    {
+      "name": "breadcrumb_disposed_entry_skips_provider_and_override",
+      "passed": true
+    },
+    {
+      "name": "filter_property_reentrancy_suppresses_old_modified_event",
+      "passed": true
+    },
+    {
+      "name": "thumbnail_delayed_A_cannot_replace_new_B_icon",
+      "passed": true
+    },
+    {
+      "name": "thumbnail_same_path_ABA_rejects_old_revision_icon",
+      "passed": true
+    },
+    {
+      "name": "thumbnail_disposal_after_icon_await_prevents_assignment",
+      "passed": true
+    },
+    {
+      "name": "thumbnail_disposed_entry_does_not_start_icon_work",
+      "passed": true
+    },
+    {
+      "name": "thumbnail_pending_cross_drive_root_skips_old_committed_A_icon",
+      "passed": true
+    },
+    {
+      "name": "thumbnail_inflight_A_is_discarded_when_B_root_becomes_pending",
+      "passed": true
+    },
+    {
+      "name": "thumbnail_blank_latest_invalidates_inflight_same_path_icon",
+      "passed": true
+    },
+    {
+      "name": "breadcrumb_Clear_reentrancy_prevents_old_components_append",
+      "passed": true
+    },
+    {
+      "name": "breadcrumb_Add_reentrancy_prevents_remaining_old_components",
+      "passed": true
+    },
+    {
+      "name": "breadcrumb_override_Clear_reentrancy_prevents_old_override",
+      "passed": true
+    },
+    {
+      "name": "breadcrumb_override_property_reentrancy_prevents_old_override_append",
+      "passed": true
+    },
+    {
+      "name": "breadcrumb_Clear_disposal_prevents_old_components_append",
+      "passed": true
+    },
+    {
+      "name": "literal_modern_route_latest_A_is_forced_while_cross_drive_B_root_pending",
+      "passed": true
+    },
+    {
+      "name": "literal_modern_route_stable_same_location_still_skips_reload",
+      "passed": true
+    },
+    {
+      "name": "literal_modern_route_explicit_associated_arguments_still_navigate",
+      "passed": true
+    },
+    {
+      "name": "literal_modern_route_tag_parameter_preserves_same_path_reload",
+      "passed": true
+    },
+    {
+      "name": "literal_modern_route_empty_location_never_navigates_while_pending",
+      "passed": true
+    }
+  ]
+}

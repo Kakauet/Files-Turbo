@@ -1,0 +1,8 @@
+"Variant","Repetition","StartedUtc","CompletedUtc","Metric","FirstDetectedMs","FirstDetectionLowerBoundMs","ViewportAllDetectedMs","ViewportDetectionLowerBoundMs","SetValueCallMs","VisiblePictures","DetectedRealThumbnails","Polls","TimedOut","PrivateBytes","WorkingSetBytes","WindowBounds"
+"PhaseIII","0","2026-10-11T15:38:06.2956613Z","2026-10-11T15:38:21.6646593Z","WindowSample_RealPatternThumbnail",,,,,"2,3827","52","0","253","True","298328064","532480000","26;26;1440;753"
+"PhaseIII","1","2026-10-11T15:38:23.0119981Z","2026-10-11T15:38:38.2562820Z","WindowSample_RealPatternThumbnail",,,,,"2,1499","52","0","253","True","300376064","536858624","26;26;1440;753"
+"PhaseIII","2","2026-10-11T15:38:39.6973675Z","2026-10-11T15:38:54.9837147Z","WindowSample_RealPatternThumbnail",,,,,"2,0428","52","0","240","True","292024320","528953344","26;26;1440;753"
+"PhaseIII","3","2026-10-11T15:38:56.3710441Z","2026-10-11T15:39:11.7817343Z","WindowSample_RealPatternThumbnail",,,,,"4,3236","52","0","232","True","291545088","529059840","26;26;1440;753"
+"PhaseIII","4","2026-10-11T15:39:13.2800660Z","2026-10-11T15:39:28.5952468Z","WindowSample_RealPatternThumbnail",,,,,"2,483","52","0","245","True","290181120","528306176","26;26;1440;753"
+"PhaseIII","5","2026-10-11T15:39:30.0582909Z","2026-10-11T15:39:45.4546875Z","WindowSample_RealPatternThumbnail",,,,,"3,5938","52","0","229","True","293838848","532430848","26;26;1440;753"
+"PhaseIII","6","2026-10-11T15:39:46.8856299Z","2026-10-11T15:40:02.2935688Z","WindowSample_RealPatternThumbnail",,,,,"2,2771","52","0","234","True","297533440","537796608","26;26;1440;753"

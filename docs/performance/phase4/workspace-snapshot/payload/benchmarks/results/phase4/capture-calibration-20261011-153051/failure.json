@@ -1,0 +1,4 @@
+{
+  "Reason": "PrintWindow ignored viewport origin; inaccurate crop removed, corrected harness internally crops full HWND buffer before exposing only FileList",
+  "UsableForComparison": false
+}

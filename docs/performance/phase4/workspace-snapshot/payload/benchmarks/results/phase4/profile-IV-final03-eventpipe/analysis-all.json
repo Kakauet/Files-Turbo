@@ -1,0 +1,1475 @@
+{
+  "TraceFile": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\results\\phase4\\profile-IV-final03-eventpipe\\session.nettrace",
+  "TraceStartUtc": "2026-10-11T16:56:45.863Z",
+  "TraceEndUtc": "2026-10-11T16:57:41.0093322Z",
+  "DurationMs": 55146.3322,
+  "EventCount": 98854,
+  "EventsLost": 0,
+  "Truncated": false,
+  "ProcessId": 3800,
+  "StackSamples": 79848,
+  "UnmatchedSuspensionEnds": 0,
+  "UnmatchedSuspensionStarts": 0,
+  "OtherSuspensions": 3328,
+  "OtherSuspensionTotalMs": 643.6577999998651,
+  "OtherSuspensionMaxMs": 1.1366999999991094,
+  "Suspensions": [
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 920,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:17.2466673Z",
+      "EndUtc": "2026-10-11T16:57:17.2606983Z",
+      "StartRelativeMs": 31383.6673,
+      "EndRelativeMs": 31397.6983,
+      "SuspensionAcquireMs": 0.006999999997788109,
+      "FullySuspendedMs": 14.024000000001251,
+      "TotalSuspensionMs": 14.03099999999904,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 25436,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:17.2607234Z",
+      "EndUtc": "2026-10-11T16:57:17.2775763Z",
+      "StartRelativeMs": 31397.7234,
+      "EndRelativeMs": 31414.5763,
+      "SuspensionAcquireMs": 0.018900000002759043,
+      "FullySuspendedMs": 16.833999999998923,
+      "TotalSuspensionMs": 16.852900000001682,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGCPrep",
+      "ThreadId": 32256,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:17.2787232Z",
+      "EndUtc": "2026-10-11T16:57:17.2818944Z",
+      "StartRelativeMs": 31415.7232,
+      "EndRelativeMs": 31418.8944,
+      "SuspensionAcquireMs": 0.004399999997986015,
+      "FullySuspendedMs": 3.166800000002695,
+      "TotalSuspensionMs": 3.171200000000681,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 27936,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:17.8357135Z",
+      "EndUtc": "2026-10-11T16:57:17.849361Z",
+      "StartRelativeMs": 31972.7135,
+      "EndRelativeMs": 31986.361,
+      "SuspensionAcquireMs": 0.007299999997485429,
+      "FullySuspendedMs": 13.640200000001641,
+      "TotalSuspensionMs": 13.647499999999127,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 27936,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:17.9088326Z",
+      "EndUtc": "2026-10-11T16:57:17.9234312Z",
+      "StartRelativeMs": 32045.8326,
+      "EndRelativeMs": 32060.4312,
+      "SuspensionAcquireMs": 0.01089999999749125,
+      "FullySuspendedMs": 14.58770000000004,
+      "TotalSuspensionMs": 14.598599999997532,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 27936,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:17.9850082Z",
+      "EndUtc": "2026-10-11T16:57:18.031215Z",
+      "StartRelativeMs": 32122.0082,
+      "EndRelativeMs": 32168.215,
+      "SuspensionAcquireMs": 0.010900000001129229,
+      "FullySuspendedMs": 46.1958999999988,
+      "TotalSuspensionMs": 46.20679999999993,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGCPrep",
+      "ThreadId": 32256,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:18.0351679Z",
+      "EndUtc": "2026-10-11T16:57:18.0421395Z",
+      "StartRelativeMs": 32172.1679,
+      "EndRelativeMs": 32179.1395,
+      "SuspensionAcquireMs": 0.006199999999807915,
+      "FullySuspendedMs": 6.965400000000955,
+      "TotalSuspensionMs": 6.9716000000007625,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 27936,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:18.1066188Z",
+      "EndUtc": "2026-10-11T16:57:18.1161955Z",
+      "StartRelativeMs": 32243.6188,
+      "EndRelativeMs": 32253.1955,
+      "SuspensionAcquireMs": 0.011299999998300336,
+      "FullySuspendedMs": 9.565400000003137,
+      "TotalSuspensionMs": 9.576700000001438,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 27936,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:18.1747459Z",
+      "EndUtc": "2026-10-11T16:57:18.1896149Z",
+      "StartRelativeMs": 32311.7459,
+      "EndRelativeMs": 32326.6149,
+      "SuspensionAcquireMs": 0.006099999998696148,
+      "FullySuspendedMs": 14.862900000000081,
+      "TotalSuspensionMs": 14.868999999998778,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 27936,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:18.2459924Z",
+      "EndUtc": "2026-10-11T16:57:18.2594761Z",
+      "StartRelativeMs": 32382.9924,
+      "EndRelativeMs": 32396.4761,
+      "SuspensionAcquireMs": 0.009000000001833541,
+      "FullySuspendedMs": 13.474699999998847,
+      "TotalSuspensionMs": 13.483700000000681,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 17960,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:18.3382121Z",
+      "EndUtc": "2026-10-11T16:57:18.3864623Z",
+      "StartRelativeMs": 32475.2121,
+      "EndRelativeMs": 32523.4623,
+      "SuspensionAcquireMs": 0.008699999998498242,
+      "FullySuspendedMs": 48.24150000000009,
+      "TotalSuspensionMs": 48.250199999998586,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGCPrep",
+      "ThreadId": 32256,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:18.394313Z",
+      "EndUtc": "2026-10-11T16:57:18.4009394Z",
+      "StartRelativeMs": 32531.313,
+      "EndRelativeMs": 32537.9394,
+      "SuspensionAcquireMs": 0.0067000000017287675,
+      "FullySuspendedMs": 6.619699999999284,
+      "TotalSuspensionMs": 6.626400000001013,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 17960,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:18.4850831Z",
+      "EndUtc": "2026-10-11T16:57:18.4947427Z",
+      "StartRelativeMs": 32622.0831,
+      "EndRelativeMs": 32631.7427,
+      "SuspensionAcquireMs": 0.010999999998603016,
+      "FullySuspendedMs": 9.648600000000442,
+      "TotalSuspensionMs": 9.659599999999045,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 920,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:18.5553825Z",
+      "EndUtc": "2026-10-11T16:57:18.6138219Z",
+      "StartRelativeMs": 32692.3825,
+      "EndRelativeMs": 32750.8219,
+      "SuspensionAcquireMs": 0.009200000000419095,
+      "FullySuspendedMs": 58.43019999999888,
+      "TotalSuspensionMs": 58.439399999999296,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 920,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:18.672941Z",
+      "EndUtc": "2026-10-11T16:57:18.6901733Z",
+      "StartRelativeMs": 32809.941,
+      "EndRelativeMs": 32827.1733,
+      "SuspensionAcquireMs": 0.018499999998311978,
+      "FullySuspendedMs": 17.213800000004994,
+      "TotalSuspensionMs": 17.232300000003306,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 920,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:18.8822555Z",
+      "EndUtc": "2026-10-11T16:57:18.893397Z",
+      "StartRelativeMs": 33019.2555,
+      "EndRelativeMs": 33030.397,
+      "SuspensionAcquireMs": 0.011500000000523869,
+      "FullySuspendedMs": 11.12999999999738,
+      "TotalSuspensionMs": 11.141499999997905,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 920,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:24.3440632Z",
+      "EndUtc": "2026-10-11T16:57:24.3812478Z",
+      "StartRelativeMs": 38481.0632,
+      "EndRelativeMs": 38518.2478,
+      "SuspensionAcquireMs": 0.006600000000617001,
+      "FullySuspendedMs": 37.177999999999884,
+      "TotalSuspensionMs": 37.1846000000005,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 920,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:30.5944634Z",
+      "EndUtc": "2026-10-11T16:57:30.6916259Z",
+      "StartRelativeMs": 44731.4634,
+      "EndRelativeMs": 44828.6259,
+      "SuspensionAcquireMs": 0.008399999998800922,
+      "FullySuspendedMs": 97.15409999999974,
+      "TotalSuspensionMs": 97.16249999999854,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 920,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:31.038216Z",
+      "EndUtc": "2026-10-11T16:57:31.0744745Z",
+      "StartRelativeMs": 45175.216,
+      "EndRelativeMs": 45211.4745,
+      "SuspensionAcquireMs": 0.009899999997287523,
+      "FullySuspendedMs": 36.24859999999899,
+      "TotalSuspensionMs": 36.258499999996275,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGCPrep",
+      "ThreadId": 32256,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:31.0765762Z",
+      "EndUtc": "2026-10-11T16:57:31.087505Z",
+      "StartRelativeMs": 45213.5762,
+      "EndRelativeMs": 45224.505,
+      "SuspensionAcquireMs": 0.007099999995261896,
+      "FullySuspendedMs": 10.921699999998964,
+      "TotalSuspensionMs": 10.928799999994226,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 920,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:31.4410296Z",
+      "EndUtc": "2026-10-11T16:57:31.4582244Z",
+      "StartRelativeMs": 45578.0296,
+      "EndRelativeMs": 45595.2244,
+      "SuspensionAcquireMs": 0.02049999999871943,
+      "FullySuspendedMs": 17.174299999998766,
+      "TotalSuspensionMs": 17.194799999997485,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGC",
+      "ThreadId": 920,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:31.7023581Z",
+      "EndUtc": "2026-10-11T16:57:31.7892323Z",
+      "StartRelativeMs": 45839.3581,
+      "EndRelativeMs": 45926.2323,
+      "SuspensionAcquireMs": 0.010699999998905696,
+      "FullySuspendedMs": 86.86350000000675,
+      "TotalSuspensionMs": 86.87420000000566,
+      "HasSuspendStop": true
+    },
+    {
+      "Reason": "SuspendForGCPrep",
+      "ThreadId": 32256,
+      "ClrInstanceId": 10,
+      "StartUtc": "2026-10-11T16:57:31.7911519Z",
+      "EndUtc": "2026-10-11T16:57:31.8103947Z",
+      "StartRelativeMs": 45928.1519,
+      "EndRelativeMs": 45947.3947,
+      "SuspensionAcquireMs": 0.00420000000303844,
+      "FullySuspendedMs": 19.23859999999695,
+      "TotalSuspensionMs": 19.24279999999999,
+      "HasSuspendStop": true
+    }
+  ],
+  "Collections": [
+    {
+      "Count": 21,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 0,
+      "StartUtc": "2026-10-11T16:57:17.2467074Z",
+      "StartRelativeMs": 31383.7074
+    },
+    {
+      "Count": 22,
+      "Reason": "InducedNotForced",
+      "Type": "BackgroundGC",
+      "Depth": 2,
+      "StartUtc": "2026-10-11T16:57:17.2769988Z",
+      "StartRelativeMs": 31413.9988
+    },
+    {
+      "Count": 23,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 0,
+      "StartUtc": "2026-10-11T16:57:17.8357532Z",
+      "StartRelativeMs": 31972.7532
+    },
+    {
+      "Count": 24,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 1,
+      "StartUtc": "2026-10-11T16:57:17.9088819Z",
+      "StartRelativeMs": 32045.8819
+    },
+    {
+      "Count": 25,
+      "Reason": "AllocSmall",
+      "Type": "BackgroundGC",
+      "Depth": 2,
+      "StartUtc": "2026-10-11T16:57:18.009282Z",
+      "StartRelativeMs": 32146.282
+    },
+    {
+      "Count": 26,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 1,
+      "StartUtc": "2026-10-11T16:57:18.0093192Z",
+      "StartRelativeMs": 32146.3192
+    },
+    {
+      "Count": 27,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 1,
+      "StartUtc": "2026-10-11T16:57:18.1066647Z",
+      "StartRelativeMs": 32243.6647
+    },
+    {
+      "Count": 28,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 1,
+      "StartUtc": "2026-10-11T16:57:18.1747918Z",
+      "StartRelativeMs": 32311.7918
+    },
+    {
+      "Count": 29,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 1,
+      "StartUtc": "2026-10-11T16:57:18.2460469Z",
+      "StartRelativeMs": 32383.0469
+    },
+    {
+      "Count": 30,
+      "Reason": "AllocSmall",
+      "Type": "BackgroundGC",
+      "Depth": 2,
+      "StartUtc": "2026-10-11T16:57:18.3681246Z",
+      "StartRelativeMs": 32505.1246
+    },
+    {
+      "Count": 31,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 1,
+      "StartUtc": "2026-10-11T16:57:18.3681636Z",
+      "StartRelativeMs": 32505.1636
+    },
+    {
+      "Count": 32,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 1,
+      "StartUtc": "2026-10-11T16:57:18.4851275Z",
+      "StartRelativeMs": 32622.1275
+    },
+    {
+      "Count": 33,
+      "Reason": "Induced",
+      "Type": "NonConcurrentGC",
+      "Depth": 2,
+      "StartUtc": "2026-10-11T16:57:18.5819183Z",
+      "StartRelativeMs": 32718.9183
+    },
+    {
+      "Count": 34,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 1,
+      "StartUtc": "2026-10-11T16:57:18.6729904Z",
+      "StartRelativeMs": 32809.9904
+    },
+    {
+      "Count": 35,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 1,
+      "StartUtc": "2026-10-11T16:57:18.8822878Z",
+      "StartRelativeMs": 33019.2878
+    },
+    {
+      "Count": 36,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 1,
+      "StartUtc": "2026-10-11T16:57:24.3440951Z",
+      "StartRelativeMs": 38481.0951
+    },
+    {
+      "Count": 37,
+      "Reason": "Induced",
+      "Type": "NonConcurrentGC",
+      "Depth": 2,
+      "StartUtc": "2026-10-11T16:57:30.6394979Z",
+      "StartRelativeMs": 44776.4979
+    },
+    {
+      "Count": 38,
+      "Reason": "InducedNotForced",
+      "Type": "BackgroundGC",
+      "Depth": 2,
+      "StartUtc": "2026-10-11T16:57:31.0740668Z",
+      "StartRelativeMs": 45211.0668
+    },
+    {
+      "Count": 39,
+      "Reason": "AllocSmall",
+      "Type": "NonConcurrentGC",
+      "Depth": 0,
+      "StartUtc": "2026-10-11T16:57:31.4410785Z",
+      "StartRelativeMs": 45578.0785
+    },
+    {
+      "Count": 40,
+      "Reason": "InducedNotForced",
+      "Type": "BackgroundGC",
+      "Depth": 2,
+      "StartUtc": "2026-10-11T16:57:31.7889934Z",
+      "StartRelativeMs": 45925.9934
+    }
+  ],
+  "HeapSnapshots": [
+    {
+      "Utc": "2026-10-11T16:57:17.2606816Z",
+      "TotalHeapSize": 18857112,
+      "TotalPromoted": 1999664,
+      "Gen2Bytes": 7757368,
+      "LohBytes": 2264008
+    },
+    {
+      "Utc": "2026-10-11T16:57:17.2863317Z",
+      "TotalHeapSize": 18852520,
+      "TotalPromoted": 13001920,
+      "Gen2Bytes": 7752776,
+      "LohBytes": 2264008
+    },
+    {
+      "Utc": "2026-10-11T16:57:17.8493443Z",
+      "TotalHeapSize": 19516856,
+      "TotalPromoted": 7148904,
+      "Gen2Bytes": 7752776,
+      "LohBytes": 2395136
+    },
+    {
+      "Utc": "2026-10-11T16:57:17.9234136Z",
+      "TotalHeapSize": 32492416,
+      "TotalPromoted": 15290944,
+      "Gen2Bytes": 17064528,
+      "LohBytes": 2788464
+    },
+    {
+      "Utc": "2026-10-11T16:57:18.0308868Z",
+      "TotalHeapSize": 31945088,
+      "TotalPromoted": 14760432,
+      "Gen2Bytes": 21577968,
+      "LohBytes": 2788464
+    },
+    {
+      "Utc": "2026-10-11T16:57:18.0540592Z",
+      "TotalHeapSize": 32816832,
+      "TotalPromoted": 36504272,
+      "Gen2Bytes": 21577968,
+      "LohBytes": 2788464
+    },
+    {
+      "Utc": "2026-10-11T16:57:18.1161736Z",
+      "TotalHeapSize": 45018056,
+      "TotalPromoted": 14699464,
+      "Gen2Bytes": 29099432,
+      "LohBytes": 3312808
+    },
+    {
+      "Utc": "2026-10-11T16:57:18.1895988Z",
+      "TotalHeapSize": 46682952,
+      "TotalPromoted": 14767856,
+      "Gen2Bytes": 35683664,
+      "LohBytes": 3312808
+    },
+    {
+      "Utc": "2026-10-11T16:57:18.2594554Z",
+      "TotalHeapSize": 59259136,
+      "TotalPromoted": 14828968,
+      "Gen2Bytes": 43312952,
+      "LohBytes": 3312808
+    },
+    {
+      "Utc": "2026-10-11T16:57:18.3862585Z",
+      "TotalHeapSize": 62680272,
+      "TotalPromoted": 14606056,
+      "Gen2Bytes": 50475112,
+      "LohBytes": 4661584
+    },
+    {
+      "Utc": "2026-10-11T16:57:18.4155665Z",
+      "TotalHeapSize": 63823408,
+      "TotalPromoted": 66646008,
+      "Gen2Bytes": 50475112,
+      "LohBytes": 4661584
+    },
+    {
+      "Utc": "2026-10-11T16:57:18.4947273Z",
+      "TotalHeapSize": 74792856,
+      "TotalPromoted": 14217904,
+      "Gen2Bytes": 57961496,
+      "LohBytes": 4661584
+    },
+    {
+      "Utc": "2026-10-11T16:57:18.6138135Z",
+      "TotalHeapSize": 86461616,
+      "TotalPromoted": 72566128,
+      "Gen2Bytes": 70074080,
+      "LohBytes": 4661584
+    },
+    {
+      "Utc": "2026-10-11T16:57:18.6901592Z",
+      "TotalHeapSize": 87844688,
+      "TotalPromoted": 14268600,
+      "Gen2Bytes": 75464448,
+      "LohBytes": 4661584
+    },
+    {
+      "Utc": "2026-10-11T16:57:18.8933879Z",
+      "TotalHeapSize": 108212072,
+      "TotalPromoted": 14884760,
+      "Gen2Bytes": 83125912,
+      "LohBytes": 12446936
+    },
+    {
+      "Utc": "2026-10-11T16:57:24.3812325Z",
+      "TotalHeapSize": 115950000,
+      "TotalPromoted": 11919776,
+      "Gen2Bytes": 89661600,
+      "LohBytes": 15082336
+    },
+    {
+      "Utc": "2026-10-11T16:57:30.6916101Z",
+      "TotalHeapSize": 35299576,
+      "TotalPromoted": 19914272,
+      "Gen2Bytes": 12454792,
+      "LohBytes": 15344536
+    },
+    {
+      "Utc": "2026-10-11T16:57:31.0985071Z",
+      "TotalHeapSize": 35299576,
+      "TotalPromoted": 21836800,
+      "Gen2Bytes": 12454792,
+      "LohBytes": 15344536
+    },
+    {
+      "Utc": "2026-10-11T16:57:31.4582008Z",
+      "TotalHeapSize": 36413288,
+      "TotalPromoted": 3199032,
+      "Gen2Bytes": 12454792,
+      "LohBytes": 15344536
+    },
+    {
+      "Utc": "2026-10-11T16:57:31.8241036Z",
+      "TotalHeapSize": 36413288,
+      "TotalPromoted": 20670256,
+      "Gen2Bytes": 12454792,
+      "LohBytes": 15344536
+    }
+  ],
+  "Windows": [
+    {
+      "Name": "EntireTrace",
+      "StartUtc": "2026-10-11T16:56:45.863Z",
+      "EndUtc": "2026-10-11T16:57:41.0093322Z",
+      "Samples": 79848,
+      "Threads": [
+        {
+          "ThreadId": 920,
+          "Samples": 3328,
+          "ManagedSamples": 73,
+          "ExternalSamples": 3255,
+          "HasProgramMain": true,
+          "TopLeaves": [
+            {
+              "Stack": "ABI.Microsoft.UI.Xaml.IApplicationStaticsMethods.Start(class WinRT.IObjectReference,class Microsoft.UI.Xaml.ApplicationInitializationCallback)",
+              "Samples": 3138
+            },
+            {
+              "Stack": "Files.App.Utils.Storage.SystemStorageFolder+<>c__DisplayClass20_0+<<FromPathAsync>b__0>d.MoveNext()",
+              "Samples": 48
+            },
+            {
+              "Stack": "Files.App.Utils.Storage.SystemStorageFile+<>c__DisplayClass24_0+<<FromPathAsync>b__0>d.MoveNext()",
+              "Samples": 25
+            },
+            {
+              "Stack": "ABI.Microsoft.UI.Xaml.IUIElementMethods.UpdateLayout(class WinRT.IObjectReference)",
+              "Samples": 19
+            },
+            {
+              "Stack": "Files.App.Utils.FileTags.FileTagsHelper.GetFileFRN(class Windows.Storage.IStorageItem)",
+              "Samples": 9
+            },
+            {
+              "Stack": "ABI.Microsoft.UI.Xaml.Controls.IAnimatedIconMethods.set_Source(class WinRT.IObjectReference,class Microsoft.UI.Xaml.Controls.IAnimatedVisualSource2)",
+              "Samples": 9
+            },
+            {
+              "Stack": "WinRT.GenericTypeInstantiations.Windows_Foundation_Collections_IMap_2_String__object.Lookup(class WinRT.IObjectReference,class System.String)",
+              "Samples": 8
+            },
+            {
+              "Stack": "ABI.Windows.Storage.IStorageItemPropertiesMethods.get_Properties(class WinRT.IObjectReference)",
+              "Samples": 6
+            }
+          ]
+        },
+        {
+          "ThreadId": 33668,
+          "Samples": 3328,
+          "ManagedSamples": 14,
+          "ExternalSamples": 3314,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)",
+              "Samples": 3263
+            },
+            {
+              "Stack": "System.Threading.PortableThreadPool+CpuUtilizationReader.get_CurrentUtilization()",
+              "Samples": 65
+            }
+          ]
+        },
+        {
+          "ThreadId": 31560,
+          "Samples": 3328,
+          "ManagedSamples": 45,
+          "ExternalSamples": 3283,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)",
+              "Samples": 3298
+            },
+            {
+              "Stack": "System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()",
+              "Samples": 9
+            },
+            {
+              "Stack": "System.IO.RandomAccess.QueueAsyncWriteFile(class Microsoft.Win32.SafeHandles.SafeFileHandle,value class System.ReadOnlyMemory`1<unsigned int8>,int64,value class System.Threading.CancellationToken,class System.IO.Strategies.OSFileStreamStrategy)",
+              "Samples": 8
+            },
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)",
+              "Samples": 5
+            },
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.ReleaseCore(int32)",
+              "Samples": 2
+            },
+            {
+              "Stack": "Interop+Kernel32.SetEvent(class Microsoft.Win32.SafeHandles.SafeWaitHandle)",
+              "Samples": 2
+            },
+            {
+              "Stack": "System.Threading.TimerQueue.EnsureTimerFiresBy(unsigned int32)",
+              "Samples": 1
+            },
+            {
+              "Stack": "System.Threading.Monitor.Enter_Slowpath(class System.Object)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 37744,
+          "Samples": 3328,
+          "ManagedSamples": 0,
+          "ExternalSamples": 3328,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.PortableThreadPool+IOCompletionPoller.Poll()",
+              "Samples": 3328
+            }
+          ]
+        },
+        {
+          "ThreadId": 37468,
+          "Samples": 3328,
+          "ManagedSamples": 2,
+          "ExternalSamples": 3326,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.PortableThreadPool+IOCompletionPoller.Poll()",
+              "Samples": 3328
+            }
+          ]
+        },
+        {
+          "ThreadId": 12848,
+          "Samples": 3328,
+          "ManagedSamples": 129,
+          "ExternalSamples": 3199,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.WaitHandle.WaitOneNoCheck(int32,bool,class System.Object,value class WaitHandleWaitSourceMap)",
+              "Samples": 3269
+            },
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.ReleaseCore(int32)",
+              "Samples": 51
+            },
+            {
+              "Stack": "System.Threading.TimerQueue.get_TickCount64()",
+              "Samples": 8
+            }
+          ]
+        },
+        {
+          "ThreadId": 34772,
+          "Samples": 3328,
+          "ManagedSamples": 2,
+          "ExternalSamples": 3326,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Tasks.Task.InternalWaitCore(int32,value class System.Threading.CancellationToken)",
+              "Samples": 3324
+            },
+            {
+              "Stack": "Files.App.Helpers.Win32Helper.GetIconOverlay(class System.String,int32,bool)",
+              "Samples": 2
+            },
+            {
+              "Stack": "System.Threading.Tasks.Task.SpinWait(int32)",
+              "Samples": 1
+            },
+            {
+              "Stack": "<Windows_Win32_UI_Shell_IShellItemImageFactory>F45E78EC040280EF17E70777983FD4A0F9623FDCECA0CD7A4B9F47AC1E4A9C64D__InterfaceImplementation.global::Windows.Win32.UI.Shell.IShellItemImageFactory.GetImage(value class Windows.Win32.Foundation.SIZE,value class Windows.Win32.UI.Shell.SIIGBF,value class Windows.Win32.Graphics.Gdi.HBITMAP*)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 39004,
+          "Samples": 3328,
+          "ManagedSamples": 2,
+          "ExternalSamples": 3326,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Tasks.Task.InternalWaitCore(int32,value class System.Threading.CancellationToken)",
+              "Samples": 3324
+            },
+            {
+              "Stack": "Files.App.Helpers.Win32Helper.GetIconOverlay(class System.String,int32,bool)",
+              "Samples": 2
+            },
+            {
+              "Stack": "Files.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Func`1<!!0>,class Microsoft.Extensions.Logging.ILogger,class System.Type)",
+              "Samples": 1
+            },
+            {
+              "Stack": "System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 30252,
+          "Samples": 3328,
+          "ManagedSamples": 1,
+          "ExternalSamples": 3327,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Tasks.Task.InternalWaitCore(int32,value class System.Threading.CancellationToken)",
+              "Samples": 3321
+            },
+            {
+              "Stack": "Files.App.Helpers.Win32Helper.GetIconOverlay(class System.String,int32,bool)",
+              "Samples": 4
+            },
+            {
+              "Stack": "System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()",
+              "Samples": 1
+            },
+            {
+              "Stack": "Files.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Func`1<!!0>,class Microsoft.Extensions.Logging.ILogger,class System.Type)",
+              "Samples": 1
+            },
+            {
+              "Stack": "System.Drawing.CoreImageExtensions.Save(class System.Drawing.IImage,class System.IO.Stream,value class System.Guid,value class System.Guid,value class Windows.Win32.Graphics.GdiPlus.EncoderParameters*)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 21464,
+          "Samples": 3328,
+          "ManagedSamples": 3,
+          "ExternalSamples": 3325,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Tasks.Task.InternalWaitCore(int32,value class System.Threading.CancellationToken)",
+              "Samples": 3325
+            },
+            {
+              "Stack": "Files.App.Helpers.Win32Helper.GetIconOverlay(class System.String,int32,bool)",
+              "Samples": 2
+            },
+            {
+              "Stack": "Files.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Func`1<!!0>,class Microsoft.Extensions.Logging.ILogger,class System.Type)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 24944,
+          "Samples": 3328,
+          "ManagedSamples": 1,
+          "ExternalSamples": 3327,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Tasks.Task.InternalWaitCore(int32,value class System.Threading.CancellationToken)",
+              "Samples": 3323
+            },
+            {
+              "Stack": "Files.App.Helpers.Win32Helper.GetIconOverlay(class System.String,int32,bool)",
+              "Samples": 2
+            },
+            {
+              "Stack": "Files.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Func`1<!!0>,class Microsoft.Extensions.Logging.ILogger,class System.Type)",
+              "Samples": 2
+            },
+            {
+              "Stack": "<Windows_Win32_UI_Shell_IShellItemImageFactory>F45E78EC040280EF17E70777983FD4A0F9623FDCECA0CD7A4B9F47AC1E4A9C64D__InterfaceImplementation.global::Windows.Win32.UI.Shell.IShellItemImageFactory.GetImage(value class Windows.Win32.Foundation.SIZE,value class Windows.Win32.UI.Shell.SIIGBF,value class Windows.Win32.Graphics.Gdi.HBITMAP*)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 35636,
+          "Samples": 3328,
+          "ManagedSamples": 2,
+          "ExternalSamples": 3326,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Tasks.Task.InternalWaitCore(int32,value class System.Threading.CancellationToken)",
+              "Samples": 3323
+            },
+            {
+              "Stack": "System.Threading.Tasks.Task.SpinWait(int32)",
+              "Samples": 2
+            },
+            {
+              "Stack": "Files.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Func`1<!!0>,class Microsoft.Extensions.Logging.ILogger,class System.Type)",
+              "Samples": 2
+            },
+            {
+              "Stack": "Files.App.Helpers.Win32Helper.GetIconOverlay(class System.String,int32,bool)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 26504,
+          "Samples": 3328,
+          "ManagedSamples": 2,
+          "ExternalSamples": 3326,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Tasks.Task.InternalWaitCore(int32,value class System.Threading.CancellationToken)",
+              "Samples": 3324
+            },
+            {
+              "Stack": "Files.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Func`1<!!0>,class Microsoft.Extensions.Logging.ILogger,class System.Type)",
+              "Samples": 2
+            },
+            {
+              "Stack": "Files.App.Helpers.Win32Helper.GetIconOverlay(class System.String,int32,bool)",
+              "Samples": 1
+            },
+            {
+              "Stack": "System.Threading.Tasks.Task.SpinWait(int32)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 25032,
+          "Samples": 3328,
+          "ManagedSamples": 2,
+          "ExternalSamples": 3326,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Tasks.Task.InternalWaitCore(int32,value class System.Threading.CancellationToken)",
+              "Samples": 3325
+            },
+            {
+              "Stack": "Files.App.Helpers.Win32Helper.GetIconOverlay(class System.String,int32,bool)",
+              "Samples": 1
+            },
+            {
+              "Stack": "Files.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Func`1<!!0>,class Microsoft.Extensions.Logging.ILogger,class System.Type)",
+              "Samples": 1
+            },
+            {
+              "Stack": "System.Threading.Tasks.Task.SpinWait(int32)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 10044,
+          "Samples": 3328,
+          "ManagedSamples": 6,
+          "ExternalSamples": 3322,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Tasks.Task.InternalWaitCore(int32,value class System.Threading.CancellationToken)",
+              "Samples": 3323
+            },
+            {
+              "Stack": "Files.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Func`1<!!0>,class Microsoft.Extensions.Logging.ILogger,class System.Type)",
+              "Samples": 2
+            },
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.ReleaseCore(int32)",
+              "Samples": 1
+            },
+            {
+              "Stack": "System.Threading.Tasks.Task.SpinWait(int32)",
+              "Samples": 1
+            },
+            {
+              "Stack": "System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 12468,
+          "Samples": 3328,
+          "ManagedSamples": 3,
+          "ExternalSamples": 3325,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Tasks.Task.InternalWaitCore(int32,value class System.Threading.CancellationToken)",
+              "Samples": 3327
+            },
+            {
+              "Stack": "Files.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Func`1<!!0>,class Microsoft.Extensions.Logging.ILogger,class System.Type)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 30892,
+          "Samples": 3328,
+          "ManagedSamples": 4,
+          "ExternalSamples": 3324,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Tasks.Task.InternalWaitCore(int32,value class System.Threading.CancellationToken)",
+              "Samples": 3323
+            },
+            {
+              "Stack": "Files.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Func`1<!!0>,class Microsoft.Extensions.Logging.ILogger,class System.Type)",
+              "Samples": 4
+            },
+            {
+              "Stack": "Files.App.Helpers.Win32Helper.GetIconOverlay(class System.String,int32,bool)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 34984,
+          "Samples": 3328,
+          "ManagedSamples": 2,
+          "ExternalSamples": 3326,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Tasks.Task.InternalWaitCore(int32,value class System.Threading.CancellationToken)",
+              "Samples": 3323
+            },
+            {
+              "Stack": "Files.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Func`1<!!0>,class Microsoft.Extensions.Logging.ILogger,class System.Type)",
+              "Samples": 2
+            },
+            {
+              "Stack": "Windows.Win32.PInvoke.SHGetFileInfo(class System.String,value class Windows.Win32.Storage.FileSystem.FILE_FLAGS_AND_ATTRIBUTES,value class Windows.Win32.UI.Shell.SHFILEINFOW&,value class Windows.Win32.UI.Shell.SHGFI_FLAGS)",
+              "Samples": 1
+            },
+            {
+              "Stack": "System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()",
+              "Samples": 1
+            },
+            {
+              "Stack": "<Windows_Win32_UI_Shell_IShellItemImageFactory>F45E78EC040280EF17E70777983FD4A0F9623FDCECA0CD7A4B9F47AC1E4A9C64D__InterfaceImplementation.global::Windows.Win32.UI.Shell.IShellItemImageFactory.GetImage(value class Windows.Win32.Foundation.SIZE,value class Windows.Win32.UI.Shell.SIIGBF,value class Windows.Win32.Graphics.Gdi.HBITMAP*)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 28876,
+          "Samples": 3328,
+          "ManagedSamples": 0,
+          "ExternalSamples": 3328,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.WaitHandle.WaitAnyMultiple(value class System.ReadOnlySpan`1<class Microsoft.Win32.SafeHandles.SafeWaitHandle>,int32)",
+              "Samples": 3328
+            }
+          ]
+        },
+        {
+          "ThreadId": 30516,
+          "Samples": 3328,
+          "ManagedSamples": 75,
+          "ExternalSamples": 3253,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)",
+              "Samples": 3295
+            },
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)",
+              "Samples": 9
+            },
+            {
+              "Stack": "System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()",
+              "Samples": 9
+            },
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.ReleaseCore(int32)",
+              "Samples": 6
+            },
+            {
+              "Stack": "",
+              "Samples": 3
+            },
+            {
+              "Stack": "System.Threading.Tasks.Task+DelayPromise..ctor(unsigned int32,class System.TimeProvider)",
+              "Samples": 1
+            },
+            {
+              "Stack": "Files.App.Helpers.UiPerformanceViewProbe.QueueDispatcherProbe(class System.Object)",
+              "Samples": 1
+            },
+            {
+              "Stack": "System.Threading.Monitor.Enter_Slowpath(class System.Object)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 34552,
+          "Samples": 3328,
+          "ManagedSamples": 0,
+          "ExternalSamples": 3328,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.Monitor.Wait(class System.Object,int32)",
+              "Samples": 3328
+            }
+          ]
+        },
+        {
+          "ThreadId": 12636,
+          "Samples": 1929,
+          "ManagedSamples": 0,
+          "ExternalSamples": 1929,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "Files.App.ViewModels.ShellViewModel+<>c__DisplayClass325_0.<WatchForDirectoryChanges>b__1(class Windows.Foundation.IAsyncAction)",
+              "Samples": 1929
+            }
+          ]
+        },
+        {
+          "ThreadId": 27936,
+          "Samples": 1406,
+          "ManagedSamples": 49,
+          "ExternalSamples": 1357,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)",
+              "Samples": 1372
+            },
+            {
+              "Stack": "System.Globalization.CompareInfo.IcuIndexOfCore(value class System.ReadOnlySpan`1<wchar>,value class System.ReadOnlySpan`1<wchar>,value class System.Globalization.CompareOptions,int32*,bool)",
+              "Samples": 15
+            },
+            {
+              "Stack": "System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()",
+              "Samples": 7
+            },
+            {
+              "Stack": "Files.App.Utils.Storage.Win32StorageEnumerator+<ListEntries>d__3.MoveNext()",
+              "Samples": 4
+            },
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.ReleaseCore(int32)",
+              "Samples": 3
+            },
+            {
+              "Stack": "Files.App.Helpers.UiPerformanceViewProbe.QueueDispatcherProbe(class System.Object)",
+              "Samples": 2
+            },
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)",
+              "Samples": 2
+            },
+            {
+              "Stack": "System.Threading.PortableThreadPool+WorkerThread.WorkerThreadStart()",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 31336,
+          "Samples": 1395,
+          "ManagedSamples": 33,
+          "ExternalSamples": 1362,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)",
+              "Samples": 1376
+            },
+            {
+              "Stack": "System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()",
+              "Samples": 8
+            },
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.ReleaseCore(int32)",
+              "Samples": 4
+            },
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)",
+              "Samples": 4
+            },
+            {
+              "Stack": "Files.App.Utils.Storage.Win32StorageEnumerator+<ListEntries>d__3.MoveNext()",
+              "Samples": 2
+            },
+            {
+              "Stack": "System.Threading.TimerQueue.FireNextTimers()",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 39596,
+          "Samples": 1344,
+          "ManagedSamples": 20,
+          "ExternalSamples": 1324,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)",
+              "Samples": 1340
+            },
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.Wait(int32,bool)",
+              "Samples": 1
+            },
+            {
+              "Stack": "System.Threading.TimerQueue.FireNextTimers()",
+              "Samples": 1
+            },
+            {
+              "Stack": "System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()",
+              "Samples": 1
+            },
+            {
+              "Stack": "LibGit2Sharp.Core.NativeMethods.git_repository_open(value class LibGit2Sharp.Core.git_repository*&,class LibGit2Sharp.Core.FilePath)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 17960,
+          "Samples": 1343,
+          "ManagedSamples": 35,
+          "ExternalSamples": 1308,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)",
+              "Samples": 1315
+            },
+            {
+              "Stack": "System.Globalization.CompareInfo.IcuIndexOfCore(value class System.ReadOnlySpan`1<wchar>,value class System.ReadOnlySpan`1<wchar>,value class System.Globalization.CompareOptions,int32*,bool)",
+              "Samples": 14
+            },
+            {
+              "Stack": "System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()",
+              "Samples": 4
+            },
+            {
+              "Stack": "System.Globalization.CompareInfo.IndexOfCore(value class System.ReadOnlySpan`1<wchar>,value class System.ReadOnlySpan`1<wchar>,value class System.Globalization.CompareOptions,int32*,bool)",
+              "Samples": 2
+            },
+            {
+              "Stack": "System.Linq.Enumerable+EnumerableSorter`2[System.__Canon,System.Boolean].CompareAnyKeys(int32,int32)",
+              "Samples": 2
+            },
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.ReleaseCore(int32)",
+              "Samples": 2
+            },
+            {
+              "Stack": "Files.App.Helpers.NaturalStringComparer+NaturalComparer.CompareNumValues(value class System.ReadOnlySpan`1<wchar>,value class System.ReadOnlySpan`1<wchar>)",
+              "Samples": 1
+            },
+            {
+              "Stack": "System.Runtime.CompilerServices.CastHelpers.StelemRef(class System.Object[],int,class System.Object)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 37712,
+          "Samples": 1263,
+          "ManagedSamples": 0,
+          "ExternalSamples": 1263,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "Files.App.ViewModels.ShellViewModel+<>c__DisplayClass325_0.<WatchForDirectoryChanges>b__1(class Windows.Foundation.IAsyncAction)",
+              "Samples": 1263
+            }
+          ]
+        },
+        {
+          "ThreadId": 26348,
+          "Samples": 565,
+          "ManagedSamples": 1,
+          "ExternalSamples": 564,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)",
+              "Samples": 565
+            }
+          ]
+        },
+        {
+          "ThreadId": 10016,
+          "Samples": 565,
+          "ManagedSamples": 1,
+          "ExternalSamples": 564,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "System.Threading.LowLevelLifoSemaphore.WaitForSignal(int32)",
+              "Samples": 564
+            },
+            {
+              "Stack": "System.Threading.TimerQueue.FireNextTimers()",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 34464,
+          "Samples": 83,
+          "ManagedSamples": 5,
+          "ExternalSamples": 78,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "WinRT.ObjectReferenceWithContext`1[WinRT.Interop.IUnknownVftbl].Release()",
+              "Samples": 62
+            },
+            {
+              "Stack": "WinRT.IObjectReference.Finalize()",
+              "Samples": 12
+            },
+            {
+              "Stack": "WinRT.ObjectReferenceWithContext`1[WinRT.Interop.IDelegateVftbl].Release()",
+              "Samples": 6
+            },
+            {
+              "Stack": "System.GC.RunFinalizers()",
+              "Samples": 2
+            },
+            {
+              "Stack": "System.Runtime.InteropServices.Marshal.Release(int)",
+              "Samples": 1
+            }
+          ]
+        },
+        {
+          "ThreadId": 10252,
+          "Samples": 31,
+          "ManagedSamples": 2,
+          "ExternalSamples": 29,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "ABI.Windows.Foundation.IAsyncOperationMethods`2[System.__Canon,System.IntPtr].GetResults(class WinRT.IObjectReference)",
+              "Samples": 31
+            }
+          ]
+        },
+        {
+          "ThreadId": 28496,
+          "Samples": 20,
+          "ManagedSamples": 0,
+          "ExternalSamples": 20,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "Files.App.ViewModels.ShellViewModel+<>c__DisplayClass325_0.<WatchForDirectoryChanges>b__1(class Windows.Foundation.IAsyncAction)",
+              "Samples": 20
+            }
+          ]
+        },
+        {
+          "ThreadId": 25436,
+          "Samples": 12,
+          "ManagedSamples": 0,
+          "ExternalSamples": 12,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "ABI.Windows.UI.StartScreen.IJumpListMethods.SaveAsync(class WinRT.IObjectReference)",
+              "Samples": 12
+            }
+          ]
+        },
+        {
+          "ThreadId": 8328,
+          "Samples": 4,
+          "ManagedSamples": 0,
+          "ExternalSamples": 4,
+          "HasProgramMain": false,
+          "TopLeaves": [
+            {
+              "Stack": "ABI.Windows.Foundation.IAsyncOperationMethods`2[System.__Canon,System.IntPtr].GetResults(class WinRT.IObjectReference)",
+              "Samples": 3
+            },
+            {
+              "Stack": "System.Threading.Tasks.SynchronizationContextAwaitTaskContinuation.PostAction(class System.Object)",
+              "Samples": 1
+            }
+          ]
+        }
+      ],
+      "UiStacks": [
+        {
+          "Stack": "ABI.Microsoft.UI.Xaml.IApplicationStaticsMethods.Start(class WinRT.IObjectReference,class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nMicrosoft.UI.Xaml.Application.Start(class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nFiles.App.Program.Main()",
+          "Samples": 3138
+        },
+        {
+          "Stack": "Files.App.Utils.Storage.SystemStorageFile+<>c__DisplayClass24_0+<<FromPathAsync>b__0>d.MoveNext()\nFiles.App.Utils.Storage.SystemStorageFile+<>c__DisplayClass24_0.<FromPathAsync>b__0(value class System.Threading.CancellationToken)\nFiles.App.Utils.Storage.SystemStorageFile.FromPathAsync(class System.String)\nFiles.App.Utils.Storage.BaseStorageFile+<>c__DisplayClass61_0+<<GetFileFromPathAsync>b__0>d.MoveNext()\nFiles.App.Utils.Storage.BaseStorageFile.GetFileFromPathAsync(class System.String)\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFileWithPathFromPathAsync>d__23.MoveNext()\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFileFromPathAsync>d__22.MoveNext()\nFiles.App.Utils.Storage.StorageFileExtensions.DangerousGetFileFromPathAsync(class System.String,class Files.App.Utils.StorageFolderWithPath,class Files.App.Utils.StorageFolderWithPath)\nFiles.App.Utils.Storage.FilesystemTasks+<WrapNullable>d__3`1[System.__Canon].MoveNext()\nFiles.App.ViewModels.ShellViewModel+<GetFileFromPathAsync>d__147.MoveNext()\nFiles.App.ViewModels.ShellViewModel.GetFileFromPathAsync(class System.String,value class System.Threading.CancellationToken)\nFiles.App.ViewModels.ShellViewModel+<LoadExtendedItemPropertiesAsync>d__303.MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Threading.Tasks.VoidTaskResult,Files.App.ViewModels.ShellViewModel+<LoadExtendedItemPropertiesAsync>d__303].MoveNext()\nMicrosoft.UI.Dispatching.DispatcherQueueSynchronizationContext+<>c__DisplayClass2_0.<Post>b__0()\nABI.Microsoft.UI.Dispatching.DispatcherQueueHandler.Do_Abi_Invoke(int)\nABI.Microsoft.UI.Xaml.IApplicationStaticsMethods.Start(class WinRT.IObjectReference,class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nMicrosoft.UI.Xaml.Application.Start(class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nFiles.App.Program.Main()",
+          "Samples": 25
+        },
+        {
+          "Stack": "Files.App.Utils.Storage.SystemStorageFolder+<>c__DisplayClass20_0+<<FromPathAsync>b__0>d.MoveNext()\nFiles.App.Utils.Storage.SystemStorageFolder+<>c__DisplayClass20_0.<FromPathAsync>b__0(value class System.Threading.CancellationToken)\nFiles.App.Utils.Storage.SystemStorageFolder.FromPathAsync(class System.String)\nFiles.App.Utils.Storage.BaseStorageFolder+<>c__DisplayClass43_0+<<GetFolderFromPathAsync>b__0>d.MoveNext()\nFiles.App.Utils.Storage.BaseStorageFolder+<>c__DisplayClass43_0.<GetFolderFromPathAsync>b__0(value class System.Threading.CancellationToken)\nSystem.Threading.Tasks.TaskToAsyncInfoAdapter`4[System.__Canon,System.__Canon,System.__Canon,System.VoidValueTypeParameter]..ctor(class System.Delegate)\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderWithPathFromPathAsync>d__26.MoveNext()\nSystem.Runtime.CompilerServices.AsyncMethodBuilderCore.Start(!!0&)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1[System.__Canon].Start(!!0&)\nFiles.App.Utils.Storage.StorageFileExtensions.DangerousGetFolderWithPathFromPathAsync(class System.String,class Files.App.Utils.StorageFolderWithPath,class Files.App.Utils.StorageFolderWithPath)\nFiles.App.ViewModels.UserControls.NavigationToolbarViewModel+<>c__DisplayClass210_2.<CheckPathInputAsync>b__2()\nFiles.App.Utils.Storage.FilesystemTasks+<Wrap>d__2`1[System.__Canon].MoveNext()\nFiles.App.Utils.Storage.FilesystemTasks.Wrap(class System.Func`1<class System.Threading.Tasks.Task`1<!!0>>)\nFiles.App.ViewModels.UserControls.NavigationToolbarViewModel+<CheckPathInputAsync>d__210.MoveNext()\nSystem.Runtime.CompilerServices.AsyncMethodBuilderCore.Start(!!0&)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder.Start(!!0&)\nFiles.App.ViewModels.UserControls.NavigationToolbarViewModel.CheckPathInputAsync(class System.String,class System.String,class Files.App.Data.Contracts.IShellPage)\nFiles.App.Views.Shells.BaseShellPage+<NavigationToolbar_QuerySubmitted>d__95.MoveNext()\nSystem.Runtime.CompilerServices.AsyncMethodBuilderCore.Start(!!0&)\nSystem.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start(!!0&)\nFiles.App.Views.Shells.BaseShellPage.NavigationToolbar_QuerySubmitted(class System.Object,class Files.App.Data.EventArguments.ToolbarQuerySubmittedEventArgs)\nFiles.App.ViewModels.UserControls.NavigationToolbarViewModel.CurrentPathSetTextBox_TextChanged(class System.Object,class Microsoft.UI.Xaml.Controls.TextChangedEventArgs)\nFiles.App.UserControls.NavigationToolbar+NavigationToolbar_obj1_Bindings.<Connect>b__147_1(class System.Object,class Microsoft.UI.Xaml.Controls.TextChangedEventArgs)\nWinRT._EventSource_global__Microsoft_UI_Xaml_Controls_TextChangedEventHandler+EventState.<GetEventInvoke>b__1_0(class System.Object,class Microsoft.UI.Xaml.Controls.TextChangedEventArgs)\nABI.Microsoft.UI.Xaml.Controls.TextChangedEventHandler.Do_Abi_Invoke(int,int,int)\nABI.Microsoft.UI.Xaml.IApplicationStaticsMethods.Start(class WinRT.IObjectReference,class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nMicrosoft.UI.Xaml.Application.Start(class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nFiles.App.Program.Main()",
+          "Samples": 20
+        },
+        {
+          "Stack": "ABI.Microsoft.UI.Xaml.IUIElementMethods.UpdateLayout(class WinRT.IObjectReference)\nMicrosoft.UI.Xaml.UIElement.UpdateLayout()\nFiles.App.UserControls.StatusBar.<QueueRemeasure>b__36_1()\nFiles.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Action,class Microsoft.Extensions.Logging.ILogger,class System.Type)\nFiles.App.UserControls.StatusBar.<QueueRemeasure>b__36_0()\nABI.Microsoft.UI.Dispatching.DispatcherQueueHandler.Do_Abi_Invoke(int)\nABI.Microsoft.UI.Xaml.IApplicationStaticsMethods.Start(class WinRT.IObjectReference,class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nMicrosoft.UI.Xaml.Application.Start(class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nFiles.App.Program.Main()",
+          "Samples": 19
+        },
+        {
+          "Stack": "Files.App.Utils.Storage.SystemStorageFolder+<>c__DisplayClass20_0+<<FromPathAsync>b__0>d.MoveNext()\nFiles.App.Utils.Storage.SystemStorageFolder+<>c__DisplayClass20_0.<FromPathAsync>b__0(value class System.Threading.CancellationToken)\nFiles.App.Utils.Storage.SystemStorageFolder.FromPathAsync(class System.String)\nFiles.App.Utils.Storage.BaseStorageFolder+<>c__DisplayClass43_0+<<GetFolderFromPathAsync>b__0>d.MoveNext()\nFiles.App.Utils.Storage.BaseStorageFolder+<>c__DisplayClass43_0.<GetFolderFromPathAsync>b__0(value class System.Threading.CancellationToken)\nSystem.Threading.Tasks.TaskToAsyncInfoAdapter`4[System.__Canon,System.__Canon,System.__Canon,System.VoidValueTypeParameter]..ctor(class System.Delegate)\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderWithPathFromPathAsync>d__26.MoveNext()\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderFromPathAsync>d__25.MoveNext()\nFiles.App.Utils.Storage.StorageFileExtensions.DangerousGetFolderFromPathAsync(class System.String,class Files.App.Utils.StorageFolderWithPath,class Files.App.Utils.StorageFolderWithPath)\nFiles.App.Utils.Storage.StorageFileExtensions+<>c__DisplayClass20_0.<GetDirectoryPathComponentsWithDisplayNameAsync>b__0()\nFiles.App.Utils.Storage.FilesystemTasks+<WrapNullable>d__3`1[System.__Canon].MoveNext()\nFiles.App.Utils.Storage.FilesystemTasks.WrapNullable(class System.Func`1<class System.Threading.Tasks.Task`1<!!0>>)\nFiles.App.Utils.Storage.StorageFileExtensions+<GetDirectoryPathComponentsWithDisplayNameAsync>d__20.MoveNext()\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.StorageFileExtensions+<GetDirectoryPathComponentsWithDisplayNameAsync>d__20].ExecutionContextCallback(class System.Object)\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.StorageFileExtensions+<GetDirectoryPathComponentsWithDisplayNameAsync>d__20].MoveNext(class System.Threading.Thread)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.StorageFileExtensions+<GetDirectoryPathComponentsWithDisplayNameAsync>d__20].MoveNext()\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)\nFiles.App.Utils.Storage.FilesystemTasks+<WrapNullable>d__3`1[System.__Canon].MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.FilesystemTasks+<WrapNullable>d__3`1[System.__Canon]].MoveNext()\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderFromPathAsync>d__25.MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderFromPathAsync>d__25].MoveNext()\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderWithPathFromPathAsync>d__26.MoveNext()",
+          "Samples": 12
+        },
+        {
+          "Stack": "Files.App.Utils.FileTags.FileTagsHelper.GetFileFRN(class Windows.Storage.IStorageItem)\nFiles.App.ViewModels.ShellViewModel+<LoadExtendedItemPropertiesAsync>d__303.MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)\nFiles.App.ViewModels.ShellViewModel+<CheckCloudDriveSyncStatusAsync>d__319.MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[Files.App.Utils.Cloud.CloudDriveSyncStatus,Files.App.ViewModels.ShellViewModel+<CheckCloudDriveSyncStatusAsync>d__319].MoveNext()\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)\nFiles.App.Utils.Storage.FilesystemTasks+<Wrap>d__2`1[System.__Canon].MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.FilesystemTasks+<Wrap>d__2`1[System.__Canon]].MoveNext()\nMicrosoft.UI.Dispatching.DispatcherQueueSynchronizationContext+<>c__DisplayClass2_0.<Post>b__0()\nABI.Microsoft.UI.Dispatching.DispatcherQueueHandler.Do_Abi_Invoke(int)\nABI.Microsoft.UI.Xaml.IApplicationStaticsMethods.Start(class WinRT.IObjectReference,class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nMicrosoft.UI.Xaml.Application.Start(class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nFiles.App.Program.Main()",
+          "Samples": 9
+        },
+        {
+          "Stack": "Files.App.Utils.Storage.SystemStorageFolder+<>c__DisplayClass20_0+<<FromPathAsync>b__0>d.MoveNext()\nFiles.App.Utils.Storage.SystemStorageFolder+<>c__DisplayClass20_0.<FromPathAsync>b__0(value class System.Threading.CancellationToken)\nFiles.App.Utils.Storage.SystemStorageFolder.FromPathAsync(class System.String)\nFiles.App.Utils.Storage.BaseStorageFolder+<>c__DisplayClass43_0+<<GetFolderFromPathAsync>b__0>d.MoveNext()\nFiles.App.Utils.Storage.BaseStorageFolder+<>c__DisplayClass43_0.<GetFolderFromPathAsync>b__0(value class System.Threading.CancellationToken)\nSystem.Threading.Tasks.TaskToAsyncInfoAdapter`4[System.__Canon,System.__Canon,System.__Canon,System.VoidValueTypeParameter]..ctor(class System.Delegate)\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderWithPathFromPathAsync>d__26.MoveNext()\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderFromPathAsync>d__25.MoveNext()\nFiles.App.Utils.Storage.StorageFileExtensions+<>c__DisplayClass20_0.<GetDirectoryPathComponentsWithDisplayNameAsync>b__0()\nFiles.App.Utils.Storage.FilesystemTasks+<WrapNullable>d__3`1[System.__Canon].MoveNext()\nFiles.App.Utils.Storage.StorageFileExtensions+<GetDirectoryPathComponentsWithDisplayNameAsync>d__20.MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.StorageFileExtensions+<GetDirectoryPathComponentsWithDisplayNameAsync>d__20].MoveNext()\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)\nFiles.App.Utils.Storage.FilesystemTasks+<WrapNullable>d__3`1[System.__Canon].MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.FilesystemTasks+<WrapNullable>d__3`1[System.__Canon]].MoveNext()\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderFromPathAsync>d__25.MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderFromPathAsync>d__25].MoveNext()\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderWithPathFromPathAsync>d__26.MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderWithPathFromPathAsync>d__26].MoveNext()\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)",
+          "Samples": 8
+        },
+        {
+          "Stack": "ABI.Microsoft.UI.Xaml.Controls.IAnimatedIconMethods.set_Source(class WinRT.IObjectReference,class Microsoft.UI.Xaml.Controls.IAnimatedVisualSource2)\nABI.Microsoft.UI.Xaml.Markup.IXamlMember.Do_Abi_SetValue_7(int,int,int)\nABI.Microsoft.UI.Xaml.IUIElementMethods.UpdateLayout(class WinRT.IObjectReference)\nMicrosoft.UI.Xaml.UIElement.UpdateLayout()\nFiles.App.UserControls.StatusBar.<QueueRemeasure>b__36_1()\nFiles.Shared.Extensions.SafetyExtensions.IgnoreExceptions(class System.Action,class Microsoft.Extensions.Logging.ILogger,class System.Type)\nFiles.App.UserControls.StatusBar.<QueueRemeasure>b__36_0()\nABI.Microsoft.UI.Dispatching.DispatcherQueueHandler.Do_Abi_Invoke(int)\nABI.Microsoft.UI.Xaml.IApplicationStaticsMethods.Start(class WinRT.IObjectReference,class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nMicrosoft.UI.Xaml.Application.Start(class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nFiles.App.Program.Main()",
+          "Samples": 6
+        },
+        {
+          "Stack": "Files.App.Utils.Storage.SystemStorageFolder+<>c__DisplayClass20_0+<<FromPathAsync>b__0>d.MoveNext()\nFiles.App.Utils.Storage.SystemStorageFolder+<>c__DisplayClass20_0.<FromPathAsync>b__0(value class System.Threading.CancellationToken)\nFiles.App.Utils.Storage.SystemStorageFolder.FromPathAsync(class System.String)\nFiles.App.Utils.Storage.BaseStorageFolder+<>c__DisplayClass43_0+<<GetFolderFromPathAsync>b__0>d.MoveNext()\nFiles.App.Utils.Storage.BaseStorageFolder+<>c__DisplayClass43_0.<GetFolderFromPathAsync>b__0(value class System.Threading.CancellationToken)\nSystem.Threading.Tasks.TaskToAsyncInfoAdapter`4[System.__Canon,System.__Canon,System.__Canon,System.VoidValueTypeParameter]..ctor(class System.Delegate)\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderWithPathFromPathAsync>d__26.MoveNext()\nSystem.Runtime.CompilerServices.AsyncMethodBuilderCore.Start(!!0&)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1[System.__Canon].Start(!!0&)\nFiles.App.Utils.Storage.StorageFileExtensions.DangerousGetFolderWithPathFromPathAsync(class System.String,class Files.App.Utils.StorageFolderWithPath,class Files.App.Utils.StorageFolderWithPath)\nFiles.App.ViewModels.ShellViewModel+<>c__DisplayClass314_0.<EnumerateItemsFromStandardFolderAsync>b__10()\nFiles.App.Utils.Storage.FilesystemTasks+<Wrap>d__2`1[System.__Canon].MoveNext()\nFiles.App.Utils.Storage.FilesystemTasks.Wrap(class System.Func`1<class System.Threading.Tasks.Task`1<!!0>>)\nFiles.App.ViewModels.ShellViewModel+<EnumerateItemsFromStandardFolderAsync>d__314.MoveNext()\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Int32,Files.App.ViewModels.ShellViewModel+<EnumerateItemsFromStandardFolderAsync>d__314].ExecutionContextCallback(class System.Object)\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Int32,Files.App.ViewModels.ShellViewModel+<EnumerateItemsFromStandardFolderAsync>d__314].MoveNext(class System.Threading.Thread)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Int32,Files.App.ViewModels.ShellViewModel+<EnumerateItemsFromStandardFolderAsync>d__314].MoveNext()\nMicrosoft.UI.Dispatching.DispatcherQueueSynchronizationContext+<>c__DisplayClass2_0.<Post>b__0()\nABI.Microsoft.UI.Dispatching.DispatcherQueueHandler.Do_Abi_Invoke(int)\nABI.Microsoft.UI.Xaml.IApplicationStaticsMethods.Start(class WinRT.IObjectReference,class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nMicrosoft.UI.Xaml.Application.Start(class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nFiles.App.Program.Main()",
+          "Samples": 4
+        },
+        {
+          "Stack": "Files.App.ViewModels.ShellViewModel+<GetExtraProperties>d__320.MoveNext()\nFiles.App.ViewModels.ShellViewModel.GetExtraProperties(class Windows.Storage.IStorageItem)\nFiles.App.ViewModels.ShellViewModel+<LoadExtendedItemPropertiesAsync>d__303.MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Threading.Tasks.VoidTaskResult,Files.App.ViewModels.ShellViewModel+<LoadExtendedItemPropertiesAsync>d__303].MoveNext()\nMicrosoft.UI.Dispatching.DispatcherQueueSynchronizationContext+<>c__DisplayClass2_0.<Post>b__0()\nABI.Microsoft.UI.Dispatching.DispatcherQueueHandler.Do_Abi_Invoke(int)\nABI.Microsoft.UI.Xaml.IApplicationStaticsMethods.Start(class WinRT.IObjectReference,class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nMicrosoft.UI.Xaml.Application.Start(class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nFiles.App.Program.Main()",
+          "Samples": 4
+        },
+        {
+          "Stack": "ABI.Microsoft.UI.Xaml.Controls.ITextBoxMethods.set_Text(class WinRT.IObjectReference,class System.String)\nMicrosoft.UI.Xaml.Controls.TextBox.set_Text(class System.String)\nFiles.App.UserControls.NavigationToolbar+XamlBindingSetters.Set_Microsoft_UI_Xaml_Controls_TextBox_Text(class Microsoft.UI.Xaml.Controls.TextBox,class System.String,class System.String)\nFiles.App.UserControls.NavigationToolbar+NavigationToolbar_obj1_Bindings+NavigationToolbar_obj1_BindingsTracking.PropertyChanged_ViewModel(class System.Object,class System.ComponentModel.PropertyChangedEventArgs)\nCommunityToolkit.Mvvm.ComponentModel.ObservableObject.SetProperty(!!0&,!!0,class System.String)\nFiles.App.ViewModels.UserControls.NavigationToolbarViewModel.set_PathControlDisplayText(class System.String)\nFiles.App.Views.Shells.ModernShellPage.NavigateToPath(class System.String,class System.Type,class Files.App.Data.EventArguments.NavigationArguments)\nFiles.App.Views.Shells.BaseShellPage.NavigateToPath(class System.String,class Files.App.Data.EventArguments.NavigationArguments)\nFiles.App.ViewModels.UserControls.NavigationToolbarViewModel+<CheckPathInputAsync>d__210.MoveNext()\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Threading.Tasks.VoidTaskResult,Files.App.ViewModels.UserControls.NavigationToolbarViewModel+<CheckPathInputAsync>d__210].ExecutionContextCallback(class System.Object)\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Threading.Tasks.VoidTaskResult,Files.App.ViewModels.UserControls.NavigationToolbarViewModel+<CheckPathInputAsync>d__210].MoveNext(class System.Threading.Thread)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.Threading.Tasks.VoidTaskResult,Files.App.ViewModels.UserControls.NavigationToolbarViewModel+<CheckPathInputAsync>d__210].MoveNext()\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)\nFiles.App.Utils.Storage.FilesystemTasks+<Wrap>d__2`1[System.__Canon].MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.FilesystemTasks+<Wrap>d__2`1[System.__Canon]].MoveNext()\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)\nFiles.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderWithPathFromPathAsync>d__26.MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.StorageFileExtensions+<DangerousGetFolderWithPathFromPathAsync>d__26].MoveNext()\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)\nFiles.App.Utils.Storage.BaseStorageFolder+<>c__DisplayClass43_0+<<GetFolderFromPathAsync>b__0>d.MoveNext()\nSystem.Threading.ExecutionContext.RunInternal(class System.Threading.ExecutionContext,class System.Threading.ContextCallback,class System.Object)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1+AsyncStateMachineBox`1[System.__Canon,Files.App.Utils.Storage.BaseStorageFolder+<>c__DisplayClass43_0+<<GetFolderFromPathAsync>b__0>d].MoveNext()\nSystem.Threading.Tasks.AwaitTaskContinuation.RunCallback(class System.Threading.ContextCallback,class System.Object,class System.Threading.Tasks.Task&)\nSystem.Threading.Tasks.Task.RunContinuations(class System.Object)",
+          "Samples": 4
+        },
+        {
+          "Stack": "Files.App.Data.Items.WindowEx.NewWindowProc(value class Windows.Win32.Foundation.HWND,unsigned int32,value class Windows.Win32.Foundation.WPARAM,value class Windows.Win32.Foundation.LPARAM)\nABI.Microsoft.UI.Xaml.IApplicationStaticsMethods.Start(class WinRT.IObjectReference,class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nMicrosoft.UI.Xaml.Application.Start(class Microsoft.UI.Xaml.ApplicationInitializationCallback)\nFiles.App.Program.Main()",
+          "Samples": 3
+        }
+      ]
+    }
+  ]
+}

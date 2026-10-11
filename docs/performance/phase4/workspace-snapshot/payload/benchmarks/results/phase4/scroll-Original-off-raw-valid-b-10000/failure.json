@@ -1,0 +1,6 @@
+{
+  "FailedUtc": "2026-10-11T16:20:15.9483917Z",
+  "Message": "Selected fixture did not become ready before the untimed scroll preparation.",
+  "ScriptLine": 379,
+  "LastScrollPreparationPercent": null
+}

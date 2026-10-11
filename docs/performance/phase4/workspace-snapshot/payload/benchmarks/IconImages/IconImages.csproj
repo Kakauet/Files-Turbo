@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Variant Condition="'$(Variant)' == ''">phase2</Variant>
+    <OutputPath>bin/$(Variant)/</OutputPath>
+    <IntermediateOutputPath>obj/$(Variant)/</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../artifacts/phase2-recovery/IconCacheService.phase1.cs" Condition="'$(Variant)' == 'phase1'" Link="IconCacheService.cs" />
+    <Compile Include="../../source/src/Files.App/Services/Storage/IconCacheService.cs" Condition="'$(Variant)' == 'phase2'" Link="IconCacheService.cs" />
+  </ItemGroup>
+</Project>

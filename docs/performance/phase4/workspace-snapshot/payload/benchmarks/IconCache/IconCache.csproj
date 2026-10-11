@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Variant Condition="'$(Variant)' == ''">baseline</Variant>
+    <AssemblyName>FilesTurbo.IconCache.$(Variant)</AssemblyName>
+    <OutputPath>bin/$(Variant)/$(Configuration)/</OutputPath>
+    <IntermediateOutputPath>obj/$(Variant)/$(Configuration)/</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="DependencyStubs.cs" />
+    <Compile Include="../../tests-extra/IconCache/ContractTests.cs" />
+    <Compile Include="baseline/IconCacheService.cs" Condition="'$(Variant)' == 'baseline'" />
+    <Compile Include="../../source/src/Files.App/Services/Storage/IconCacheService.cs" Condition="'$(Variant)' == 'turbo'" />
+  </ItemGroup>
+</Project>

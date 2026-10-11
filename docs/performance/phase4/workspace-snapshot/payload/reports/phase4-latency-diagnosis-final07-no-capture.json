@@ -1,0 +1,984 @@
+{
+  "GeneratedUtc": "2026-10-11T18:24:41.8689252Z",
+  "SourceCommit": "bf4390ee0a2eed6cece0e99d1a021ce7fd255574",
+  "Trace": {
+    "Evidence": "benchmarks\\results\\phase4\\profile-IV-final07-latency\\trace.jsonl",
+    "Sha256": "3F775D851129FC1B999F8D55AE0653EE144365D91C5B1AEE99EB33D6DF534DB0",
+    "ProcessIdFromCaptureMetadata": 37548,
+    "Records": 1786,
+    "MaximumReportedDroppedRecords": 0,
+    "HasUtcAnchor": true
+  },
+  "Counts": {
+    "IncludedNonemptyNavigationOperations": 2,
+    "ExcludedEmptyNavigationOperations": 0,
+    "DeclaredCalibrationOperations": 0,
+    "DeclaredPreparationOperations": 0,
+    "OperationsWithTimedObservation": 0,
+    "ObservationSamplesProvided": 0
+  },
+  "Clock": {
+    "Trace": "OperationElapsedMs uses the operation Stopwatch; deltas subtract its Requested marker. It begins after earlier navigation handling, not at the UIA setter.",
+    "Observation": "Optional UIA samples use their own Stopwatch from before SetValue to completed captured buffer. UTC anchor correlations are approximate, not shared Stopwatch or physical pixel clocks.",
+    "Quantiles": "Linear interpolation over ordered samples; small n does not establish tail guarantees.",
+    "CalibrationClassification": "Caller-specified operation IDs; the trace has no calibration milestone. A matched timed CSV observation is recorded separately."
+  },
+  "StageAliases": {
+    "Pass": [
+      "ViewportPassStarted",
+      "ViewportThumbnailPassStarted",
+      "ThumbnailViewportPassStarted",
+      "ThumbnailPassStarted"
+    ],
+    "Queue": [
+      "ViewportPassQueued",
+      "ViewportThumbnailQueued",
+      "ThumbnailViewportQueued",
+      "ViewportWorkQueued",
+      "ThumbnailQueued"
+    ]
+  },
+  "Operations": [
+    {
+      "OperationId": 3,
+      "MaximumPublishedCount": 99,
+      "DeclaredCalibration": false,
+      "DeclaredPreparation": false,
+      "MatchedTimedObservationCount": 0,
+      "RequestedUtcFromTraceAnchor": "2026-10-11T18:23:35.9496195Z",
+      "FirstStages": {
+        "Requested": {
+          "OperationElapsedMs": 0.0034,
+          "SinceRequestedMarkerMs": 0.0,
+          "DurationMs": 0.0,
+          "Count": 0,
+          "Value": 0
+        },
+        "FirstItemAvailable": {
+          "OperationElapsedMs": 8.8696,
+          "SinceRequestedMarkerMs": 8.866200000000001,
+          "DurationMs": 0.0,
+          "Count": 1,
+          "Value": 0
+        },
+        "DataPublished": {
+          "OperationElapsedMs": 24.4128,
+          "SinceRequestedMarkerMs": 24.4094,
+          "DurationMs": 1.6505,
+          "Count": 64,
+          "Value": 0
+        },
+        "ContainerRealized": {
+          "OperationElapsedMs": 34.2485,
+          "SinceRequestedMarkerMs": 34.2451,
+          "DurationMs": 0.0,
+          "Count": 1,
+          "Value": 0
+        },
+        "ListingCompleted": {
+          "OperationElapsedMs": 258.4424,
+          "SinceRequestedMarkerMs": 258.439,
+          "DurationMs": 0.0,
+          "Count": 99,
+          "Value": 0
+        },
+        "AdaptiveLayoutCompleted": {
+          "OperationElapsedMs": 596.232,
+          "SinceRequestedMarkerMs": 596.2285999999999,
+          "DurationMs": 0.037,
+          "Count": 99,
+          "Value": 0
+        },
+        "ViewportWorkRequested": {
+          "OperationElapsedMs": 34.4375,
+          "SinceRequestedMarkerMs": 34.4341,
+          "DurationMs": 0.0,
+          "Count": 1,
+          "Value": 0
+        },
+        "ViewportPassQueued": {
+          "OperationElapsedMs": 34.4407,
+          "SinceRequestedMarkerMs": 34.4373,
+          "DurationMs": 0.0,
+          "Count": 1,
+          "Value": 0
+        },
+        "ViewportPassStarted": {
+          "OperationElapsedMs": 233.0249,
+          "SinceRequestedMarkerMs": 233.0215,
+          "DurationMs": 198.5812,
+          "Count": 52,
+          "Value": 0
+        },
+        "ViewportPassCompleted": {
+          "OperationElapsedMs": 234.1827,
+          "SinceRequestedMarkerMs": 234.1793,
+          "DurationMs": 1.1591,
+          "Count": 52,
+          "Value": 0
+        },
+        "ItemJobStarted": {
+          "OperationElapsedMs": 238.3444,
+          "SinceRequestedMarkerMs": 238.341,
+          "DurationMs": 0.0,
+          "Count": 4,
+          "Value": 48
+        },
+        "ThumbnailCacheStarted": {
+          "OperationElapsedMs": 238.4943,
+          "SinceRequestedMarkerMs": 238.4909,
+          "DurationMs": 0.0,
+          "Count": 0,
+          "Value": 96
+        },
+        "ThumbnailCacheCompleted": {
+          "OperationElapsedMs": 580.2916,
+          "SinceRequestedMarkerMs": 580.2882,
+          "DurationMs": 341.7992,
+          "Count": 0,
+          "Value": 1
+        },
+        "ThumbnailNativeStarted": null,
+        "ThumbnailNativeCompleted": null,
+        "ThumbnailDispatcherWait": {
+          "OperationElapsedMs": 588.8284,
+          "SinceRequestedMarkerMs": 588.8249999999999,
+          "DurationMs": 1.08,
+          "Count": 0,
+          "Value": 0
+        },
+        "ThumbnailDecodeCompleted": {
+          "OperationElapsedMs": 589.6449,
+          "SinceRequestedMarkerMs": 589.6415,
+          "DurationMs": 0.3722,
+          "Count": 0,
+          "Value": 1
+        },
+        "ThumbnailApplied": {
+          "OperationElapsedMs": 590.2608,
+          "SinceRequestedMarkerMs": 590.2574,
+          "DurationMs": 0.0,
+          "Count": 0,
+          "Value": 0
+        },
+        "ItemJobCompleted": {
+          "OperationElapsedMs": 590.4622,
+          "SinceRequestedMarkerMs": 590.4588,
+          "DurationMs": 352.1196,
+          "Count": 0,
+          "Value": 0
+        },
+        "RenderCallbackWithVisibleContainer": {
+          "OperationElapsedMs": 334.024,
+          "SinceRequestedMarkerMs": 334.0206,
+          "DurationMs": 0.0,
+          "Count": 52,
+          "Value": 0
+        },
+        "ScrollGeometryIgnored": null,
+        "ScrollDeferred": null,
+        "ScrollFinalWithoutMovement": null,
+        "ScrollSettleScheduled": null,
+        "ScrollSettled": null,
+        "ViewportThumbnailPassStarted": null,
+        "ThumbnailViewportPassStarted": null,
+        "ThumbnailPassStarted": null,
+        "ViewportThumbnailQueued": null,
+        "ThumbnailViewportQueued": null,
+        "ViewportWorkQueued": null,
+        "ThumbnailQueued": null
+      },
+      "LastCompletionElapsedMs": {
+        "ThumbnailApplied": 772.7037,
+        "ItemJobCompleted": 772.7675
+      },
+      "DeltasMs": {
+        "RequestedToFirstNonemptyPublication": 24.4094,
+        "RequestedToContainerRealized": 34.2451,
+        "ContainerRealizedToFirstWorkRequested": 0.18900000000000006,
+        "FirstWorkRequestedToFirstPassQueued": 0.0031999999999996476,
+        "FirstPassQueuedToFirstPassStarted": 198.5842,
+        "ContainerRealizedToFirstPass": 198.7764,
+        "FirstPassToFirstJob": 5.319500000000005,
+        "FirstQueueToFirstJob": 203.90370000000001,
+        "ContainerRealizedToFirstJob": 204.0959,
+        "FinalPublicationToFirstJob": 9.28740000000002,
+        "RequestedToFirstJob": 238.341,
+        "FirstJobToFirstCacheStarted": 0.14990000000000236,
+        "FirstCacheCompletionToFirstDispatcherMarker": 8.536799999999971,
+        "FirstDispatcherMarkerToFirstDecodeCompleted": 0.8165000000000191,
+        "FirstDecodeCompletedToFirstApplied": 0.6159000000000106,
+        "FirstJobToFirstApplied": 351.9164,
+        "RequestedToFirstApplied": 590.2574,
+        "RequestedToLastApplied": 772.7003,
+        "FirstAppliedToLastApplied": 182.4429,
+        "ListingCompletedToAdaptiveCompleted": 337.78959999999995,
+        "AdaptiveCompletedToFirstJob": -357.88759999999996,
+        "FirstScrollDeferredToFirstSettled": null,
+        "FirstScrollSettleScheduledToFirstSettled": null
+      },
+      "PrejobFractionOfRequestedToFirstApplied": 0.40379163395494916,
+      "StageCounts": {
+        "AdaptiveLayoutCompleted": 1,
+        "ContainerRealized": 1,
+        "DataPublished": 2,
+        "DispatcherQueueDelay": 33,
+        "FirstItemAvailable": 1,
+        "ItemJobCompleted": 52,
+        "ItemJobStarted": 52,
+        "KeyInputDelivered": 0,
+        "ListingCompleted": 1,
+        "NavigationXamlFrameDuration": 21,
+        "OverlayCompleted": 52,
+        "OverlayQueueWait": 52,
+        "PointerInputDelivered": 0,
+        "PublicationQueueDelay": 2,
+        "RenderCallbackWithVisibleContainer": 1,
+        "Requested": 1,
+        "ScrollDeferred": 0,
+        "ScrollFinalWithoutMovement": 0,
+        "ScrollGeometryIgnored": 0,
+        "ScrollSettled": 0,
+        "ScrollSettleScheduled": 0,
+        "ScrollViewChanged": 0,
+        "ScrollViewChanging": 0,
+        "ScrollXamlFrameDuration": 0,
+        "ThumbnailApplied": 52,
+        "ThumbnailCacheCompleted": 52,
+        "ThumbnailCacheQueueWait": 52,
+        "ThumbnailCacheStarted": 52,
+        "ThumbnailDecodeCompleted": 52,
+        "ThumbnailDispatcherWait": 52,
+        "ThumbnailNativeCompleted": 0,
+        "ThumbnailNativeQueueWait": 0,
+        "ThumbnailNativeStarted": 0,
+        "ThumbnailPassStarted": 0,
+        "ThumbnailQueued": 0,
+        "ThumbnailViewportPassStarted": 0,
+        "ThumbnailViewportQueued": 0,
+        "ViewportPassCompleted": 57,
+        "ViewportPassQueued": 57,
+        "ViewportPassStarted": 57,
+        "ViewportThumbnailPassStarted": 0,
+        "ViewportThumbnailQueued": 0,
+        "ViewportWorkQueued": 0,
+        "ViewportWorkRequested": 99
+      },
+      "DurationDistributionsMs": {
+        "PublicationQueueDelay": {
+          "Count": 2,
+          "Min": 11.0465,
+          "P50": 105.46924999999999,
+          "P95": 190.449725,
+          "P99": 198.003545,
+          "Max": 199.892,
+          "Mean": 105.46925
+        },
+        "AdaptiveLayoutCompleted": {
+          "Count": 1,
+          "Min": 0.037,
+          "P50": 0.037,
+          "P95": 0.037,
+          "P99": 0.037,
+          "Max": 0.037,
+          "Mean": 0.037
+        },
+        "ItemJobCompleted": {
+          "Count": 52,
+          "Min": 3.8197,
+          "P50": 9.09735,
+          "P95": 352.31588999999997,
+          "P99": 353.35826399999996,
+          "Max": 353.5743,
+          "Mean": 39.72089423076923
+        },
+        "ThumbnailCacheQueueWait": {
+          "Count": 52,
+          "Min": 0.0019,
+          "P50": 0.0197,
+          "P95": 0.078445,
+          "P99": 0.10838100000000009,
+          "Max": 0.1323,
+          "Mean": 0.02830576923076923
+        },
+        "ThumbnailCacheCompleted": {
+          "Count": 52,
+          "Min": 2.7011,
+          "P50": 3.4608499999999998,
+          "P95": 342.11537,
+          "P99": 345.54745,
+          "Max": 345.5806,
+          "Mean": 29.975540384615385
+        },
+        "ThumbnailNativeQueueWait": {
+          "Count": 0,
+          "Min": null,
+          "P50": null,
+          "P95": null,
+          "P99": null,
+          "Max": null,
+          "Mean": null
+        },
+        "ThumbnailNativeCompleted": {
+          "Count": 0,
+          "Min": null,
+          "P50": null,
+          "P95": null,
+          "P99": null,
+          "Max": null,
+          "Mean": null
+        },
+        "ThumbnailDispatcherWait": {
+          "Count": 52,
+          "Min": 0.0011,
+          "P50": 0.0016,
+          "P95": 0.0037800000000000012,
+          "P99": 0.5312400000000022,
+          "Max": 1.08,
+          "Mean": 0.02264423076923077
+        },
+        "ThumbnailDecodeCompleted": {
+          "Count": 52,
+          "Min": 0.1707,
+          "P50": 0.22205,
+          "P95": 0.40946500000000013,
+          "P99": 1.5862860000000045,
+          "Max": 2.709,
+          "Mean": 0.2986442307692307
+        },
+        "OverlayQueueWait": {
+          "Count": 52,
+          "Min": 0.0074,
+          "P50": 0.036750000000000005,
+          "P95": 0.086955,
+          "P99": 0.12476400000000008,
+          "Max": 0.147,
+          "Mean": 0.043038461538461546
+        },
+        "OverlayCompleted": {
+          "Count": 52,
+          "Min": 1.4361,
+          "P50": 2.25525,
+          "P95": 10.72240000000001,
+          "P99": 13.344449000000003,
+          "Max": 13.9157,
+          "Mean": 3.155973076923077
+        },
+        "DispatcherQueueDelay": {
+          "Count": 33,
+          "Min": 0.0887,
+          "P50": 0.1758,
+          "P95": 92.93359999999994,
+          "P99": 349.3405159999999,
+          "Max": 459.2273,
+          "Mean": 23.03399393939394
+        },
+        "ViewportPassStarted": {
+          "Count": 57,
+          "Min": 0.0039,
+          "P50": 0.0174,
+          "P95": 30.93566000000004,
+          "P99": 115.71676799999966,
+          "Max": 198.5812,
+          "Mean": 6.036163157894737
+        },
+        "ViewportPassCompleted": {
+          "Count": 57,
+          "Min": 0.0189,
+          "P50": 0.1338,
+          "P95": 0.26156,
+          "P99": 0.662771999999998,
+          "Max": 1.1591,
+          "Mean": 0.15712280701754386
+        }
+      },
+      "ObservationBindings": [],
+      "ProbeCoverage": {
+        "ViewChangedEvents": 0,
+        "NavigationXamlFrameEvents": 21,
+        "ScrollXamlFrameEvents": 0,
+        "VisibleRenderMilestonePresent": true,
+        "MissingProbeEventsDoNotProveNoViewChangesOrRendering": true
+      }
+    },
+    {
+      "OperationId": 5,
+      "MaximumPublishedCount": 99,
+      "DeclaredCalibration": false,
+      "DeclaredPreparation": false,
+      "MatchedTimedObservationCount": 0,
+      "RequestedUtcFromTraceAnchor": "2026-10-11T18:23:40.7080211Z",
+      "FirstStages": {
+        "Requested": {
+          "OperationElapsedMs": 0.0032,
+          "SinceRequestedMarkerMs": 0.0,
+          "DurationMs": 0.0,
+          "Count": 0,
+          "Value": 0
+        },
+        "FirstItemAvailable": {
+          "OperationElapsedMs": 8.8825,
+          "SinceRequestedMarkerMs": 8.8793,
+          "DurationMs": 0.0,
+          "Count": 1,
+          "Value": 0
+        },
+        "DataPublished": {
+          "OperationElapsedMs": 18.8854,
+          "SinceRequestedMarkerMs": 18.8822,
+          "DurationMs": 1.0767,
+          "Count": 64,
+          "Value": 0
+        },
+        "ContainerRealized": {
+          "OperationElapsedMs": 26.4643,
+          "SinceRequestedMarkerMs": 26.461100000000002,
+          "DurationMs": 0.0,
+          "Count": 1,
+          "Value": 0
+        },
+        "ListingCompleted": {
+          "OperationElapsedMs": 280.6268,
+          "SinceRequestedMarkerMs": 280.6236,
+          "DurationMs": 0.0,
+          "Count": 99,
+          "Value": 0
+        },
+        "AdaptiveLayoutCompleted": {
+          "OperationElapsedMs": 546.2627,
+          "SinceRequestedMarkerMs": 546.2595,
+          "DurationMs": 0.0217,
+          "Count": 99,
+          "Value": 0
+        },
+        "ViewportWorkRequested": {
+          "OperationElapsedMs": 26.5435,
+          "SinceRequestedMarkerMs": 26.540300000000002,
+          "DurationMs": 0.0,
+          "Count": 1,
+          "Value": 0
+        },
+        "ViewportPassQueued": {
+          "OperationElapsedMs": 26.5457,
+          "SinceRequestedMarkerMs": 26.5425,
+          "DurationMs": 0.0,
+          "Count": 1,
+          "Value": 0
+        },
+        "ViewportPassStarted": {
+          "OperationElapsedMs": 214.7113,
+          "SinceRequestedMarkerMs": 214.7081,
+          "DurationMs": 188.1653,
+          "Count": 52,
+          "Value": 0
+        },
+        "ViewportPassCompleted": {
+          "OperationElapsedMs": 214.9567,
+          "SinceRequestedMarkerMs": 214.95350000000002,
+          "DurationMs": 0.2458,
+          "Count": 52,
+          "Value": 0
+        },
+        "ItemJobStarted": {
+          "OperationElapsedMs": 220.4214,
+          "SinceRequestedMarkerMs": 220.4182,
+          "DurationMs": 0.0,
+          "Count": 4,
+          "Value": 48
+        },
+        "ThumbnailCacheStarted": {
+          "OperationElapsedMs": 220.547,
+          "SinceRequestedMarkerMs": 220.5438,
+          "DurationMs": 0.0,
+          "Count": 0,
+          "Value": 96
+        },
+        "ThumbnailCacheCompleted": {
+          "OperationElapsedMs": 223.6391,
+          "SinceRequestedMarkerMs": 223.63590000000002,
+          "DurationMs": 2.9736,
+          "Count": 0,
+          "Value": 1
+        },
+        "ThumbnailNativeStarted": null,
+        "ThumbnailNativeCompleted": null,
+        "ThumbnailDispatcherWait": {
+          "OperationElapsedMs": 225.5682,
+          "SinceRequestedMarkerMs": 225.565,
+          "DurationMs": 0.0019,
+          "Count": 0,
+          "Value": 0
+        },
+        "ThumbnailDecodeCompleted": {
+          "OperationElapsedMs": 225.8665,
+          "SinceRequestedMarkerMs": 225.8633,
+          "DurationMs": 0.2856,
+          "Count": 0,
+          "Value": 1
+        },
+        "ThumbnailApplied": {
+          "OperationElapsedMs": 226.1459,
+          "SinceRequestedMarkerMs": 226.14270000000002,
+          "DurationMs": 0.0,
+          "Count": 0,
+          "Value": 0
+        },
+        "ItemJobCompleted": {
+          "OperationElapsedMs": 226.2525,
+          "SinceRequestedMarkerMs": 226.2493,
+          "DurationMs": 5.6252,
+          "Count": 0,
+          "Value": 0
+        },
+        "RenderCallbackWithVisibleContainer": null,
+        "ScrollGeometryIgnored": null,
+        "ScrollDeferred": null,
+        "ScrollFinalWithoutMovement": null,
+        "ScrollSettleScheduled": null,
+        "ScrollSettled": null,
+        "ViewportThumbnailPassStarted": null,
+        "ThumbnailViewportPassStarted": null,
+        "ThumbnailPassStarted": null,
+        "ViewportThumbnailQueued": null,
+        "ThumbnailViewportQueued": null,
+        "ViewportWorkQueued": null,
+        "ThumbnailQueued": null
+      },
+      "LastCompletionElapsedMs": {
+        "ThumbnailApplied": 549.6125,
+        "ItemJobCompleted": 549.6657
+      },
+      "DeltasMs": {
+        "RequestedToFirstNonemptyPublication": 18.8822,
+        "RequestedToContainerRealized": 26.461100000000002,
+        "ContainerRealizedToFirstWorkRequested": 0.07920000000000016,
+        "FirstWorkRequestedToFirstPassQueued": 0.0021999999999984254,
+        "FirstPassQueuedToFirstPassStarted": 188.16559999999998,
+        "ContainerRealizedToFirstPass": 188.24699999999999,
+        "FirstPassToFirstJob": 5.710100000000011,
+        "FirstQueueToFirstJob": 193.8757,
+        "ContainerRealizedToFirstJob": 193.9571,
+        "FinalPublicationToFirstJob": 5.729299999999995,
+        "RequestedToFirstJob": 220.4182,
+        "FirstJobToFirstCacheStarted": 0.1255999999999915,
+        "FirstCacheCompletionToFirstDispatcherMarker": 1.929099999999977,
+        "FirstDispatcherMarkerToFirstDecodeCompleted": 0.2983000000000118,
+        "FirstDecodeCompletedToFirstApplied": 0.27940000000000964,
+        "FirstJobToFirstApplied": 5.724500000000006,
+        "RequestedToFirstApplied": 226.14270000000002,
+        "RequestedToLastApplied": 549.6093,
+        "FirstAppliedToLastApplied": 323.46659999999997,
+        "ListingCompletedToAdaptiveCompleted": 265.6359,
+        "AdaptiveCompletedToFirstJob": -325.8413,
+        "FirstScrollDeferredToFirstSettled": null,
+        "FirstScrollSettleScheduledToFirstSettled": null
+      },
+      "PrejobFractionOfRequestedToFirstApplied": 0.9746863374320728,
+      "StageCounts": {
+        "AdaptiveLayoutCompleted": 1,
+        "ContainerRealized": 1,
+        "DataPublished": 2,
+        "DispatcherQueueDelay": 0,
+        "FirstItemAvailable": 1,
+        "ItemJobCompleted": 52,
+        "ItemJobStarted": 52,
+        "KeyInputDelivered": 0,
+        "ListingCompleted": 1,
+        "NavigationXamlFrameDuration": 0,
+        "OverlayCompleted": 52,
+        "OverlayQueueWait": 52,
+        "PointerInputDelivered": 0,
+        "PublicationQueueDelay": 2,
+        "RenderCallbackWithVisibleContainer": 0,
+        "Requested": 1,
+        "ScrollDeferred": 0,
+        "ScrollFinalWithoutMovement": 0,
+        "ScrollGeometryIgnored": 0,
+        "ScrollSettled": 0,
+        "ScrollSettleScheduled": 0,
+        "ScrollViewChanged": 0,
+        "ScrollViewChanging": 0,
+        "ScrollXamlFrameDuration": 0,
+        "ThumbnailApplied": 52,
+        "ThumbnailCacheCompleted": 52,
+        "ThumbnailCacheQueueWait": 52,
+        "ThumbnailCacheStarted": 52,
+        "ThumbnailDecodeCompleted": 52,
+        "ThumbnailDispatcherWait": 52,
+        "ThumbnailNativeCompleted": 0,
+        "ThumbnailNativeQueueWait": 0,
+        "ThumbnailNativeStarted": 0,
+        "ThumbnailPassStarted": 0,
+        "ThumbnailQueued": 0,
+        "ThumbnailViewportPassStarted": 0,
+        "ThumbnailViewportQueued": 0,
+        "ViewportPassCompleted": 59,
+        "ViewportPassQueued": 59,
+        "ViewportPassStarted": 59,
+        "ViewportThumbnailPassStarted": 0,
+        "ViewportThumbnailQueued": 0,
+        "ViewportWorkQueued": 0,
+        "ViewportWorkRequested": 99
+      },
+      "DurationDistributionsMs": {
+        "PublicationQueueDelay": {
+          "Count": 2,
+          "Min": 7.9509,
+          "P50": 100.77675,
+          "P95": 184.32001499999998,
+          "P99": 191.746083,
+          "Max": 193.6026,
+          "Mean": 100.77674999999999
+        },
+        "AdaptiveLayoutCompleted": {
+          "Count": 1,
+          "Min": 0.0217,
+          "P50": 0.0217,
+          "P95": 0.0217,
+          "P99": 0.0217,
+          "Max": 0.0217,
+          "Mean": 0.0217
+        },
+        "ItemJobCompleted": {
+          "Count": 52,
+          "Min": 3.345,
+          "P50": 6.9601500000000005,
+          "P95": 89.27579,
+          "P99": 90.094307,
+          "Max": 90.3056,
+          "Mean": 23.820221153846152
+        },
+        "ThumbnailCacheQueueWait": {
+          "Count": 52,
+          "Min": 0.0021,
+          "P50": 0.01005,
+          "P95": 0.038015,
+          "P99": 0.053128000000000015,
+          "Max": 0.0568,
+          "Mean": 0.015207692307692307
+        },
+        "ThumbnailCacheCompleted": {
+          "Count": 52,
+          "Min": 2.4337,
+          "P50": 3.0987,
+          "P95": 3.7079750000000002,
+          "P99": 4.108625000000001,
+          "Max": 4.2476,
+          "Mean": 3.12215576923077
+        },
+        "ThumbnailNativeQueueWait": {
+          "Count": 0,
+          "Min": null,
+          "P50": null,
+          "P95": null,
+          "P99": null,
+          "Max": null,
+          "Mean": null
+        },
+        "ThumbnailNativeCompleted": {
+          "Count": 0,
+          "Min": null,
+          "P50": null,
+          "P95": null,
+          "P99": null,
+          "Max": null,
+          "Mean": null
+        },
+        "ThumbnailDispatcherWait": {
+          "Count": 52,
+          "Min": 0.0008,
+          "P50": 0.0012499999999999998,
+          "P95": 0.003415000000000002,
+          "P99": 0.0069640000000000075,
+          "Max": 0.0088,
+          "Mean": 0.0016865384615384615
+        },
+        "ThumbnailDecodeCompleted": {
+          "Count": 52,
+          "Min": 0.1537,
+          "P50": 0.18869999999999998,
+          "P95": 0.3370850000000001,
+          "P99": 0.39615,
+          "Max": 0.4038,
+          "Mean": 0.2141019230769231
+        },
+        "OverlayQueueWait": {
+          "Count": 52,
+          "Min": 0.0115,
+          "P50": 0.03,
+          "P95": 0.09997000000000003,
+          "P99": 0.115386,
+          "Max": 0.1161,
+          "Mean": 0.04178076923076923
+        },
+        "OverlayCompleted": {
+          "Count": 52,
+          "Min": 1.3498,
+          "P50": 2.0242,
+          "P95": 2.7296600000000004,
+          "P99": 3.0908410000000006,
+          "Max": 3.3004,
+          "Mean": 2.073719230769231
+        },
+        "DispatcherQueueDelay": {
+          "Count": 0,
+          "Min": null,
+          "P50": null,
+          "P95": null,
+          "P99": null,
+          "Max": null,
+          "Mean": null
+        },
+        "ViewportPassStarted": {
+          "Count": 59,
+          "Min": 0.0032,
+          "P50": 0.0121,
+          "P95": 23.22782,
+          "P99": 100.91833600000027,
+          "Max": 188.1653,
+          "Mean": 4.685662711864407
+        },
+        "ViewportPassCompleted": {
+          "Count": 59,
+          "Min": 0.0184,
+          "P50": 0.1266,
+          "P95": 0.23273000000000002,
+          "P99": 0.25617400000000007,
+          "Max": 0.2705,
+          "Mean": 0.12909322033898304
+        }
+      },
+      "ObservationBindings": [],
+      "ProbeCoverage": {
+        "ViewChangedEvents": 0,
+        "NavigationXamlFrameEvents": 0,
+        "ScrollXamlFrameEvents": 0,
+        "VisibleRenderMilestonePresent": false,
+        "MissingProbeEventsDoNotProveNoViewChangesOrRendering": true
+      }
+    }
+  ],
+  "ExcludedOperations": [],
+  "ObservationSessions": [],
+  "AggregateDeltasMs": {
+    "RequestedToFirstNonemptyPublication": {
+      "Count": 2,
+      "Min": 18.8822,
+      "P50": 21.6458,
+      "P95": 24.13304,
+      "P99": 24.354128000000003,
+      "Max": 24.4094,
+      "Mean": 21.6458
+    },
+    "RequestedToContainerRealized": {
+      "Count": 2,
+      "Min": 26.461100000000002,
+      "P50": 30.3531,
+      "P95": 33.8559,
+      "P99": 34.16726,
+      "Max": 34.2451,
+      "Mean": 30.3531
+    },
+    "ContainerRealizedToFirstWorkRequested": {
+      "Count": 2,
+      "Min": 0.07920000000000016,
+      "P50": 0.1341000000000001,
+      "P95": 0.18351000000000006,
+      "P99": 0.18790200000000007,
+      "Max": 0.18900000000000006,
+      "Mean": 0.1341000000000001
+    },
+    "FirstWorkRequestedToFirstPassQueued": {
+      "Count": 2,
+      "Min": 0.0021999999999984254,
+      "P50": 0.0026999999999990365,
+      "P95": 0.0031499999999995863,
+      "P99": 0.0031899999999996354,
+      "Max": 0.0031999999999996476,
+      "Mean": 0.0026999999999990365
+    },
+    "FirstPassQueuedToFirstPassStarted": {
+      "Count": 2,
+      "Min": 188.16559999999998,
+      "P50": 193.3749,
+      "P95": 198.06327000000002,
+      "P99": 198.480014,
+      "Max": 198.5842,
+      "Mean": 193.3749
+    },
+    "ContainerRealizedToFirstPass": {
+      "Count": 2,
+      "Min": 188.24699999999999,
+      "P50": 193.5117,
+      "P95": 198.24993,
+      "P99": 198.671106,
+      "Max": 198.7764,
+      "Mean": 193.5117
+    },
+    "FirstPassToFirstJob": {
+      "Count": 2,
+      "Min": 5.319500000000005,
+      "P50": 5.514800000000008,
+      "P95": 5.690570000000011,
+      "P99": 5.7061940000000115,
+      "Max": 5.710100000000011,
+      "Mean": 5.514800000000008
+    },
+    "FirstQueueToFirstJob": {
+      "Count": 2,
+      "Min": 193.8757,
+      "P50": 198.8897,
+      "P95": 203.40230000000003,
+      "P99": 203.80342000000002,
+      "Max": 203.90370000000001,
+      "Mean": 198.8897
+    },
+    "ContainerRealizedToFirstJob": {
+      "Count": 2,
+      "Min": 193.9571,
+      "P50": 199.0265,
+      "P95": 203.58896,
+      "P99": 203.994512,
+      "Max": 204.0959,
+      "Mean": 199.0265
+    },
+    "FinalPublicationToFirstJob": {
+      "Count": 2,
+      "Min": 5.729299999999995,
+      "P50": 7.508350000000007,
+      "P95": 9.109495000000019,
+      "P99": 9.251819000000019,
+      "Max": 9.28740000000002,
+      "Mean": 7.508350000000007
+    },
+    "RequestedToFirstJob": {
+      "Count": 2,
+      "Min": 220.4182,
+      "P50": 229.3796,
+      "P95": 237.44486,
+      "P99": 238.161772,
+      "Max": 238.341,
+      "Mean": 229.3796
+    },
+    "FirstJobToFirstCacheStarted": {
+      "Count": 2,
+      "Min": 0.1255999999999915,
+      "P50": 0.13774999999999693,
+      "P95": 0.14868500000000182,
+      "P99": 0.14965700000000226,
+      "Max": 0.14990000000000236,
+      "Mean": 0.13774999999999693
+    },
+    "FirstCacheCompletionToFirstDispatcherMarker": {
+      "Count": 2,
+      "Min": 1.929099999999977,
+      "P50": 5.232949999999974,
+      "P95": 8.206414999999971,
+      "P99": 8.470722999999971,
+      "Max": 8.536799999999971,
+      "Mean": 5.232949999999974
+    },
+    "FirstDispatcherMarkerToFirstDecodeCompleted": {
+      "Count": 2,
+      "Min": 0.2983000000000118,
+      "P50": 0.5574000000000154,
+      "P95": 0.7905900000000188,
+      "P99": 0.811318000000019,
+      "Max": 0.8165000000000191,
+      "Mean": 0.5574000000000154
+    },
+    "FirstDecodeCompletedToFirstApplied": {
+      "Count": 2,
+      "Min": 0.27940000000000964,
+      "P50": 0.4476500000000101,
+      "P95": 0.5990750000000105,
+      "P99": 0.6125350000000105,
+      "Max": 0.6159000000000106,
+      "Mean": 0.4476500000000101
+    },
+    "FirstJobToFirstApplied": {
+      "Count": 2,
+      "Min": 5.724500000000006,
+      "P50": 178.82045000000002,
+      "P95": 334.606805,
+      "P99": 348.454481,
+      "Max": 351.9164,
+      "Mean": 178.82045
+    },
+    "RequestedToFirstApplied": {
+      "Count": 2,
+      "Min": 226.14270000000002,
+      "P50": 408.20005000000003,
+      "P95": 572.051665,
+      "P99": 586.616253,
+      "Max": 590.2574,
+      "Mean": 408.20005
+    },
+    "RequestedToLastApplied": {
+      "Count": 2,
+      "Min": 549.6093,
+      "P50": 661.1548,
+      "P95": 761.54575,
+      "P99": 770.46939,
+      "Max": 772.7003,
+      "Mean": 661.1548
+    },
+    "FirstAppliedToLastApplied": {
+      "Count": 2,
+      "Min": 182.4429,
+      "P50": 252.95475,
+      "P95": 316.41541499999994,
+      "P99": 322.056363,
+      "Max": 323.46659999999997,
+      "Mean": 252.95475
+    },
+    "ListingCompletedToAdaptiveCompleted": {
+      "Count": 2,
+      "Min": 265.6359,
+      "P50": 301.71274999999997,
+      "P95": 334.18191499999995,
+      "P99": 337.06806299999994,
+      "Max": 337.78959999999995,
+      "Mean": 301.71274999999997
+    },
+    "AdaptiveCompletedToFirstJob": {
+      "Count": 2,
+      "Min": -357.88759999999996,
+      "P50": -341.86445,
+      "P95": -327.44361499999997,
+      "P99": -326.161763,
+      "Max": -325.8413,
+      "Mean": -341.86445
+    },
+    "FirstScrollDeferredToFirstSettled": {
+      "Count": 0,
+      "Min": null,
+      "P50": null,
+      "P95": null,
+      "P99": null,
+      "Max": null,
+      "Mean": null
+    },
+    "FirstScrollSettleScheduledToFirstSettled": {
+      "Count": 0,
+      "Min": null,
+      "P50": null,
+      "P95": null,
+      "P99": null,
+      "Max": null,
+      "Mean": null
+    }
+  },
+  "Note": "Two warm known media operations3,5; startup1 excluded. Fixed dwell, no capture/readiness polling; ON diagnostic control not primary OFF comparison.",
+  "Limitations": [
+    "The aggregate includes calibration/preparation when declared; inspect per-operation roles before comparing timed observations.",
+    "Only numeric trace fields and known milestone names are retained per operation; no item names or item paths are copied.",
+    "Parallel jobs share OperationId without RowId; earliest cache/decode/applied markers can belong to different rows. Their deltas are operation milestones, not a per-row critical path.",
+    "ThumbnailDispatcherWait starts at the apply method; it does not include earlier async continuation scheduling after native cache completion.",
+    "Missing pass/queue milestones remain null. Missing ViewChanged/render probe records do not demonstrate absence of those events; probe attachment or disposal can remove coverage.",
+    "UTC sample joins require matching process IDs when both capture metadata and observation metadata provide them; absent IDs leave identity unverified.",
+    "Adaptive completion correlation does not show its CPU cost or causality; DurationMs is reported separately.",
+    "Diagnostics are opt-in. PrintWindow/UIA/polling can perturb rendering; warm cache and observer time remain included.",
+    "No physical presentation, cold-cache guarantee, global performance verdict, or inference of unique thumbnail identity is made."
+  ]
+}

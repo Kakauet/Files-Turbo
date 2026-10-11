@@ -1,0 +1,2 @@
+"Variant","Scenario","Repetition","Metric","StartedUtc","CompletedUtc","AccessibleNamesMs","StatusFullCountMs","PathUpdatedMs","Navigate2CallMs","PathReadMaxMs","NamesQueryMaxMs","StatusReadMaxMs","Polls","TimedOut","WindowBounds"
+"Explorer","10000","0","COMNavigate2_ExplorerUIA","2026-10-11T15:48:26.2596868Z","2026-10-11T15:48:36.2626731Z",,,"124,3455","1,79","88,8553","54,0118","23,4558","492","True","-8;-8;1936;1048"

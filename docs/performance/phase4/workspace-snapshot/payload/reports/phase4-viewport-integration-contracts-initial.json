@@ -1,0 +1,39 @@
+{
+  "Source": {
+    "SourcePath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Views\\Layouts\\BaseLayoutPage.cs",
+    "SourceSha256": "FFE1D817B6E8AF70D5FB2135F695A548C484B501C62641FB210F6A5FFB7458FC",
+    "QueuePath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Helpers\\ViewportWorkQueue.cs",
+    "QueueSha256": "4A55C6151DE272439EEC9E4B9FE10AA313776D04728905F89EDC27A4B12133AC",
+    "GeneratedSha256": "7985D4F3BDFD7ECB256A7D5F95038E5111640E47D87873E3EFCA441948A9CE6C",
+    "Scope": "Literal production handoff and retry methods, real queue; Shell/WinUI/viewport enumeration are controlled doubles."
+  },
+  "Results": [
+    {
+      "Name": "metadata_failure_retries_same_row_without_duplicate_thumbnail",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "metadata_capacity_eviction_refills_without_duplicate_thumbnails",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "invalidated_thumbnail_stage_reextracts_before_retrying_metadata",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "git_version_change_keeps_thumbnail_and_loads_new_git_properties",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "disposed_handoff_does_not_initialize_metadata",
+      "Passed": true,
+      "Failure": null
+    }
+  ],
+  "Passed": 5,
+  "Scope": "Exact handoff methods/queue, controlled Shell/dispatcher/viewport. No WinUI or native latency."
+}

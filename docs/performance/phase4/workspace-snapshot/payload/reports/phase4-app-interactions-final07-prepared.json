@@ -1,0 +1,68 @@
+{
+  "Status": "Pending",
+  "UiExecuted": false,
+  "StartedUtc": "2026-10-11T18:22:16.6882136Z",
+  "CompletedUtc": "2026-10-11T18:22:16.8022151Z",
+  "Fixture": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final07",
+  "FixtureManifest": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\ui-phase4-operations\\final07\\manifest.json",
+  "Package": null,
+  "Results": [
+    {
+      "Name": "single_selection",
+      "Status": "Pending",
+      "Reason": "Prepared; app UI has not been executed."
+    },
+    {
+      "Name": "multiselection",
+      "Status": "Pending",
+      "Reason": "Prepared; app UI has not been executed."
+    },
+    {
+      "Name": "copy_paste",
+      "Status": "Pending",
+      "Reason": "Prepared; app UI has not been executed."
+    },
+    {
+      "Name": "cut_paste",
+      "Status": "Pending",
+      "Reason": "Prepared; app UI has not been executed."
+    },
+    {
+      "Name": "rename",
+      "Status": "Pending",
+      "Reason": "Prepared; app UI has not been executed."
+    },
+    {
+      "Name": "back_forward",
+      "Status": "Pending",
+      "Reason": "Prepared; app UI has not been executed."
+    },
+    {
+      "Name": "create_folder",
+      "Status": "Pending",
+      "Reason": "Prepared; app UI has not been executed."
+    },
+    {
+      "Name": "preview_toggle",
+      "Status": "Pending",
+      "Reason": "Prepared; app UI has not been executed."
+    },
+    {
+      "Name": "new_tab",
+      "Status": "Pending",
+      "Reason": "Prepared; app UI has not been executed."
+    },
+    {
+      "Name": "sort",
+      "Status": "Pending",
+      "Reason": "Prepared; app UI has not been executed."
+    },
+    {
+      "Name": "layout",
+      "Status": "Pending",
+      "Reason": "Prepared; app UI has not been executed."
+    }
+  ],
+  "UiActions": [],
+  "Scope": "UIA patterns on one exact registered experimental PID and confirmed synthetic paths. Filesystem reads only corroborate requested app operations. Fixture creation is setup, not an app operation. No global keyboard, foreground forcing, private-name inventory, performance or broad file-operation safety claim."
+}

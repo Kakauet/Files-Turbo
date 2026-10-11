@@ -1,0 +1,2 @@
+"Scenario","Repetition","StartedUtc","CompletedUtc","EmptyCountMs","Navigate2CallMs","TimedOut"
+"10000","0","2026-10-11T17:18:26.3500573Z","2026-10-11T17:18:26.4643024Z","112,6239","3,358","False"

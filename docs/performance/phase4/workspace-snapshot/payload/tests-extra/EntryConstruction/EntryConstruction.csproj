@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <SnapshotRoot Condition="'$(SnapshotRoot)' == ''">snapshots/verified-final04</SnapshotRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="$(SnapshotRoot)/*.cs" />
+    <None Include="$(SnapshotRoot)/source-metadata.json" CopyToOutputDirectory="Always" TargetPath="source-metadata.json" />
+  </ItemGroup>
+</Project>

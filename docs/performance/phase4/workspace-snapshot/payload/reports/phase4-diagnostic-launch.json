@@ -1,0 +1,10 @@
+{
+  "ProcessId": 3800,
+  "WindowHandle": {
+    "value": 4852550
+  },
+  "Package": "FilesTurbo.Experimental_4.2.39.6_x64__ykqwq8d6ps0ag",
+  "InstallLocation": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\artifacts\\development-layout\\managed-release-phase4-final03\\layout",
+  "ReadyUtc": "2026-10-11T16:52:54.0875017Z",
+  "Scope": "Window and navigation control ready; no physical presentation or startup timing claim."
+}

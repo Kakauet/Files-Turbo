@@ -1,0 +1,98 @@
+{
+  "VerifiedUtc": "2026-10-11T17:51:22.3308721Z",
+  "Status": "compiled-source-and-packaged-assembly-match",
+  "Scope": "SHA256 Portable PDB checksums of every changed/new production C# file under src since Phase IV start; PDB CodeView identity; packaged assembly equality. XAML, package manifest and CsWin32 declarations have separate input hashes. No runtime verdict.",
+  "PhaseIIIStartCommit": "1b66432ad3baf122aa4e608b67ea47a5401a78ed",
+  "SourceCommit": "081841c996fd02bc24d901ce3092764dd545bc08",
+  "SourceWorkingTreeDirty": false,
+  "Delivery": "artifacts\\development-layout\\managed-release-phase4-final06",
+  "ChangedCSharpCount": 8,
+  "Assemblies": [
+    {
+      "Assembly": "Files.dll",
+      "LayoutPath": "Files.dll",
+      "SHA256": "9207F935EC1EE18C9CDE0B55FAECE45599DDE46B837808419108906161631BE0",
+      "PdbPath": "source\\src\\Files.App\\bin\\x64\\Release\\net10.0-windows10.0.26100.0\\win-x64\\Files.pdb",
+      "PdbSHA256": "239A5E8076B71020305A73C27418B21E4C8C7559E98DF0F1DA1F3A784068C19C",
+      "PdbIdentityMatchesAssembly": true
+    },
+    {
+      "Assembly": "Files.App.CsWin32.dll",
+      "LayoutPath": "Files.App.CsWin32.dll",
+      "SHA256": "9240A280516BC5FC8454A8072A96C2D55F14559AEA86A0ACDAF9F2752510F350",
+      "PdbPath": "source\\src\\Files.App.CsWin32\\bin\\x64\\Release\\net10.0-windows10.0.26100.0\\win-x64\\Files.App.CsWin32.pdb",
+      "PdbSHA256": "1B4C6C16B29292B16D1861A756AB5FA456802B858D85B6A953FA2983FF4F0FE1",
+      "PdbIdentityMatchesAssembly": true
+    },
+    {
+      "Assembly": "Files.App.Storage.dll",
+      "LayoutPath": "Files.App.Storage.dll",
+      "SHA256": "6A7FA6721BF32DD53EB052A080E17051C7F6D2D103B12BB81C08E08420F75105",
+      "PdbPath": "source\\src\\Files.App.Storage\\bin\\x64\\Release\\net10.0-windows10.0.26100.0\\win-x64\\Files.App.Storage.pdb",
+      "PdbSHA256": "646D2C79FFF27E2D0B2EA64B51C5696EE58CE8F554B5EC96A618646CDBFFA3CE",
+      "PdbIdentityMatchesAssembly": true
+    }
+  ],
+  "Documents": [
+    {
+      "Path": "src/Files.App/Helpers/BitmapHelper.cs",
+      "SHA256": "F15297CB0E4C16052D7C40A2DCDD25C46C840B6B6EA181F6385B2E43FD9A8F82",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App/Helpers/ViewportWorkQueue.cs",
+      "SHA256": "50FFB3A7BC883DEEE7C540093EF25D985035101C70A722616265D82260B1C9AF",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App/Utils/Storage/Helpers/FileThumbnailHelper.cs",
+      "SHA256": "D1AFB73B74B4F39CF38B8398A6CF6FD1E58FD7B7510CAA5FAF0FD2246B946884",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App/Utils/Storage/Search/FolderSearch.cs",
+      "SHA256": "1BD4682F4F1823003CDA310129D42BA365A90586C6C13CC63CDCF582F3061576",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App/ViewModels/ShellViewModel.cs",
+      "SHA256": "3A68AD18E014C7C420614D93804667105F1E5699041F41D6F960407939555540",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App/Views/Layouts/BaseLayoutPage.cs",
+      "SHA256": "033EA86E897B877298FA6F5AC4B714A8F16FACDEBE68D39A7B02F1459ADBF300",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App/Views/Shells/BaseShellPage.cs",
+      "SHA256": "3D6E9B7B2814EC2B6A15DBE2752E975425401575E60826890B380E4E13756A22",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App.Storage/Windows/Managers/STATask.cs",
+      "SHA256": "DF132C791F4043A85974EDE9623699CD0131C838B952F8DCF855F0209F0E8216",
+      "Assembly": "Files.App.Storage.dll"
+    }
+  ],
+  "SourceInputs": [
+    {
+      "Path": "src/Files.App/Package.appxmanifest",
+      "SHA256": "D177ADB53AC1E5D9F5C73EBC679DB30144BF48C5543F728589A0AC9AE6541CBF",
+      "CheckKind": "source-input-hash-not-a-portable-PDB-document"
+    },
+    {
+      "Path": "src/Files.App/Views/Layouts/GridLayoutPage.xaml",
+      "SHA256": "8880149FF9A0D88F8676043D54D046FADFD3CC703240F201998173F20C015CC6",
+      "CheckKind": "source-input-hash-not-a-portable-PDB-document"
+    }
+  ],
+  "Manifest": {
+    "SourceSHA256": "D177ADB53AC1E5D9F5C73EBC679DB30144BF48C5543F728589A0AC9AE6541CBF",
+    "Identity": "FilesTurbo.Experimental",
+    "Path": "src/Files.App/Package.appxmanifest",
+    "Publisher": "CN=Files",
+    "Version": "4.2.39.8",
+    "LayoutSHA256": "CAC0750010202F4EF9FD7E332F4870A7F480AFFC3D737E73ACE162E2ED41D574"
+  }
+}

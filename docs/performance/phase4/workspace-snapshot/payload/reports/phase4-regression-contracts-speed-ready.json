@@ -1,0 +1,512 @@
+{
+  "CapturedAtUtc": "2026-10-11T17:53:56.4802340+00:00",
+  "StartedAtUtc": "2026-10-11T17:53:36.3680069+00:00",
+  "Status": "Completed",
+  "SourceHead": "081841c996fd02bc24d901ce3092764dd545bc08",
+  "SourceWorkingTreeDirtyAtStart": false,
+  "ExpectedContracts": 159,
+  "TotalContracts": 159,
+  "Failed": 0,
+  "Scope": "Fresh sequential rebuilds and contract runs over frozen current extracted/linked sources. Controlled Shell/dispatcher/WinRT plus native search against fresh synthetic NTFS fixture and junction. No WinUI, rendered frame or app file-operation claim.",
+  "Cases": [
+    {
+      "Group": "ToolbarPathNavigation",
+      "Passed": 37,
+      "Failed": 0,
+      "ExpectedContracts": 37,
+      "BuildWarnings": null,
+      "Evidence": "reports/phase4-path-navigation-contracts-speed-ready.json",
+      "EvidenceSha256": "9B0EC76E69EC80EE977ED323ADF35F8ACEC650BC70AEF75C8E92C9D34A91BB1C",
+      "ExecutionExitCode": 0,
+      "ExecutionLog": "artifacts/phase4-search-regression-speed-ready/path-navigation-execution.log",
+      "ExecutionLogSha256": "EB8941075D37F843BC50ACF423B5A71BAA5100E44E341E3D530CA5BADFA79F0E"
+    },
+    {
+      "Group": "WorkingDirectoryAndBreadcrumb",
+      "Passed": 41,
+      "Failed": 0,
+      "ExpectedContracts": 41,
+      "BuildWarnings": null,
+      "Evidence": "reports/phase4-working-directory-contracts-speed-ready.json",
+      "EvidenceSha256": "8BE1CD6970FB0C3BDEEFCCCCA8EAEC7233FCF4C40EBFF02AC3C39D948A35790E",
+      "ExecutionExitCode": 0,
+      "ExecutionLog": "artifacts/phase4-search-regression-speed-ready/working-directory-execution.log",
+      "ExecutionLogSha256": "0E8F3B178C4A7D9B1E3423179ABAFEF0910769B23C7DE0A7DCD5160D8E431ECA"
+    },
+    {
+      "Group": "ShellNavigationAndControlledEnumeration",
+      "Passed": 22,
+      "Failed": 0,
+      "ExpectedContracts": 22,
+      "BuildWarnings": null,
+      "Evidence": "reports/phase4-navigation-shell-contracts-speed-ready.json",
+      "EvidenceSha256": "BF6FD7E4D599F84B5A8DBE0C3AD2C50266EB980C0C419E745B8885D003F6F394",
+      "ExecutionExitCode": 0,
+      "ExecutionLog": "artifacts/phase4-search-regression-speed-ready/shell-navigation-execution.log",
+      "ExecutionLogSha256": "ECD9626D4FCB7BFA9F61F7A3FF4AAA12C88339EF3831D70D90EBDE349593E51B"
+    },
+    {
+      "Group": "AdaptiveLayout",
+      "Passed": 17,
+      "Failed": 0,
+      "ExpectedContracts": 17,
+      "BuildWarnings": null,
+      "Evidence": "reports/phase4-adaptive-contracts-speed-ready.json",
+      "EvidenceSha256": "6A154FDC4004104541C9D87C43FF18083CA3804039A7A719B8A3F7AA587400A0",
+      "ExecutionExitCode": 0,
+      "ExecutionLog": "artifacts/phase4-search-regression-speed-ready/adaptive-execution.log",
+      "ExecutionLogSha256": "A9A3112F9540E85CE485D745F760F7988BE9BCFE1338031E894ABCDB105F7B16"
+    },
+    {
+      "Group": "NativeNameSearchFreshSyntheticNTFS",
+      "Passed": 28,
+      "Failed": 0,
+      "ExpectedContracts": 28,
+      "BuildWarnings": null,
+      "Evidence": "artifacts/phase4-search-regression-speed-ready/native-contracts/search-contracts.json",
+      "EvidenceSha256": "51DB8441BFD64DF07974B4656EA0832DD665429A04E3492F1242756994F3AA9A",
+      "ExecutionExitCode": 0,
+      "ExecutionLog": "artifacts/phase4-search-regression-speed-ready/native-search-execution.log",
+      "ExecutionLogSha256": "E1B0CF2750EE918E1C9B34206D28D2FE0E67270AFB3617B1215B4813E3FA36C7"
+    },
+    {
+      "Group": "RecursiveSearchAndJunctionCycle",
+      "Passed": 3,
+      "Failed": 0,
+      "ExpectedContracts": 3,
+      "BuildWarnings": null,
+      "Evidence": "artifacts/phase4-search-regression-speed-ready/search-traversal-contracts.json",
+      "EvidenceSha256": "0312EBA72FA3AC954CCCF9D9E053DBFA300A2E29895F90525C63D5D91B19F920",
+      "ExecutionExitCode": 0,
+      "ExecutionLog": "artifacts/phase4-search-regression-speed-ready/traversal-execution.log",
+      "ExecutionLogSha256": "3FF716E55DF3EC5FFF3B00F8C00A118CEF486380DF4D19E7B6A0BFC85BB0D601"
+    },
+    {
+      "Group": "SuggestionsScheduling",
+      "Passed": 11,
+      "Failed": 0,
+      "ExpectedContracts": 11,
+      "BuildWarnings": null,
+      "Evidence": "artifacts/phase4-search-regression-speed-ready/suggestion-contracts/search-pipeline-contracts.json",
+      "EvidenceSha256": "BAED4EDF2148070169A3D2DDC78C3244FEB5E859715D1772F3980770B9635B1C",
+      "ExecutionExitCode": 0,
+      "ExecutionLog": "artifacts/phase4-search-regression-speed-ready/suggestions-execution.log",
+      "ExecutionLogSha256": "4C3B4C2DA4CFD4D936B39D0FB076F78FF0F4E3278215613D7045F5BECB0DF22D"
+    }
+  ],
+  "Builds": [
+    {
+      "Project": "tests-extra/Phase3PathNavigation/PathNavigationContracts.csproj",
+      "Configuration": "Release",
+      "Target": "Rebuild",
+      "ExitCode": 0,
+      "BuildErrors": 0,
+      "BuildWarnings": null,
+      "Log": "artifacts/phase4-search-regression-speed-ready/path-navigation-build.log",
+      "LogSha256": "62418F8FD0ADA34232B97BD237D59C256E72869F487961AF87EC278AA2BD8AD0",
+      "Assembly": "tests-extra/Phase3PathNavigation/bin/Release/net10.0/PathNavigationContracts.dll",
+      "AssemblySha256": "7AA1D9FB8BC668B7021D659BC9264A2770B2424775C13AF1A55FEA5B276DF0E2",
+      "RuntimeConfigSha256": "C230A317A54DD960BCBEB5F347F52E18DC665A26F7EFDA2159FCED9A5AC7E097",
+      "CopiedInteropSha256": null
+    },
+    {
+      "Project": "tests-extra/Phase3WorkingDirectory/WorkingDirectoryContracts.csproj",
+      "Configuration": "Release",
+      "Target": "Rebuild",
+      "ExitCode": 0,
+      "BuildErrors": 0,
+      "BuildWarnings": null,
+      "Log": "artifacts/phase4-search-regression-speed-ready/working-directory-build.log",
+      "LogSha256": "E96BE0E3A1406339FF13F86CAE6E61D59841A47031D10A063A4F6FD06A55BF96",
+      "Assembly": "tests-extra/Phase3WorkingDirectory/bin/Release/net10.0/WorkingDirectoryContracts.dll",
+      "AssemblySha256": "AAB56FEDC6A030DC9EA9B8D466CD4941BDBFAE53DF57413FACB5ECF208DF9B1B",
+      "RuntimeConfigSha256": "C230A317A54DD960BCBEB5F347F52E18DC665A26F7EFDA2159FCED9A5AC7E097",
+      "CopiedInteropSha256": null
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Configuration": "Release",
+      "Target": "Rebuild",
+      "ExitCode": 0,
+      "BuildErrors": 0,
+      "BuildWarnings": null,
+      "Log": "artifacts/phase4-search-regression-speed-ready/shell-navigation-build.log",
+      "LogSha256": "61EE2891668C4E8122F087BD915B804822E20E0C008EE771319044D948C2F2E7",
+      "Assembly": "tests-extra/Phase3Navigation/bin/Release/net10.0/NavigationContracts.dll",
+      "AssemblySha256": "83AC0303DE8A68A4B9D6CDCAD5427130D68D042856C8D612591AC55A859AB7B1",
+      "RuntimeConfigSha256": "C230A317A54DD960BCBEB5F347F52E18DC665A26F7EFDA2159FCED9A5AC7E097",
+      "CopiedInteropSha256": null
+    },
+    {
+      "Project": "tests-extra/Adaptive/AdaptiveContracts.csproj",
+      "Configuration": "Release",
+      "Target": "Rebuild",
+      "ExitCode": 0,
+      "BuildErrors": 0,
+      "BuildWarnings": null,
+      "Log": "artifacts/phase4-search-regression-speed-ready/adaptive-build.log",
+      "LogSha256": "00C2F85BE0115C06E0A907E2CB173E4A9D7F59C664943D593DBCB2BE8C7AAB9F",
+      "Assembly": "tests-extra/Adaptive/bin/Release/net10.0/AdaptiveContracts.dll",
+      "AssemblySha256": "C1CF1797DB0D4FB15EC9A23D8EA06E9F26A1F1946DE9D9ACE4EFA5E576D0FD71",
+      "RuntimeConfigSha256": "C230A317A54DD960BCBEB5F347F52E18DC665A26F7EFDA2159FCED9A5AC7E097",
+      "CopiedInteropSha256": null
+    },
+    {
+      "Project": "tests-extra/Search/Search.Tests.csproj",
+      "Configuration": "Release",
+      "Target": "Rebuild",
+      "ExitCode": 0,
+      "BuildErrors": 0,
+      "BuildWarnings": null,
+      "Log": "artifacts/phase4-search-regression-speed-ready/native-search-build.log",
+      "LogSha256": "95BFFB1A236EC8256C833BAC35C8CAC37AB9A8BEF20C576C43ECFB55E194C18D",
+      "Assembly": "tests-extra/Search/bin/Release/net10.0-windows10.0.26100.0/Search.Tests.dll",
+      "AssemblySha256": "41E904227869E96F08E92B441E40C7585F9DD82123B8BA100D93866527D4BFDE",
+      "RuntimeConfigSha256": "3E965CD7CFD553C2FF4E842D8D8019AAAE2DA0A21D92FF85A87573DD8D1B95C6",
+      "CopiedInteropSha256": "9240A280516BC5FC8454A8072A96C2D55F14559AEA86A0ACDAF9F2752510F350"
+    },
+    {
+      "Project": "benchmarks/Search/Search.csproj",
+      "Configuration": "Release",
+      "Target": "Rebuild",
+      "ExitCode": 0,
+      "BuildErrors": 0,
+      "BuildWarnings": null,
+      "Log": "artifacts/phase4-search-regression-speed-ready/traversal-build.log",
+      "LogSha256": "5079A8BEB4AEA3C30F4B89D94FB930A56872EEEAB3F80E2A2ADCF0DC4D26173D",
+      "Assembly": "benchmarks/Search/bin/Release/net10.0-windows10.0.26100.0/FilesTurbo.SearchBench.dll",
+      "AssemblySha256": "6C7DF3B83E09EDFD666DD44E03BD53C96421EF7E3B4E9F3A0F5745292D0663EE",
+      "RuntimeConfigSha256": "3E965CD7CFD553C2FF4E842D8D8019AAAE2DA0A21D92FF85A87573DD8D1B95C6",
+      "CopiedInteropSha256": "9240A280516BC5FC8454A8072A96C2D55F14559AEA86A0ACDAF9F2752510F350"
+    },
+    {
+      "Project": "benchmarks/Phase3/Search/SearchPipeline.csproj",
+      "Configuration": "Release",
+      "Target": "Rebuild",
+      "ExitCode": 0,
+      "BuildErrors": 0,
+      "BuildWarnings": null,
+      "Log": "artifacts/phase4-search-regression-speed-ready/suggestions-build.log",
+      "LogSha256": "F27785B4C5445BACA2FC151F61A11BB623CF2A28496D2CE6C20EDD16E7A70D25",
+      "Assembly": "benchmarks/Phase3/Search/bin/Release/net10.0-windows10.0.26100.0/SearchPipeline.dll",
+      "AssemblySha256": "30125B3D6FFF026C33A2246EDF4CB13181949276EEEF73251605172FBD5DCAD1",
+      "RuntimeConfigSha256": "3E965CD7CFD553C2FF4E842D8D8019AAAE2DA0A21D92FF85A87573DD8D1B95C6",
+      "CopiedInteropSha256": "9240A280516BC5FC8454A8072A96C2D55F14559AEA86A0ACDAF9F2752510F350"
+    }
+  ],
+  "CompiledSources": [
+    {
+      "Project": "tests-extra/Phase3PathNavigation/PathNavigationContracts.csproj",
+      "Path": "source/src/Files.App/Helpers/Navigation/LatestPathNavigationCoordinator.cs",
+      "Sha256": "188FBEBA9E0834F7808FC5A66DD118E9959360A2F08F80434B374043E4A0F8C5"
+    },
+    {
+      "Project": "tests-extra/Phase3PathNavigation/PathNavigationContracts.csproj",
+      "Path": "tests-extra/Phase3PathNavigation/PathCore.generated.cs",
+      "Sha256": "82E27D258F89156F804118C91B3188BBBC04F3A0767DF990468E8252ED7F1433"
+    },
+    {
+      "Project": "tests-extra/Phase3PathNavigation/PathNavigationContracts.csproj",
+      "Path": "tests-extra/Phase3PathNavigation/PathNavigationContracts.csproj",
+      "Sha256": "4170B5E14A76EE6F60F28F1FAB8AE201F10708653E107D82F1926DD5679757F7"
+    },
+    {
+      "Project": "tests-extra/Phase3PathNavigation/PathNavigationContracts.csproj",
+      "Path": "tests-extra/Phase3PathNavigation/Program.cs",
+      "Sha256": "E43706F2E6B38DE6854DDCD22B3C530353B49966BC0211DBBB59F90CB5B4ED9E"
+    },
+    {
+      "Project": "tests-extra/Phase3PathNavigation/PathNavigationContracts.csproj",
+      "Path": "tests-extra/Phase3PathNavigation/Substitutes.cs",
+      "Sha256": "81A066C9CFF24DF9C9CC9F89EEABE7252E3F24711F8218E9619D85CE8D738F35"
+    },
+    {
+      "Project": "tests-extra/Phase3WorkingDirectory/WorkingDirectoryContracts.csproj",
+      "Path": "tests-extra/Phase3WorkingDirectory/BreadcrumbCore.generated.cs",
+      "Sha256": "83AA4030986C8093CB3850D118706D00935A87884948CF2EC486B5BE073A9C5E"
+    },
+    {
+      "Project": "tests-extra/Phase3WorkingDirectory/WorkingDirectoryContracts.csproj",
+      "Path": "tests-extra/Phase3WorkingDirectory/FolderThumbnailCore.generated.cs",
+      "Sha256": "94F05C303AB1FFA29D4333AEFDE192D16F052AC4BE0C01469C2681B1A7FFC130"
+    },
+    {
+      "Project": "tests-extra/Phase3WorkingDirectory/WorkingDirectoryContracts.csproj",
+      "Path": "tests-extra/Phase3WorkingDirectory/ModernRouteCore.generated.cs",
+      "Sha256": "0F6D0BE35B8855407967302F92AC5BEEDEDADE7FED626A7B52BF665823FDBC9E"
+    },
+    {
+      "Project": "tests-extra/Phase3WorkingDirectory/WorkingDirectoryContracts.csproj",
+      "Path": "tests-extra/Phase3WorkingDirectory/Program.cs",
+      "Sha256": "A2C6A6AF04D2E2BBEB9B306B405A5982BE2AE6B9AA04ECE64BA461A6970B3437"
+    },
+    {
+      "Project": "tests-extra/Phase3WorkingDirectory/WorkingDirectoryContracts.csproj",
+      "Path": "tests-extra/Phase3WorkingDirectory/Substitutes.cs",
+      "Sha256": "FB67EFBC60DE09A72CEFA0D46C01DB21605C8DEA0E7224DB10542879714DA81C"
+    },
+    {
+      "Project": "tests-extra/Phase3WorkingDirectory/WorkingDirectoryContracts.csproj",
+      "Path": "tests-extra/Phase3WorkingDirectory/WorkingDirectoryContracts.csproj",
+      "Sha256": "424052DA39AE8A154F36013487C38719A6C525B20F95DF4EBC1214B0BBFBE039"
+    },
+    {
+      "Project": "tests-extra/Phase3WorkingDirectory/WorkingDirectoryContracts.csproj",
+      "Path": "tests-extra/Phase3WorkingDirectory/WorkingDirectoryCore.generated.cs",
+      "Sha256": "46A599616681E1FB3DD1F69D43E9F2A3F3957EE35B88FB3B9B8B97C3D97C2FFE"
+    },
+    {
+      "Project": "tests-extra/Phase3WorkingDirectory/WorkingDirectoryContracts.csproj",
+      "Path": "tests-extra/Phase3WorkingDirectory/WorkingDirectoryPending.generated.cs",
+      "Sha256": "C70C18AE43912E762591BF770D2C347E03CCD411F37BA1AA11251B5D7B096FAC"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "source/src/Files.App/Helpers/CollectionDebugView.cs",
+      "Sha256": "29CDACF408D3533591F91C2610812C1C72627DA1C45AAC0D7E381727661BF176"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "source/src/Files.App/Helpers/IntervalSampler.cs",
+      "Sha256": "7B4F2399717356AFE7CFA8AF39402CE8AE2442ACC9D2001348C69D6D543298F2"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Collection/BlockingListEnumerator.cs",
+      "Sha256": "DDD83B7C5B24014F7004DAE5412B7E2EBBF18AB9C429FA2E2C920F3CA932DAE6"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Collection/BulkConcurrentObservableCollection.cs",
+      "Sha256": "27A648EFA8409C2BC9F019972430F26DB795666786126A8EA02A70B7E8E0E83F"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Collection/ConcurrentCollection.cs",
+      "Sha256": "24CB73D77940F36CA2F33B6B8A60A765048E5B23DA32665E64DDA0A5CD828734"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Collection/GroupedCollection.cs",
+      "Sha256": "478E9AA822732953B2C4A20B30BD677BB806AF04FE18CF3F3BDDE1FDFB632B49"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Collection/IGroupableItem.cs",
+      "Sha256": "06A2E68637323933DAD586C68B43C11CB62F86C89F530E99BF68E7C44C8256D1"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Collection/IGroupedCollectionHeader.cs",
+      "Sha256": "4C51F2594A3458FFBF1F4E7744F53FC9D09F8145FDBDB66A85B081D2129FB2B2"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Collection/SortingHelper.cs",
+      "Sha256": "32684930654910B1D8887FD2EC7A0D04DEFEF86E8414E18D9F85737FDAB53DA2"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Enumerators/StorageEnumerationTask.cs",
+      "Sha256": "B7D2AFE9E2049AA2536070077CC7923674D4160CD3AC4AD8303A771179C7BA44"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Enumerators/UniversalStorageEnumerator.cs",
+      "Sha256": "F3B1BFA630CCB7003CE1E3D24E3A46473432DB0A29C37AF2AADD84FB6954D8BA"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "source/src/Files.Shared/Extensions/LinqExtensions.cs",
+      "Sha256": "1D016B1780A54590C7C739A32DDE52E271D34662C2EDE68A7B910C014269F2FB"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "tests-extra/Phase3Navigation/EnumerationStubs.cs",
+      "Sha256": "ACC0FAE315713EE0DD88A10AA3C66B7482C3347FC03088DB8DF8D939487DA616"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Sha256": "692FA34F9A38A2F92E7D08D0E1F8918FB6BEA985F97E37C9EF82D2E201D290D2"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "tests-extra/Phase3Navigation/Program.cs",
+      "Sha256": "CAB8303A8ED4F4D7D42668B34B366DB3FB88F62E57137CA61CAD08A2CF71CA6B"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "tests-extra/Phase3Navigation/ShellCore.generated.cs",
+      "Sha256": "B05276E34CF1E3177118084942810589EF0B640A1B90E6E607E160E5BB2F652D"
+    },
+    {
+      "Project": "tests-extra/Phase3Navigation/NavigationContracts.csproj",
+      "Path": "tests-extra/Phase3Navigation/ShellStubs.cs",
+      "Sha256": "FE716EDF84FF6ABD75A97A6191BB148A0C7A37BA056F6F3948701589E73184AF"
+    },
+    {
+      "Project": "tests-extra/Adaptive/AdaptiveContracts.csproj",
+      "Path": "source/src/Files.App/Data/Enums/FolderLayoutModes.cs",
+      "Sha256": "4BBDBAE0556F91FCF6E704EF64E1AA61482312A91DFE541EFB7F020D789EE3EA"
+    },
+    {
+      "Project": "tests-extra/Adaptive/AdaptiveContracts.csproj",
+      "Path": "source/src/Files.App/Data/Items/IniSectionDataItem.cs",
+      "Sha256": "677AAB59D1A6D177F6C6E3459C6C0C78DA46E6A4B58DAB5CF53C6866597910DC"
+    },
+    {
+      "Project": "tests-extra/Adaptive/AdaptiveContracts.csproj",
+      "Path": "source/src/Files.App/Helpers/Layout/AdaptiveLayoutHelpers.cs",
+      "Sha256": "78E9727467F4E74CD9B87BFFF713B45E6575EB6620311DB51861EC454F1364AA"
+    },
+    {
+      "Project": "tests-extra/Adaptive/AdaptiveContracts.csproj",
+      "Path": "source/src/Files.Shared/Helpers/FileExtensionHelpers.cs",
+      "Sha256": "C14CEC1C18316C120397D7DC1672310E832673018C7AE5B978A099882E3F27F6"
+    },
+    {
+      "Project": "tests-extra/Adaptive/AdaptiveContracts.csproj",
+      "Path": "tests-extra/Adaptive/AdaptiveContracts.csproj",
+      "Sha256": "9EEA4F36A82D6FDF882DBFE4EF3253D4968084DEAEE767B7E776400C14E8AA30"
+    },
+    {
+      "Project": "tests-extra/Adaptive/AdaptiveContracts.csproj",
+      "Path": "tests-extra/Adaptive/Program.cs",
+      "Sha256": "B52FB705D56517937BEDA0D66B36399D5E26E134B36A1DB4C6AC4CB1E96D9E09"
+    },
+    {
+      "Project": "tests-extra/Adaptive/AdaptiveContracts.csproj",
+      "Path": "tests-extra/Adaptive/Substitutes.cs",
+      "Sha256": "DC86C1C861EF6713881E013E6411D45991AC79979F947CA7F7E27C2912D12B9C"
+    },
+    {
+      "Project": "tests-extra/Search/Search.Tests.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Search/NativeNameSearch.cs",
+      "Sha256": "A0230C0A3FAB756A0FC5F3CCF00C30812615131D906F85058E02FB51C8FC3120"
+    },
+    {
+      "Project": "tests-extra/Search/Search.Tests.csproj",
+      "Path": "tests-extra/Search/Program.cs",
+      "Sha256": "CE1EFD3B1C1BBB2B695BE705519D820B4BCAB5DFAABC95734032419081293510"
+    },
+    {
+      "Project": "tests-extra/Search/Search.Tests.csproj",
+      "Path": "tests-extra/Search/Search.Tests.csproj",
+      "Sha256": "3CAD902E9B31685578102786E4140EE985A0B88AD28046A6ECAA6FFF7EE1B974"
+    },
+    {
+      "Project": "benchmarks/Search/Search.csproj",
+      "Path": "benchmarks/Search/Program.cs",
+      "Sha256": "2D52600E4FECAFB9D2500457A5F609392D06D7F74F888C14F696BAAA6CC52D33"
+    },
+    {
+      "Project": "benchmarks/Search/Search.csproj",
+      "Path": "benchmarks/Search/Search.csproj",
+      "Sha256": "40D0828EAF3973D196DAB75892E674E8A0A77A5A0741C06DC6F3864DE9393521"
+    },
+    {
+      "Project": "benchmarks/Search/Search.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Search/NativeNameSearch.cs",
+      "Sha256": "A0230C0A3FAB756A0FC5F3CCF00C30812615131D906F85058E02FB51C8FC3120"
+    },
+    {
+      "Project": "benchmarks/Search/Search.csproj",
+      "Path": "source/src/Files.Shared/Helpers/FileExtensionHelpers.cs",
+      "Sha256": "C14CEC1C18316C120397D7DC1672310E832673018C7AE5B978A099882E3F27F6"
+    },
+    {
+      "Project": "benchmarks/Phase3/Search/SearchPipeline.csproj",
+      "Path": "benchmarks/Phase3/Search/Program.cs",
+      "Sha256": "E88AC4FDF353256BBF99FC53043060EDC80FB1E69AE9E6EAE67D5E04442BF094"
+    },
+    {
+      "Project": "benchmarks/Phase3/Search/SearchPipeline.csproj",
+      "Path": "benchmarks/Phase3/Search/SearchPipeline.csproj",
+      "Sha256": "1F1F58F3B60DC14226B41F696BB5753837026DBB95C3DE172F921F4652716086"
+    },
+    {
+      "Project": "benchmarks/Phase3/Search/SearchPipeline.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Search/NativeNameSearch.cs",
+      "Sha256": "A0230C0A3FAB756A0FC5F3CCF00C30812615131D906F85058E02FB51C8FC3120"
+    },
+    {
+      "Project": "benchmarks/Phase3/Search/SearchPipeline.csproj",
+      "Path": "source/src/Files.App/Utils/Storage/Search/SearchSuggestionPipeline.cs",
+      "Sha256": "8FF54EE9FDDFE4111D861680AB803C9055268EFF1E74576A47BBFBE58C4C7711"
+    },
+    {
+      "Project": "benchmarks/Phase3/Search/SearchPipeline.csproj",
+      "Path": "source/src/Files.Shared/Helpers/FileExtensionHelpers.cs",
+      "Sha256": "C14CEC1C18316C120397D7DC1672310E832673018C7AE5B978A099882E3F27F6"
+    }
+  ],
+  "PreparationInputs": [
+    {
+      "Path": "source/src/Files.App/ViewModels/UserControls/NavigationToolbarViewModel.cs",
+      "Sha256": "50FBACE19B050CD1C54B8DDFAFD3AA66872C4250F09A72BF1A08B2036116ABD0"
+    },
+    {
+      "Path": "source/src/Files.App/ViewModels/ShellViewModel.cs",
+      "Sha256": "3A68AD18E014C7C420614D93804667105F1E5699041F41D6F960407939555540"
+    },
+    {
+      "Path": "source/src/Files.App/Views/Shells/BaseShellPage.cs",
+      "Sha256": "3D6E9B7B2814EC2B6A15DBE2752E975425401575E60826890B380E4E13756A22"
+    },
+    {
+      "Path": "source/src/Files.App/Views/Shells/ModernShellPage.xaml.cs",
+      "Sha256": "4201CFC25076F1BBB4DA55AC9BB022F8CB40767D24B26B317B5864F7BDA94D74"
+    },
+    {
+      "Path": "tests-extra/Phase3PathNavigation/Prepare-PathContracts.ps1",
+      "Sha256": "2776CE1500F4DB7D102A4AC75CCC4ACF9F790D2B9F0A013A39360C883442E075"
+    },
+    {
+      "Path": "tests-extra/Phase3WorkingDirectory/Prepare-WorkingDirectoryContracts.ps1",
+      "Sha256": "53931DC895CCB16EC15BCCB69BAB7976DEF1946F4767F675C2BF89934DAE8387"
+    },
+    {
+      "Path": "tests-extra/Phase3Navigation/Prepare-ShellContracts.ps1",
+      "Sha256": "E650D0899D3064F78D1487D482426A6E6A6FE470579CD612F1AFB7831CBDB43E"
+    },
+    {
+      "Path": "tests-extra/Phase3PathNavigation/source-hash.txt",
+      "Sha256": "5420B0C607C40749D8B47AE7D4DEF45406209BA01EBBE998A3CF1CC172E6AAC1"
+    },
+    {
+      "Path": "tests-extra/Phase3WorkingDirectory/source-hashes.json",
+      "Sha256": "89D7BA89F1A094E7F83BB8D94554B4F2855E5900E65F393AB285C265F4F61384"
+    },
+    {
+      "Path": "tests-extra/Phase3Navigation/source-hash.txt",
+      "Sha256": "5DEE6F5E37A2A67004E46798368D3B1E1E4E3CF109D2442F86ACC287A1C03D1E"
+    },
+    {
+      "Path": "tooling/Enter-WorkspaceEnvironment.ps1",
+      "Sha256": "2AEE379EE982110F0465546353E6784D4723AE4C23FC2F9AD82489A4387D9A3E"
+    },
+    {
+      "Path": "tooling/Test-Phase4FinalContracts.ps1",
+      "Sha256": "CDD753342EE823DCDC4879B4DE1B8F3DA116D321E88FAB05A0ABC7ED80EDB116"
+    }
+  ],
+  "InteropReference": {
+    "Path": "source/src/Files.App.CsWin32/bin/x64/Release/net10.0-windows10.0.26100.0/win-x64/Files.App.CsWin32.dll",
+    "Sha256": "9240A280516BC5FC8454A8072A96C2D55F14559AEA86A0ACDAF9F2752510F350"
+  },
+  "FreshSearchFixture": "artifacts/phase4-search-regression-speed-ready/fixture",
+  "FixtureFileSystem": "NTFS",
+  "BuildErrors": 0,
+  "BuildErrorsScope": "Number of contract rebuilds with a nonzero exit code; exact compiler diagnostics are retained in each build log.",
+  "BuildWarningsScope": "Summary count from isolated harness build logs when present; no assertion of application warning delta.",
+  "Sdk": "10.0.401",
+  "DotnetPath": "tooling/dotnet-10.0.401/dotnet.exe",
+  "DotnetRuntimes": [
+    "Microsoft.AspNetCore.App 10.0.12 [C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\tooling\\dotnet-10.0.401\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.NETCore.App 10.0.12 [C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\tooling\\dotnet-10.0.401\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.WindowsDesktop.App 10.0.12 [C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\tooling\\dotnet-10.0.401\\shared\\Microsoft.WindowsDesktop.App]"
+  ],
+  "CurrentAction": "Complete",
+  "Failure": null
+}

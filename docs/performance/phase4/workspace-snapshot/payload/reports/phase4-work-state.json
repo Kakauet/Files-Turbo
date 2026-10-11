@@ -1,0 +1,54 @@
+{
+  "State": "final-delivery-awaiting-evidence-snapshot-and-verification",
+  "SourceCommit": "bf4390ee0a2eed6cece0e99d1a021ce7fd255574",
+  "CurrentVersion": "4.2.39.9",
+  "Build": "phase4-managed-release-08",
+  "Delivery": "artifacts/development-layout/managed-release-phase4-final07",
+  "ContractsPassed": 327,
+  "ContractsFailed": 0,
+  "Images": {
+    "AllP95Ms": 733.34789,
+    "Visible": 52,
+    "AllMedianMs": 659.7923,
+    "FirstMedianMs": 524.18175,
+    "AllVsPhaseIIIReductionPercent": 50.05,
+    "Samples": 10
+  },
+  "FirstVisit": {
+    "Samples": 3,
+    "All52Ms": [
+      1259.183,
+      1025.6664,
+      1099.5516
+    ],
+    "GloballyCold": false
+  },
+  "Ui": {
+    "RapidCycles": 20,
+    "PassedOperations": 7,
+    "RapidSubmissions": 140,
+    "PendingOperations": [
+      "Create folder",
+      "New tab",
+      "Sort",
+      "Layout"
+    ],
+    "Navigation": 40,
+    "ScrollMoves": 60
+  },
+  "DeliveredProcessId": 38424,
+  "Diagnostics": "Off",
+  "Remaining": [
+    "Final report freeze",
+    "Workspace evidence snapshot",
+    "Local recovery tag",
+    "Final verification"
+  ],
+  "Limitations": [
+    "No physical FPS measurement",
+    "No equivalent Explorer thumbnail timing",
+    "1k median and intermediate video comparison regressions",
+    "No broad daily-use or all-provider coverage"
+  ],
+  "UpdatedUtc": "2026-10-11T18:33:56.3713140Z"
+}

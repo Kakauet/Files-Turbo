@@ -1,0 +1,64 @@
+{
+  "CreatedUtc": "2026-10-11T15:56:07.4021492Z",
+  "FixturePath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks\\media-phase4-edge",
+  "Scope": "Synthetic edge cases only; no user media, Shell extraction or system cache manipulation. Expected display is a reference, not evidence of provider support.",
+  "ScriptSHA256": "2282B4EE714EDA6A811C67DC6CF452EA9A8A2CE37234FDFF285C096467FDB380",
+  "FfmpegVersion": "ffmpeg version 8.0.1-full_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers",
+  "WebpStatus": "Created: libwebp lossless",
+  "Files": [
+    {
+      "Name": "alpha-regions.png",
+      "Kind": "PNG alpha",
+      "Width": 1024,
+      "Height": 1024,
+      "Expected": "Transparent margins; red opaque, green alpha160, blue alpha80; opaque fine lines at bottom.",
+      "Bytes": 18132,
+      "SHA256": "986565F5DF9FFF29116A39E7197429EC924E0458E2B0087269C9631F13E4EC83"
+    },
+    {
+      "Name": "orientation-6.jpg",
+      "Kind": "JPEG EXIF orientation6",
+      "Width": 1024,
+      "Height": 512,
+      "Expected": "Display portrait512x1024: TL blue, TR red, BL yellow, BR green. Raw pixels1024x512; no embedded thumbnail.",
+      "Bytes": 28298,
+      "SHA256": "A5FBB4B167C29B27AF07EA2A97A6B7BBE8517B69D60F18EF2064B80761388AB9"
+    },
+    {
+      "Name": "orientation-6-reference.png",
+      "Kind": "PNG orientation reference",
+      "Width": 512,
+      "Height": 1024,
+      "Expected": "Pixel reference for the expected clockwise EXIF orientation; rotated labels are intentional.",
+      "Bytes": 17728,
+      "SHA256": "005A014DBD453DE5A537C91B8DD32A45962C72967873227A497C527A33C18850"
+    },
+    {
+      "Name": "corrupt-truncated.png",
+      "Kind": "Intentionally corrupt PNG",
+      "Width": 0,
+      "Height": 0,
+      "Expected": "Signature and truncated header only. Thumbnail failure/fallback expected; must not block subsequent files.",
+      "Bytes": 15,
+      "SHA256": "FB5532B5CFBF54A6E4790750146178A10014DC46C28C21081E1FB55E2181122A"
+    },
+    {
+      "Name": "vector-no-embedded-thumbnail.pdf",
+      "Kind": "PDF without embedded thumbnail",
+      "Width": 240,
+      "Height": 300,
+      "Expected": "Valid one-page vector PDF. Installed providers may produce a thumbnail; generic icon is also a supported outcome.",
+      "Bytes": 758,
+      "SHA256": "B78A0214225DD9F8275B04210FE1316E662AD736E51200AE14EB41E2D87BA774"
+    },
+    {
+      "Name": "alpha-lossless.webp",
+      "Kind": "Lossless WebP alpha",
+      "Width": 1024,
+      "Height": 1024,
+      "Expected": "Same alpha regions as PNG. Actual Shell thumbnail support depends on installed codecs/providers.",
+      "Bytes": 326,
+      "SHA256": "82E7E907B7DA04F1F68361AB438DC451DEAEB1BDF9D172B45AF61337BBD78C59"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "Status": "superseded-never-registered-not-measured",
+  "Delivery": "artifacts/development-layout/managed-release-phase4-final04",
+  "AppBuild": "phase4-managed-release-05",
+  "SourceCommit": "e9035aed70a1620ab13c2282e94a7b47facbd2b5",
+  "Reason": "Added missing WinRT cast metadata to avoid new CsWinRT1034 warning. Final delivery will use fresh build06 final05 and full source/PDB/package validation.",
+  "CapturedUtc": "2026-10-11T17:26:39.3717312Z"
+}

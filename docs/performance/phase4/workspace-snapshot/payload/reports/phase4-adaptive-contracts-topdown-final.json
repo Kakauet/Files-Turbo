@@ -1,0 +1,96 @@
+{
+  "TimestampUtc": "2026-10-11T16:48:02.6972333Z",
+  "ProductionSource": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source/src/Files.App/Helpers/Layout/AdaptiveLayoutHelpers.cs",
+  "SourceSha256": "78E9727467F4E74CD9B87BFFF713B45E6575EB6620311DB51861EC454F1364AA",
+  "Passed": 17,
+  "Failed": 0,
+  "Results": [
+    {
+      "Name": "EveryExistingAudioVideoImageExtension",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "CaseInsensitiveExtensions",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "NonMediaAndUnknownExtensions",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "ExactSixtyPercentRemainsDetails",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "AboveSixtyPercentUsesGrid",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "EmptyDoesNotChangeLayout",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "FolderDenominatorAndStoredExtensionPreserved",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "ShortcutUsesOwnExtensionAndNotTarget",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "PrimaryFolderZipRemainsDetails",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "RelativeExtensionFolderDoesNotChangeKnownMetadata",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "DesktopIniPicturesAndVideosOverrideCount",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "DesktopIniOtherModeRemainsDetails",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "UserFixedSharedAndDisabledSettingsPreserved",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "AlreadyChosenLayoutDoesNotToggle",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "PredictionUnknownPathFallsBack",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "PredictionUsesSameExtensionSet",
+      "Passed": true,
+      "Error": ""
+    },
+    {
+      "Name": "HundredThousandKnownExtensionsNoItemPathAccess",
+      "Passed": true,
+      "Error": ""
+    }
+  ],
+  "SyntheticFixture": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\benchmarks/fixtures/adaptive-contracts-a8554f244baf472bb42cfccf801a372b",
+  "Scope": "Full linked AdaptiveLayoutHelpers; UI/service/ListedItem dependencies substituted; no WinUI frame claim"
+}

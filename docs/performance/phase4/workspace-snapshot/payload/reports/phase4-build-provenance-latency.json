@@ -1,0 +1,93 @@
+{
+  "VerifiedUtc": "2026-10-11T17:29:28.4665990Z",
+  "Status": "compiled-source-and-packaged-assembly-match",
+  "Scope": "SHA256 Portable PDB checksums of every changed/new production C# file under src since Phase IV start; PDB CodeView identity; packaged assembly equality. XAML, package manifest and CsWin32 declarations have separate input hashes. No runtime verdict.",
+  "PhaseIIIStartCommit": "1b66432ad3baf122aa4e608b67ea47a5401a78ed",
+  "SourceCommit": "95fe88371b6795d935a71e562db2532a74d8b902",
+  "SourceWorkingTreeDirty": false,
+  "Delivery": "artifacts\\development-layout\\managed-release-phase4-final05",
+  "ChangedCSharpCount": 8,
+  "Assemblies": [
+    {
+      "Assembly": "Files.dll",
+      "LayoutPath": "Files.dll",
+      "SHA256": "7AA38E94DCF2500A6E0600235112E4741A146C573628523D0B5BF9FB59D02238",
+      "PdbPath": "source\\src\\Files.App\\bin\\x64\\Release\\net10.0-windows10.0.26100.0\\win-x64\\Files.pdb",
+      "PdbSHA256": "CCE2501189843B6DD0DD080384A63763DB0B1C0D65556C97DE339C3B0DFD0FC5",
+      "PdbIdentityMatchesAssembly": true
+    },
+    {
+      "Assembly": "Files.App.CsWin32.dll",
+      "LayoutPath": "Files.App.CsWin32.dll",
+      "SHA256": "4713A197298943FD4CC92058F7D22D2A250D1789B295C0708D78A6B2B108E165",
+      "PdbPath": "source\\src\\Files.App.CsWin32\\bin\\x64\\Release\\net10.0-windows10.0.26100.0\\win-x64\\Files.App.CsWin32.pdb",
+      "PdbSHA256": "8FA43F945FEA5BECF73B5DC4CD5086C08F47444E1B8012F2CF9644F1B7814B48",
+      "PdbIdentityMatchesAssembly": true
+    },
+    {
+      "Assembly": "Files.App.Storage.dll",
+      "LayoutPath": "Files.App.Storage.dll",
+      "SHA256": "9FFF044E72A3A2290EA5150DD0B187D31B07844B8425C958BDA589922278957C",
+      "PdbPath": "source\\src\\Files.App.Storage\\bin\\x64\\Release\\net10.0-windows10.0.26100.0\\win-x64\\Files.App.Storage.pdb",
+      "PdbSHA256": "61A41E1882F08702A347FE6A7473CD3332B212F10CC78804605BFF6FFD9502F9",
+      "PdbIdentityMatchesAssembly": true
+    }
+  ],
+  "Documents": [
+    {
+      "Path": "src/Files.App/Helpers/BitmapHelper.cs",
+      "SHA256": "4C03835B71B8128D4DD38615595A929E0D5FE1EED66EE52A8ACD1BF632258163",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App/Helpers/ViewportWorkQueue.cs",
+      "SHA256": "50FFB3A7BC883DEEE7C540093EF25D985035101C70A722616265D82260B1C9AF",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App/Utils/Storage/Helpers/FileThumbnailHelper.cs",
+      "SHA256": "D1AFB73B74B4F39CF38B8398A6CF6FD1E58FD7B7510CAA5FAF0FD2246B946884",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App/Utils/Storage/Search/FolderSearch.cs",
+      "SHA256": "1BD4682F4F1823003CDA310129D42BA365A90586C6C13CC63CDCF582F3061576",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App/ViewModels/ShellViewModel.cs",
+      "SHA256": "9CD1C2E2F9969964AFBF3159F10C590A965785BB62D83F9F50D4FA2E67D260CD",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App/Views/Layouts/BaseLayoutPage.cs",
+      "SHA256": "033EA86E897B877298FA6F5AC4B714A8F16FACDEBE68D39A7B02F1459ADBF300",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App/Views/Shells/BaseShellPage.cs",
+      "SHA256": "3D6E9B7B2814EC2B6A15DBE2752E975425401575E60826890B380E4E13756A22",
+      "Assembly": "Files.dll"
+    },
+    {
+      "Path": "src/Files.App.Storage/Windows/Managers/STATask.cs",
+      "SHA256": "DF132C791F4043A85974EDE9623699CD0131C838B952F8DCF855F0209F0E8216",
+      "Assembly": "Files.App.Storage.dll"
+    }
+  ],
+  "SourceInputs": [
+    {
+      "Path": "src/Files.App/Package.appxmanifest",
+      "SHA256": "56345AF4E108DE3CA08D5B4B44619A56B31290363EC25A3DB5A73E4DF4FF88FA",
+      "CheckKind": "source-input-hash-not-a-portable-PDB-document"
+    }
+  ],
+  "Manifest": {
+    "Path": "src/Files.App/Package.appxmanifest",
+    "SourceSHA256": "56345AF4E108DE3CA08D5B4B44619A56B31290363EC25A3DB5A73E4DF4FF88FA",
+    "Publisher": "CN=Files",
+    "Version": "4.2.39.7",
+    "Identity": "FilesTurbo.Experimental",
+    "LayoutSHA256": "91168026917F9B5903856AAD0DEAB18B30839F436FDB6515768FCAE5F1D6E0C9"
+  }
+}

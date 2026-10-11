@@ -1,0 +1,84 @@
+{
+  "Source": {
+    "SourcePath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Views\\Layouts\\BaseLayoutPage.cs",
+    "SourceSha256": "081D8C804441FA2821E23BA6BC9AF6BC0CFE919D6690BB7D25E9AA7ED162863A",
+    "QueuePath": "C:\\Users\\guill\\Documents\\ChatGPT\\Files Fast\\source\\src\\Files.App\\Helpers\\ViewportWorkQueue.cs",
+    "QueueSha256": "50FFB3A7BC883DEEE7C540093EF25D985035101C70A722616265D82260B1C9AF",
+    "GeneratedSha256": "161DC96990B9C376266C936B37FA4AD6CF699FFC1C1A7914C768B6FE1C41ADBB",
+    "Scope": "Literal production handoff, bounded retries, reload, visible enumeration and reprioritization; real queue. Shell/WinUI/viewport surfaces are controlled doubles."
+  },
+  "Results": [
+    {
+      "Name": "metadata_failure_retries_same_row_without_duplicate_thumbnail",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "metadata_capacity_rejection_refills_without_duplicate_thumbnails",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "new_visible_metadata_evicts_pending_cached_row_without_reextracting_thumbnail",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "invalidated_thumbnail_stage_reextracts_before_retrying_metadata",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "git_version_change_keeps_thumbnail_and_loads_new_git_properties",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "disposed_handoff_does_not_initialize_metadata",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "visible_rows_start_in_vertical_order_despite_realization_order",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "missing_visible_range_coalesces_reverse_callbacks_and_starts_top_four_first",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "missing_visible_range_coalesces_shuffled_callbacks_and_starts_top_four_first",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "reload_prioritizes_vertical_visible_indices_before_cached_rows",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "reload_before_queue_creation_keeps_first_slots_for_visible_top_rows",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "persistent_metadata_failure_has_bounded_immediate_retries",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "leaving_viewport_clears_failure_bound_and_allows_new_attempt",
+      "Passed": true,
+      "Failure": null
+    },
+    {
+      "Name": "persistent_thumbnail_failure_has_bounded_immediate_retries",
+      "Passed": true,
+      "Failure": null
+    }
+  ],
+  "Passed": 14,
+  "Scope": "Exact handoff methods/queue, controlled Shell/dispatcher/viewport. No WinUI or native latency."
+}

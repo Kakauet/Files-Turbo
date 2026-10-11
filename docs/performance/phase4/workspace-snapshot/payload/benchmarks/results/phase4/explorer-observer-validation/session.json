@@ -1,0 +1,22 @@
+{
+  "Status": "CompletedWithTimeouts",
+  "Variant": "Explorer",
+  "StartedUtc": "2026-10-11T15:48:24.4030640Z",
+  "CompletedUtc": "2026-10-11T15:48:37.3507595Z",
+  "Culture": "es-ES",
+  "ProcessId": 2000,
+  "CreatedWindowHandle": 1968622,
+  "CreatedWindowClosed": true,
+  "Scenarios": [
+    "10000"
+  ],
+  "Repetitions": 1,
+  "View": "ShellFolderView CurrentViewMode=4 (Details), scoped to created synthetic window",
+  "ConcurrentBuild": false,
+  "Creation": "Shell.Explore(empty); existing/new ShellWindows compared using HWND only; existing window locations are never read",
+  "Navigation": "COM Navigate2 from verified fixture window; start includes COM call, provider names and cached status count, observer costs included",
+  "CacheState": "Warm/uncontrolled; no global cache manipulation",
+  "PhysicalPresentationMeasured": false,
+  "ThumbnailComparisonAvailable": false,
+  "Limits": "Explorer UIA and COM observer differ from Files ValuePattern. Window bounds may differ. Shared Explorer process CPU/RAM cannot be attributed to this fixture window; no process-wide termination or global settings changes."
+}

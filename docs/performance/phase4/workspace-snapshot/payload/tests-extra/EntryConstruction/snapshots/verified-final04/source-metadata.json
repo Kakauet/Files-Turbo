@@ -1,0 +1,85 @@
+{
+  "PreparedUtc": "2026-10-11T14:17:07.0837765Z",
+  "OriginalReference": "files-turbo-phase3-start",
+  "OriginalCommit": "b18efc91ed3033081691f407a2bb7b5ee3d7d21d",
+  "Scope": "Verbatim production Name property, extension helper, known-file shortcut condition and URL expression, IsZipPath method and CheckForSolutionFile method. Controlled model/settings/collection and filesystem probe counters; not full GetFile or WinUI.",
+  "CurrentSource": [
+    {
+      "Path": "source/src/Files.App/Data/Items/ListedItem.cs",
+      "SHA256": "FB3CD3F911F170758874EFAF4D365D7F55300D080BFD20982A181A8E706C4B86"
+    },
+    {
+      "Path": "source/src/Files.App/Utils/Storage/Enumerators/Win32StorageEnumerator.cs",
+      "SHA256": "7A607C6A0528BC3F51377E7C19CA5BFA909383252B414041B55D5F7381A38C98"
+    },
+    {
+      "Path": "source/src/Files.Shared/Helpers/FileExtensionHelpers.cs",
+      "SHA256": "C14CEC1C18316C120397D7DC1672310E832673018C7AE5B978A099882E3F27F6"
+    },
+    {
+      "Path": "source/src/Files.App/Utils/Storage/StorageItems/ZipStorageFolder.cs",
+      "SHA256": "4EFFFB6F6A70EE6A0AE8D9E6BB6164FA529251B87E21F0424EA99A75DE6FB149"
+    },
+    {
+      "Path": "source/src/Files.App/ViewModels/ShellViewModel.cs",
+      "SHA256": "E7BFC351253F89CC330A2ED1FFD08B873C3280DB34173DCD30EC4D836B3AD25D"
+    }
+  ],
+  "SnapshotName": "verified-final04",
+  "HarnessSource": [
+    {
+      "Path": "tests-extra/EntryConstruction/Program.cs",
+      "SHA256": "8C2AA124973D0B193152EFF77DBB215167638EB47278C44339B36A3B0C6349EB"
+    },
+    {
+      "Path": "tests-extra/EntryConstruction/EntryConstruction.csproj",
+      "SHA256": "D8ED0F81BF1533F90AD9844F382F8E4DB37203D7F30F649C1F77E5BB5B2BB083"
+    },
+    {
+      "Path": "tests-extra/EntryConstruction/Prepare-EntryContracts.ps1",
+      "SHA256": "F97CD68DBB61B6036E223908D41BD3698E8170A39FD36620AFF034B18AC0A7F1"
+    }
+  ],
+  "ExtractedSource": [
+    {
+      "Path": "Current-Classification.cs",
+      "SHA256": "15BF0B8C24F80FB186F4C00603C4E1AFF2067F8152555F397EDD2EC53E01E65F"
+    },
+    {
+      "Path": "Current-Extensions.cs",
+      "SHA256": "6218081F63BA0B66B7C7E42D3651F98DA4AE56FB19AD77F8F3D329B1681CA058"
+    },
+    {
+      "Path": "Current-Name.cs",
+      "SHA256": "00673856D968F6F64F57BAC179B35A61CFB44CA12E6ACB0BA6B76CBADC8BE034"
+    },
+    {
+      "Path": "Current-Solution.cs",
+      "SHA256": "C1A33FA5301D7D9AC11CD62124DA4C31966C2CFADFF913BE154A2287117E94F7"
+    },
+    {
+      "Path": "Current-Zip.cs",
+      "SHA256": "C175BA8F62AD9167F8CB241E99F1D92EE401FCE19B814E37F81E8AD8D7FB2787"
+    },
+    {
+      "Path": "Original-Classification.cs",
+      "SHA256": "3FBF451905130624881994952ADDAEE41B1600FAD09C38F9407874CF6E490939"
+    },
+    {
+      "Path": "Original-Extensions.cs",
+      "SHA256": "4E9D21833120492B1756157EDE499351C41E4CF042935FB3AEBA3CD1C36A308D"
+    },
+    {
+      "Path": "Original-Name.cs",
+      "SHA256": "901E4CCC5E31E09ECC3DF5A1E0547F026ED617517FD36C15215F362C6406B628"
+    },
+    {
+      "Path": "Original-Solution.cs",
+      "SHA256": "EDCD8345D6A8D0B95A2F6DF4501444F78BB6F645C4CD90C2555DED1C347CD1F4"
+    },
+    {
+      "Path": "Original-Zip.cs",
+      "SHA256": "5EF9362DB8E71B52374F62F460CB5EA07C4C2C8B86CD096A55355E2A6A7ACA67"
+    }
+  ]
+}

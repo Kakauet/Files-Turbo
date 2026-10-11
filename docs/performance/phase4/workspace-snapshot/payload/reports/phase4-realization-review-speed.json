@@ -1,0 +1,79 @@
+{
+  "GeneratedUtc": "2026-10-11T17:58:13.4000693Z",
+  "SourceCommit": "081841c996fd02bc24d901ce3092764dd545bc08",
+  "Version": "4.2.39.8",
+  "Scope": "Read-only review of ContainerContentChanging, phase0, tooltip/date work and viewport scheduling. No production changes, builds, UI actions or new performance runs executed for this review.",
+  "Conclusion": "Keep .8 unchanged while the coordinator finishes its measurements. Repeated tooltip setup is a concrete candidate for a later measured change; the review does not establish its latency cost.",
+  "Findings": [
+    {
+      "File": "source/src/Files.App/Views/Layouts/BaseLayoutPage.cs",
+      "Lines": [
+        1700,
+        1724,
+        1734,
+        1739,
+        1740,
+        1748,
+        1789
+      ],
+      "Evidence": "RefreshItem, Loaded and PointerEntered each read ItemTooltipText. The helper applies tooltip text and Mouse placement to both the container and realized template root without checking existing values. RefreshItem plus Loaded can issue eight dependency-property writes per row when both targets exist."
+    },
+    {
+      "File": "source/src/Files.App/Data/Items/ListedItem.cs",
+      "Lines": [
+        45,
+        317,
+        514,
+        516
+      ],
+      "Evidence": "ItemTooltipText builds a new StringBuilder/string on each read. Modified-date text is cached lazily; IsRealChanges checks already-formatted values, so a fresh item with null formatted strings does not unconditionally format all dates."
+    },
+    {
+      "File": "source/src/Files.App/Services/DateTimeFormatter/AbstractDateTimeFormatter.cs",
+      "Lines": [
+        10
+      ],
+      "Evidence": "CultureInfo is static. Localized strings also have a ConcurrentDictionary fast path in source/src/Files.App/Extensions/StringExtensions.cs:103; this does not support adding another global date/resource cache."
+    }
+  ],
+  "PendingRecommendation": {
+    "Status": "Deferred; not implemented and not timed.",
+    "File": "source/src/Files.App/Views/Layouts/BaseLayoutPage.cs",
+    "Line": 1734,
+    "Change": "Make tooltip writes idempotent: compare ToolTipService.GetToolTip with the requested string using ordinal equality and set Mouse placement only when it differs. Keep phase0, Loaded and hover calls so new template roots and first hover dwell retain their setup.",
+    "ExpectedEffect": "Avoid redundant native property writes. This alone still rebuilds the tooltip string; no material latency improvement is established.",
+    "TopDownRisk": "No direct ordering change: the candidate does not alter coalescing, dispatcher priorities, sorted indices or the bounded 4/128 queues. Any future implementation must retain the current scheduling contracts."
+  },
+  "MeasurementContext": {
+    "Evidence": "benchmarks/results/phase4/thumbnails-speed-final06-images-summary/summary.json",
+    "Diagnostics": "Off",
+    "SamplesPerVersion": 10,
+    "VisiblePictures": 52,
+    "Timeouts": 0,
+    "Metric": "Observed captured-surface detection, P50 and interpolated P95 in milliseconds",
+    "Before": {
+      "Version": "4.2.39.7",
+      "FirstP50Ms": 650.1355,
+      "FirstP95Ms": 786.140635,
+      "All52P50Ms": 1219.1006499999999,
+      "All52P95Ms": 1382.24296
+    },
+    "After": {
+      "Version": "4.2.39.8",
+      "FirstP50Ms": 541.5373500000001,
+      "FirstP95Ms": 589.82239,
+      "All52P50Ms": 708.90185,
+      "All52P95Ms": 796.272815
+    },
+    "P50ReductionPercent": {
+      "First": 16.7,
+      "All52": 41.85
+    },
+    "Attribution": "The .8 measurements cover its combined changes. They do not measure the deferred tooltip candidate or isolate one production change."
+  },
+  "Limits": [
+    "The older .7 ON trace shows coalesced-pass waiting, not a measured per-row tooltip cost. Gaps between realization/request markers also contain template creation and other work before the next BaseLayoutPage callback.",
+    "Raising or running the pass inline could reserve the first four jobs from an incomplete or reversed realization sequence; keep the coalesced ascending-index scheduling.",
+    "Captured-surface detection includes UIA, polling and capture overhead; warm/uncontrolled caches and unalternated runs limit comparison. Ten samples do not establish tail guarantees, physical presentation, CPU or FPS."
+  ]
+}
