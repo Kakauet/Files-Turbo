@@ -13,30 +13,48 @@ namespace Files.App.Services
 		// Dummy path to generate generic icons for folders, executables, and shortcuts.
 		private static readonly string _dummyPath = Path.Combine(Path.GetPathRoot(Environment.SystemDirectory)!, "x46696c6573");
 
-		private readonly ConcurrentDictionary<string, byte[]?> _cache = new();
-		private readonly ConcurrentDictionary<string, BitmapImage> _imageCache = new();
+		private readonly ConcurrentDictionary<IconCacheKey, Lazy<Task<byte[]?>>> _cache = new();
+		private readonly ConcurrentDictionary<IconCacheKey, BitmapImage> _imageCache = new();
 
-		public async Task<byte[]?> GetIconAsync(string? itemPath, string? extension, bool isFolder, uint size)
+		public Task<byte[]?> GetIconAsync(string? itemPath, string? extension, bool isFolder, uint size)
 		{
-			var key = $"{(isFolder ? ":folder:" : (extension?.ToLowerInvariant() ?? ":noext:"))}:{size}";
+			var key = GetCacheKey(extension, isFolder, size);
 
 			if (_cache.TryGetValue(key, out var cached))
-				return cached;
+				return cached.Value;
 
-			// Always use the dummy path so the shell resolves the generic type icon from the
-			// extension alone. This works correctly for all path types (local, MTP, FTP, network,
-			// cloud, etc.) because the cache is keyed by extension anyway, not by item identity.
-			// Folders use a real path so the exact-size extraction succeeds and matches per-item icons.
-			var iconPath = isFolder ? Environment.SystemDirectory : (string.IsNullOrEmpty(extension) ? _dummyPath : _dummyPath + extension);
+			return GetOrCreateIconAsync(key, extension, isFolder, size);
+		}
 
-			var icon = await FileThumbnailHelper.GetIconAsync(
-				iconPath,
-				size,
-				isFolder,
-				IconOptions.ReturnIconOnly);
+		private Task<byte[]?> GetOrCreateIconAsync(IconCacheKey key, string? extension, bool isFolder, uint size)
+		{
+			Lazy<Task<byte[]?>>? entry = null;
+			entry = new(() => LoadIconAsync(key, extension, isFolder, size, entry!));
+			return _cache.GetOrAdd(key, entry).Value;
+		}
 
-			_cache.TryAdd(key, icon);
-			return icon;
+		private async Task<byte[]?> LoadIconAsync(IconCacheKey key, string? extension, bool isFolder, uint size, Lazy<Task<byte[]?>> entry)
+		{
+			try
+			{
+				// Always use the dummy path so the shell resolves the generic type icon from the
+				// extension alone. This works correctly for all path types (local, MTP, FTP, network,
+				// cloud, etc.) because the cache is keyed by extension anyway, not by item identity.
+				// Folders use a real path so the exact-size extraction succeeds and matches per-item icons.
+				var iconPath = isFolder ? Environment.SystemDirectory : (string.IsNullOrEmpty(extension) ? _dummyPath : _dummyPath + extension);
+
+				return await FileThumbnailHelper.GetIconAsync(
+					iconPath,
+					size,
+					isFolder,
+					IconOptions.ReturnIconOnly);
+			}
+			catch
+			{
+				// Retry failures without removing a replacement created after Clear.
+				_cache.TryRemove(new KeyValuePair<IconCacheKey, Lazy<Task<byte[]?>>>(key, entry));
+				throw;
+			}
 		}
 
 		public async Task<BitmapImage?> GetIconImageAsync(string? itemPath, string? extension, bool isFolder, uint size)
@@ -45,7 +63,7 @@ namespace Files.App.Services
 			if (DispatcherQueue.GetForCurrentThread() is null)
 				return null;
 
-			var key = $"{(isFolder ? ":folder:" : (extension?.ToLowerInvariant() ?? ":noext:"))}:{size}";
+			var key = GetCacheKey(extension, isFolder, size);
 			if (_imageCache.TryGetValue(key, out var cached))
 				return cached;
 
@@ -65,5 +83,10 @@ namespace Files.App.Services
 			_cache.Clear();
 			_imageCache.Clear();
 		}
+
+		private static IconCacheKey GetCacheKey(string? extension, bool isFolder, uint size)
+			=> new(isFolder ? ":folder:" : extension?.ToLowerInvariant() ?? ":noext:", size);
+
+		private readonly record struct IconCacheKey(string Type, uint Size);
 	}
 }

@@ -296,7 +296,7 @@ namespace Files.App.Utils.Taskbar
 			{
 				_lastLaunchDate = DateTime.Now;
 
-				_ = Launcher.LaunchUriAsync(new Uri("files-dev:"));
+				_ = Launcher.LaunchUriAsync(new Uri("files-turbo:"));
 			}
 			else
 				MainWindow.Instance.Activate();
@@ -311,7 +311,7 @@ namespace Files.App.Utils.Taskbar
 		{
 			Microsoft.Windows.AppLifecycle.AppInstance.Restart("");
 
-			var pool = new Semaphore(0, 1, $"Files-{AppLifecycleHelper.AppEnvironment}-Instance", out var isNew);
+			var pool = new Semaphore(0, 1, AppLifecycleHelper.InstanceSemaphoreName, out var isNew);
 			if (!isNew)
 				pool.Release();
 
@@ -326,7 +326,7 @@ namespace Files.App.Utils.Taskbar
 
 				App.AppModel.ForceProcessTermination = true;
 
-				var pool = new Semaphore(0, 1, $"Files-{AppLifecycleHelper.AppEnvironment}-Instance", out var isNew);
+				var pool = new Semaphore(0, 1, AppLifecycleHelper.InstanceSemaphoreName, out var isNew);
 				if (!isNew)
 					pool.Release();
 				else

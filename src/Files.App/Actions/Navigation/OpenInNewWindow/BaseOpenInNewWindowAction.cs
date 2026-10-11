@@ -54,7 +54,7 @@ namespace Files.App.Actions
 			{
 				var targetPath = (listedItem as IShortcutItem)?.TargetPath;
 				var selectedItemPath = !string.IsNullOrEmpty(targetPath) ? targetPath : listedItem.GetRequiredPath();
-				var folderUri = new Uri($"files-dev:?folder={@selectedItemPath}");
+				var folderUri = new Uri($"files-turbo:?folder={@selectedItemPath}");
 
 				await Launcher.LaunchUriAsync(folderUri);
 			}

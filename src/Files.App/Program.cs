@@ -48,7 +48,7 @@ namespace Files.App
 			// paths like "." against the terminal's CWD rather than its own. (#16982)
 			ApplicationData.Current.LocalSettings.Values[LaunchCwdKey] = Environment.CurrentDirectory;
 
-			var pool = new Semaphore(0, 1, $"Files-{AppLifecycleHelper.AppEnvironment}-Instance", out var isNew);
+			var pool = new Semaphore(0, 1, AppLifecycleHelper.InstanceSemaphoreName, out var isNew);
 
 			if (!isNew)
 			{
@@ -273,8 +273,8 @@ namespace Files.App
 			var cmdLaunchArgs = activatedArgs.Data is ILaunchActivatedEventArgs launchArgs &&
 				launchArgs.Arguments is not null &&
 				CommandLineParser.SplitArguments(launchArgs.Arguments, true).FirstOrDefault() is string arg0 &&
-				(arg0.EndsWith($"files-dev.exe", StringComparison.OrdinalIgnoreCase) ||
-				arg0.EndsWith($"files-dev", StringComparison.OrdinalIgnoreCase)) ? launchArgs.Arguments : null;
+				(arg0.EndsWith($"files-turbo.exe", StringComparison.OrdinalIgnoreCase) ||
+				arg0.EndsWith($"files-turbo", StringComparison.OrdinalIgnoreCase)) ? launchArgs.Arguments : null;
 			var cmdProtocolArgs = activatedArgs.Data is IProtocolActivatedEventArgs protocolArgs &&
 				protocolArgs.Uri.Query.TrimStart('?').Split('=') is string[] parsedArgs &&
 				parsedArgs.Length == 2 && parsedArgs[0] == "cmd" ? Uri.UnescapeDataString(parsedArgs[1]) : null;

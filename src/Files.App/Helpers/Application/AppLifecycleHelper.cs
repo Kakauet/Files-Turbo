@@ -27,6 +27,7 @@ namespace Files.App.Helpers
 	public static class AppLifecycleHelper
 	{
 		private readonly static string AppInformationKey = @$"Software\Files Community\{Package.Current.Id.Name}\v1\AppInformation";
+		public static string InstanceSemaphoreName { get; } = $"Files-{Package.Current.Id.FamilyName}-Instance";
 
 		/// <summary>
 		/// Gets the value that indicates whether the app is updated.
@@ -610,7 +611,7 @@ namespace Files.App.Helpers
 						// Try to re-launch and start over
 						MainWindow.Instance.DispatcherQueue.EnqueueOrInvokeAsync(async () =>
 						{
-							await Launcher.LaunchUriAsync(new Uri("files-dev:"));
+							await Launcher.LaunchUriAsync(new Uri("files-turbo:"));
 						})
 						.Wait(100);
 					}

@@ -73,7 +73,7 @@ namespace Files.App.ViewModels.Settings
 			{
 				var sourcePath = Path.Combine(destFolder, "*");
 				var branchPath = Path.Combine(dataPath, "Branch.txt");
-				var command = $"-command \"New-Item -Force -Path {Win32Helper.ToPowerShellStringLiteral(dataPath)} -ItemType Directory; Copy-Item -Filter *.* -Path {Win32Helper.ToPowerShellStringLiteral(sourcePath)} -Recurse -Force -Destination {Win32Helper.ToPowerShellStringLiteral(dataPath)}; 'files-dev' | Out-File -Encoding utf8 -Force -FilePath {Win32Helper.ToPowerShellStringLiteral(branchPath)}\"";
+				var command = $"-command \"New-Item -Force -Path {Win32Helper.ToPowerShellStringLiteral(dataPath)} -ItemType Directory; Copy-Item -Filter *.* -Path {Win32Helper.ToPowerShellStringLiteral(sourcePath)} -Recurse -Force -Destination {Win32Helper.ToPowerShellStringLiteral(dataPath)}; 'files-turbo' | Out-File -Encoding utf8 -Force -FilePath {Win32Helper.ToPowerShellStringLiteral(branchPath)}\"";
 				if (!await Win32Helper.RunPowershellCommandAsync(command, PowerShellExecutionOptions.Hidden))
 				{
 					// Error copying files

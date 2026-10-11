@@ -421,6 +421,10 @@ namespace Files.App.Utils.Storage
 				count = collection.Count;
 				collection.AddRange(items);
 
+				// Ungrouped bulk changes only notify at EndBulkOperation, so no event snapshot is needed.
+				if (isBulkOperationStarted && !IsGrouped)
+					return;
+
 				e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, items.ToList(), count);
 				OnCollectionChanged(e);
 			}
@@ -438,6 +442,9 @@ namespace Files.App.Utils.Storage
 			lock (syncRoot)
 			{
 				collection.InsertRange(index, items);
+
+				if (isBulkOperationStarted && !IsGrouped)
+					return;
 
 				e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, items.ToList(), index);
 				OnCollectionChanged(e);
