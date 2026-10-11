@@ -1800,6 +1800,13 @@ namespace Files.App.Views.Layouts
 			}
 		}
 
+		private async Task UpdateToolTipPropertiesAsync(SelectorItem container, ListedItem item)
+		{
+			if (ParentShellPageInstance?.ShellViewModel is { } viewModel &&
+				await viewModel.LoadToolTipPropertiesAsync(item) && IsCurrentContainer(container, item))
+				UpdateItemToolTip(container, item.ItemTooltipText);
+		}
+
 		[DynamicWindowsRuntimeCast(typeof(SelectorItem))]
 		protected internal void FileListItem_PointerEntered(object sender, PointerRoutedEventArgs e)
 		{
@@ -1808,7 +1815,10 @@ namespace Files.App.Views.Layouts
 				MainWindow.Instance.SetCanWindowToFront(false);
 
 			if (sender is SelectorItem tooltipContainer && tooltipContainer.Content is ListedItem listedItem)
+			{
 				UpdateItemToolTip(tooltipContainer, listedItem.ItemTooltipText);
+				_ = UpdateToolTipPropertiesAsync(tooltipContainer, listedItem);
+			}
 
 			if (!UserSettingsService.FoldersSettingsService.SelectFilesOnHover)
 				return;

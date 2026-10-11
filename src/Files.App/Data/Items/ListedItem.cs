@@ -415,6 +415,8 @@ namespace Files.App.Utils
 
 		}
 
+		internal bool ExtraPropertiesRequested { get; set; }
+
 		private string? imageDimensions;
 		public string? ImageDimensions
 		{
