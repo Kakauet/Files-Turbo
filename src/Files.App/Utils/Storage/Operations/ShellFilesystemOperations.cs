@@ -99,11 +99,10 @@ namespace Files.App.Utils.Storage
 			if (result)
 			{
 				fsProgress.ReportStatus(FileSystemStatusCode.Success);
-				var copiedSources = GetSuccessfulResults(copyResult.Items);
+				var copiedSources = GetSuccessfulResults(copyResult.Items).ToList();
 				if (copiedSources.Any())
 				{
-					var sourceMatch = await copiedSources.Select(x => sourceRename
-						.SingleOrDefault(s => s.Path.Equals(x.Source, StringComparison.OrdinalIgnoreCase))).WhereNotNull().ToListAsync();
+					var sourceMatch = OperationSourceMatch.Match(copiedSources.Select(x => x.Source), sourceRename, s => s.Path);
 
 					return new StorageHistory(
 						FileOperationType.Copy,
@@ -395,17 +394,12 @@ namespace Files.App.Utils.Storage
 			{
 				fsProgress.ReportStatus(FileSystemStatusCode.Success);
 
-				foreach (var item in deleteResult.Items)
-				{
-					if (item.Source is { } itemPath)
-						await ShellViewModel.RemoveFileOrFolderAsync(itemPath);
-				}
+				await ShellViewModel.RemoveFileOrFoldersAsync(deleteResult.Items.Select(item => item.Source).WhereNotNull());
 
-				var recycledSources = GetSuccessfulResults(deleteResult.Items);
+				var recycledSources = GetSuccessfulResults(deleteResult.Items).ToList();
 				if (recycledSources.Any())
 				{
-					var sourceMatch = await recycledSources.Select(x => source.DistinctBy(x => x.Path)
-						.SingleOrDefault(s => s.Path.Equals(x.Source, StringComparison.OrdinalIgnoreCase))).WhereNotNull().ToListAsync();
+					var sourceMatch = OperationSourceMatch.Match(recycledSources.Select(x => x.Source), source, s => s.Path);
 
 					return new StorageHistory(
 						FileOperationType.Recycle,
@@ -549,11 +543,10 @@ namespace Files.App.Utils.Storage
 			{
 				fsProgress.ReportStatus(FileSystemStatusCode.Success);
 
-				var movedSources = GetSuccessfulResults(moveResult.Items);
+				var movedSources = GetSuccessfulResults(moveResult.Items).ToList();
 				if (movedSources.Any())
 				{
-					var sourceMatch = await movedSources.Select(x => sourceRename
-						.SingleOrDefault(s => s.Path.Equals(x.Source, StringComparison.OrdinalIgnoreCase))).WhereNotNull().ToListAsync();
+					var sourceMatch = OperationSourceMatch.Match(movedSources.Select(x => x.Source), sourceRename, s => s.Path);
 
 					return new StorageHistory(FileOperationType.Move,
 						sourceMatch,
@@ -791,11 +784,10 @@ namespace Files.App.Utils.Storage
 			{
 				fsProgress.ReportStatus(FileSystemStatusCode.Success);
 
-				var movedSources = GetSuccessfulResults(moveResult.Items);
+				var movedSources = GetSuccessfulResults(moveResult.Items).ToList();
 				if (movedSources.Any())
 				{
-					var sourceMatch = await movedSources.Select(x => source
-						.SingleOrDefault(s => s.Path.Equals(x.Source, StringComparison.OrdinalIgnoreCase))).WhereNotNull().ToListAsync();
+					var sourceMatch = OperationSourceMatch.Match(movedSources.Select(x => x.Source), source, s => s.Path);
 
 					// Recycle bin also stores a file starting with $I for each item
 					await DeleteItemsAsync(await movedSources.Zip(sourceMatch, (rSrc, oSrc) => new { rSrc, oSrc })

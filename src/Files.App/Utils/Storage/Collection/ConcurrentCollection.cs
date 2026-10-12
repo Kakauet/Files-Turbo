@@ -159,6 +159,24 @@ namespace Files.App.Helpers
 			}
 		}
 
+		/// <summary>Removes every matching item in a single pass and returns them in their former order.</summary>
+		public List<T> RemoveAll(Func<T, bool> match)
+		{
+			var removed = new List<T>();
+			lock (syncRoot)
+			{
+				collection.RemoveAll(item =>
+				{
+					if (!match(item))
+						return false;
+					removed.Add(item);
+					return true;
+				});
+			}
+
+			return removed;
+		}
+
 		public void RemoveAt(int index)
 		{
 			lock (syncRoot)

@@ -3180,8 +3180,33 @@ namespace Files.App.ViewModels
 			const uint FILE_ACTION_RENAMED_NEW_NAME = 0x00000005;
 
 			const int UPDATE_BATCH_SIZE = 32;
+			// Consecutive additions or removals are applied together: one duplicate check or one pass over the
+			// listing per batch instead of a scan of the whole listing per event
+			const int CHANGE_BATCH_SIZE = 256;
 			var sampler = new IntervalSampler(200);
 			var updateQueue = new Queue<string>();
+			var queuedUpdates = new HashSet<string>(StringComparer.Ordinal);
+
+			List<string> TakeRun(string first, uint action, uint otherAction)
+			{
+				var run = new List<string>() { first };
+				while (run.Count < CHANGE_BATCH_SIZE && operationQueue.TryPeek(out var next) &&
+					(next.Action == action || next.Action == otherAction) && operationQueue.TryDequeue(out next))
+					run.Add(next.FileName);
+				return run;
+			}
+
+			List<string> DequeueUpdates()
+			{
+				var items = new List<string>();
+				for (var i = 0; i < UPDATE_BATCH_SIZE && updateQueue.Count > 0; i++)
+				{
+					var path = updateQueue.Dequeue();
+					queuedUpdates.Remove(path);
+					items.Add(path);
+				}
+				return items;
+			}
 
 			var anyEdits = false;
 			ListedItem? lastItemAdded = null;
@@ -3221,19 +3246,19 @@ namespace Files.App.ViewModels
 								{
 									case FILE_ACTION_ADDED:
 									case FILE_ACTION_RENAMED_NEW_NAME:
-										lastItemAdded = await AddFileOrFolderAsync(operation.FileName);
-										if (lastItemAdded is not null)
+										var (lastResult, anyAdded) = await AddFileOrFoldersAsync(TakeRun(operation.FileName, FILE_ACTION_ADDED, FILE_ACTION_RENAMED_NEW_NAME));
+										lastItemAdded = lastResult;
+										if (anyAdded)
 											anyEdits = true;
 										break;
 
 									case FILE_ACTION_MODIFIED:
-										if (!updateQueue.Contains(operation.FileName))
+										if (queuedUpdates.Add(operation.FileName))
 											updateQueue.Enqueue(operation.FileName);
 										break;
 
 									case FILE_ACTION_REMOVED:
-										var itemRemoved = await RemoveFileOrFolderAsync(operation.FileName);
-										if (itemRemoved is not null)
+										if (await RemoveFileOrFoldersAsync(TakeRun(operation.FileName, FILE_ACTION_REMOVED, FILE_ACTION_REMOVED)) > 0)
 											anyEdits = true;
 										break;
 
@@ -3284,21 +3309,11 @@ namespace Files.App.ViewModels
 								await HandleChangesOccurredAsync();
 						}
 
-						var itemsToUpdate = new List<string>();
-						for (var i = 0; i < UPDATE_BATCH_SIZE && updateQueue.Count > 0; i++)
-							itemsToUpdate.Add(updateQueue.Dequeue());
-
-						await UpdateFilesOrFoldersAsync(itemsToUpdate, hasSyncStatus);
+						await UpdateFilesOrFoldersAsync(DequeueUpdates(), hasSyncStatus);
 					}
 
 					if (updateQueue.Count > 0)
-					{
-						var itemsToUpdate = new List<string>();
-						for (var i = 0; i < UPDATE_BATCH_SIZE && updateQueue.Count > 0; i++)
-							itemsToUpdate.Add(updateQueue.Dequeue());
-
-						await UpdateFilesOrFoldersAsync(itemsToUpdate, hasSyncStatus);
-					}
+						await UpdateFilesOrFoldersAsync(DequeueUpdates(), hasSyncStatus);
 
 					if (anyEdits && sampler.CheckNow())
 						await HandleChangesOccurredAsync();
@@ -3352,7 +3367,69 @@ namespace Files.App.ViewModels
 			enumFolderSemaphore.Release();
 		}
 
-		private async Task<ListedItem?> AddFileOrFolderAsync(string fileOrFolderPath)
+		/// <summary>
+		/// Adds the items created at <paramref name="paths"/> with one duplicate check for the whole batch.
+		/// </summary>
+		/// <returns>The item for the last path (null when it is gone or hidden) and whether any path produced an item.</returns>
+		private async Task<(ListedItem? Last, bool Any)> AddFileOrFoldersAsync(IReadOnlyList<string> paths)
+		{
+			var items = new List<ListedItem>(paths.Count);
+			ListedItem? last = null;
+			foreach (var path in paths)
+			{
+				try
+				{
+					last = await CreateListedItemAsync(path);
+				}
+				catch (Exception ex)
+				{
+					App.Logger.LogWarning(ex, ex.Message);
+					continue;
+				}
+
+				if (last is not null)
+					items.Add(last);
+			}
+
+			if (items.Count == 0)
+				return (last, false);
+
+			try
+			{
+				await enumFolderSemaphore.WaitAsync(semaphoreCTS.Token);
+			}
+			catch (OperationCanceledException)
+			{
+				return (last, true);
+			}
+
+			try
+			{
+				var listed = new HashSet<string>(filesAndFolders.ToList().Select(x => x.GetRequiredPath()), StringComparer.OrdinalIgnoreCase);
+				foreach (var item in items)
+				{
+					if (!listed.Add(item.GetRequiredPath())) // Avoid adding duplicate items
+						continue;
+
+					filesAndFolders.Add(item);
+
+					if (UserSettingsService.FoldersSettingsService.AreAlternateStreamsVisible)
+					{
+						// New file added, enumerate ADS
+						foreach (var ads in Win32Helper.GetAlternateStreams(item.GetRequiredPath()))
+							filesAndFolders.Add(Win32StorageEnumerator.GetAlternateStream(ads, item));
+					}
+				}
+			}
+			finally
+			{
+				enumFolderSemaphore.Release();
+			}
+
+			return (last, true);
+		}
+
+		private async Task<ListedItem?> CreateListedItemAsync(string fileOrFolderPath)
 		{
 			FINDEX_INFO_LEVELS findInfoLevel = FINDEX_INFO_LEVELS.FindExInfoBasic;
 			var additionalFlags = FIND_FIRST_EX_CASE_SENSITIVE;
@@ -3394,7 +3471,6 @@ namespace Files.App.ViewModels
 				return null;
 
 			listedItem.Win32Attributes = (FileAttributes)findData.dwFileAttributes;
-			await AddFileOrFolderAsync(listedItem);
 
 			return listedItem;
 		}
@@ -3440,11 +3516,19 @@ namespace Files.App.ViewModels
 			return null;
 		}
 
-		private async Task UpdateFilesOrFoldersAsync(IEnumerable<string> paths, bool hasSyncStatus)
+		private async Task UpdateFilesOrFoldersAsync(IReadOnlyCollection<string> paths, bool hasSyncStatus)
 		{
+			if (paths.Count == 0)
+				return;
+
+			// One snapshot for the batch; the first item per path wins, as with a front-to-back search
+			var itemsByPath = new Dictionary<string, ListedItem>(StringComparer.OrdinalIgnoreCase);
+			foreach (var listed in filesAndFolders.ToList())
+				itemsByPath.TryAdd(listed.GetRequiredPath(), listed);
+
 			foreach (var path in paths)
 			{
-				var item = filesAndFolders.ToList().FirstOrDefault(x => x.GetRequiredPath().Equals(path, StringComparison.OrdinalIgnoreCase));
+				var item = itemsByPath.GetValueOrDefault(path);
 				if (item is not null && item.NeedsDelayedThumbnailLoad)
 				{
 					App.Logger.LogInformation("FILE_ACTION_MODIFIED thumbnail retry triggered [{Id}] '{Extension}'.", path.GetHashCode(), Path.GetExtension(path));
@@ -3476,7 +3560,8 @@ namespace Files.App.ViewModels
 
 			try
 			{
-				var matchingItems = filesAndFolders.ToList().Where(x => paths.Any(p => p.Equals(x.ItemPath, StringComparison.OrdinalIgnoreCase)));
+				var pathSet = new HashSet<string>(paths, StringComparer.OrdinalIgnoreCase);
+				var matchingItems = filesAndFolders.ToList().Where(x => x.ItemPath is { } itemPath && pathSet.Contains(itemPath));
 				var results = await Task.WhenAll(matchingItems.Select(x => GetFileOrFolderUpdateInfoAsync(x, hasSyncStatus)));
 
 				await dispatcherQueue.EnqueueOrInvokeAsync(() =>
@@ -3582,6 +3667,53 @@ namespace Files.App.ViewModels
 			}
 
 			return null;
+		}
+
+		/// <summary>Removes the items at <paramref name="paths"/> in one pass over the listing.</summary>
+		/// <returns>The number of items removed, alternate streams not included.</returns>
+		public async Task<int> RemoveFileOrFoldersAsync(IEnumerable<string> paths)
+		{
+			var targets = new HashSet<string>(paths, StringComparer.OrdinalIgnoreCase);
+			if (targets.Count == 0)
+				return 0;
+
+			try
+			{
+				await enumFolderSemaphore.WaitAsync(semaphoreCTS.Token);
+			}
+			catch (OperationCanceledException)
+			{
+				return 0;
+			}
+
+			try
+			{
+				var removed = filesAndFolders.RemoveAll(x => targets.Contains(x.GetRequiredPath()));
+				if (removed.Count == 0)
+					return 0;
+
+				foreach (var item in removed)
+				{
+					if (thumbnailRetryDebounce.TryRemove(item.GetRequiredPath(), out var debounceCts))
+					{
+						debounceCts.Cancel();
+						debounceCts.Dispose();
+					}
+				}
+
+				if (UserSettingsService.FoldersSettingsService.AreAlternateStreamsVisible)
+				{
+					// Main files are removed, remove connected ADS
+					var removedPaths = new HashSet<string>(removed.Select(x => x.ItemPath).WhereNotNull(), StringComparer.Ordinal);
+					filesAndFolders.RemoveAll(x => x is AlternateStreamItem ads && removedPaths.Contains(ads.MainStreamPath));
+				}
+
+				return removed.Count;
+			}
+			finally
+			{
+				enumFolderSemaphore.Release();
+			}
 		}
 
 		public async Task AddSearchResultsToCollectionAsync(ObservableCollection<ListedItem> searchItems, string currentSearchPath)
