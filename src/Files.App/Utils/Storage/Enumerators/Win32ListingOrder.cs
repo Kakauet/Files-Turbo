@@ -36,7 +36,8 @@ namespace Files.App.Utils.Storage
 					var isFile = (attributes & FileAttributes.Directory) == 0;
 					// These names are supplied by the shell rather than the directory record.
 					if ((!isFile && (attributes & (FileAttributes.ReadOnly | FileAttributes.System)) != 0) ||
-						item.cFileName.EndsWith(ShellLibraryItem.EXTENSION, StringComparison.OrdinalIgnoreCase))
+						item.cFileName.EndsWith(ShellLibraryItem.EXTENSION, StringComparison.OrdinalIgnoreCase) ||
+						NativeNameSearch.IsShortcut(item.cFileName))
 						return null;
 
 					var name = item.cFileName;
