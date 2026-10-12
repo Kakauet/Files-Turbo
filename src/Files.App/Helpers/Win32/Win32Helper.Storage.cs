@@ -187,7 +187,7 @@ namespace Files.App.Helpers
 				}
 			}
 
-			if (iconOptions.HasFlag(IconOptions.ReturnThumbnailOnly))
+			if (iconOptions.HasFlag(IconOptions.ReturnThumbnailOnly) || iconOptions.HasFlag(IconOptions.ReturnOnlyIfCached))
 				return null;
 
 			// The image-list fallback (e.g. paths that do not exist) produces encoded icons

@@ -179,8 +179,9 @@ namespace Files.App.ViewModels
 
 				if (work.HasFlag(ItemImageWork.ItemIcon))
 				{
+					var options = IconOptions.ReturnIconOnly | (request.CloudPlaceholder ? IconOptions.ReturnOnlyIfCached : IconOptions.None);
 					var icon = await FileThumbnailHelper.GetImageDataAsync(request.Path, request.Size, request.IsFolder,
-						IconOptions.ReturnIconOnly, token, STATaskPriority.Fast, request.PerformanceOperation).ConfigureAwait(false);
+						options, token, STATaskPriority.Fast, request.PerformanceOperation).ConfigureAwait(false);
 					if (icon is not null)
 						PostImage(new(request, icon, ThumbnailImageKind.Icon, !request.ThumbnailExpected, token));
 				}
