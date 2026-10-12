@@ -2319,6 +2319,8 @@ namespace Files.App.ViewModels
 		private async Task<int> EnumerateItemsFromStandardFolderAsync(string path, CancellationToken cancellationToken, LibraryItem? library = null)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
+			var workingDirectory = WorkingDirectory
+				?? throw new InvalidOperationException("The working directory has not been initialized.");
 			enumeratedCloudSyncStatus = null;
 
 			// Flag to use FindFirstFileExFromApp or StorageFolder enumeration - Use storage folder for Box Drive (#4629)
@@ -2586,14 +2588,7 @@ namespace Files.App.ViewModels
 							if (!cancellationToken.IsCancellationRequested)
 								CheckForSolutionFile();
 						}, Microsoft.UI.Dispatching.DispatcherQueuePriority.Low);
-						desktopIniUpdateTask = dispatcherQueue.EnqueueOrInvokeAsync(() =>
-						{
-							if (cancellationToken.IsCancellationRequested)
-								return;
-							GetDesktopIniFileData();
-							CheckForBackgroundImage();
-						},
-						Microsoft.UI.Dispatching.DispatcherQueuePriority.Low);
+						desktopIniUpdateTask = UpdateDesktopIniAsync(workingDirectory, cancellationToken);
 					});
 
 					// Cache the resolved folder so the post-enum switch reuses it.
@@ -2700,12 +2695,18 @@ namespace Files.App.ViewModels
 			SolutionFilePath = solutionPath;
 		}
 
-		private void GetDesktopIniFileData()
+		private async Task UpdateDesktopIniAsync(string directoryPath, CancellationToken cancellationToken)
 		{
-			var workingDirectory = WorkingDirectory
-				?? throw new InvalidOperationException("The working directory has not been initialized.");
-			var path = Path.Combine(workingDirectory, "desktop.ini");
-			DesktopIni = WindowsIniService.GetData(path);
+			// File.Exists and ReadLines can wait for the SMB timeout on an unavailable share.
+			var data = await Task.Run(() => WindowsIniService.GetData(Path.Combine(directoryPath, "desktop.ini")));
+			await dispatcherQueue.EnqueueOrInvokeAsync(() =>
+			{
+				if (cancellationToken.IsCancellationRequested || WorkingDirectory != directoryPath)
+					return;
+
+				DesktopIni = data;
+				CheckForBackgroundImage();
+			}, Microsoft.UI.Dispatching.DispatcherQueuePriority.Low);
 		}
 
 		public void CheckForBackgroundImage()
