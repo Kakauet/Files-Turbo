@@ -41,6 +41,7 @@
         <Compile Include="..\..\src\Files.App\Services\DateTimeFormatter\ITimeSpanLabel.cs" Link="Linked\ITimeSpanLabel.cs" />
         <Compile Include="..\..\src\Files.App\Utils\Storage\Enumerators\OrderedPrefix.cs" Link="Linked\OrderedPrefix.cs" />
         <Compile Include="..\..\src\Files.App\Utils\Storage\Enumerators\Win32ListingOrder.cs" Link="Linked\Win32ListingOrder.cs" />
+        <Compile Include="..\..\src\Files.App\Helpers\CoalescingRunner.cs" Link="Linked\CoalescingRunner.cs" />
         <Compile Include="..\..\src\Files.App\Helpers\CollectionDebugView.cs" Link="Linked\CollectionDebugView.cs" />
         <Compile Include="..\..\src\Files.App\Helpers\ViewportWorkQueue.cs" Link="Linked\ViewportWorkQueue.cs" />
         <Compile Include="..\..\src\Files.App\Helpers\Navigation\LatestPathNavigationCoordinator.cs" Link="Linked\LatestPathNavigationCoordinator.cs" />

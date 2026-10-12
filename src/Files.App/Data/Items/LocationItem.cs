@@ -282,9 +282,20 @@ namespace Files.App.Data.Items
 	{
 		private readonly IStorageTrashBinService StorageTrashBinService = Ioc.Default.GetRequiredService<IStorageTrashBinService>();
 
+		// Recycling n items raises 2n watcher events, and each size query enumerates the whole bin;
+		// one query at a time, plus one after a burst, keeps the size current without a query per event
+		private readonly CoalescingRunner spaceUsedRefresh;
+
 		public async void RefreshSpaceUsed(object? sender, FileSystemEventArgs e)
 		{
-			await RefreshSpaceUsedAsync();
+			try
+			{
+				await spaceUsedRefresh.RequestAsync();
+			}
+			catch (Exception ex)
+			{
+				App.Logger.LogWarning(ex, "Failed to refresh the recycle bin size.");
+			}
 		}
 
 		private Task RefreshSpaceUsedAsync()
@@ -313,6 +324,7 @@ namespace Files.App.Data.Items
 
 		public RecycleBinLocationItem()
 		{
+			spaceUsedRefresh = new(RefreshSpaceUsedAsync, TimeSpan.FromMilliseconds(250));
 			StorageTrashBinService.Watcher.ItemAdded += RefreshSpaceUsed;
 			StorageTrashBinService.Watcher.ItemDeleted += RefreshSpaceUsed;
 
