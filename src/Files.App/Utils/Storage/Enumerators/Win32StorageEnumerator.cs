@@ -16,6 +16,9 @@ namespace Files.App.Utils.Storage
 
 		private static readonly string folderTypeTextLocalized = Strings.Folder.GetLocalizedResource();
 
+		// Rows in the first publication: more than a maximized Details view shows
+		private const int FirstBatchSize = 64;
+
 		public static async Task<List<ListedItem>> ListEntries(
 			string path,
 			Win32PInvoke.SafeFindHandle hFile,
@@ -30,7 +33,6 @@ namespace Files.App.Utils.Storage
 		)
 		{
 			var sampler = new IntervalSampler(500);
-			var firstBatchSampler = new IntervalSampler(150);
 			Task publication = Task.CompletedTask;
 			var hasFlushedFirstBatch = false;
 			var tempList = new List<ListedItem>();
@@ -66,6 +68,8 @@ namespace Files.App.Utils.Storage
 							break;
 						}
 					} while (buffered.Count < 200_000 && Stopwatch.GetElapsedTime(scanStarted).TotalMilliseconds < 150);
+					UiPerformanceTrace.Mark(performanceOperationId, "ScanCompleted", buffered.Count,
+						Stopwatch.GetElapsedTime(scanStarted).TotalMilliseconds, complete ? 1 : 0);
 					if (complete)
 					{
 						buffered.RemoveAll(x => x.cFileName is "." or ".." ||
@@ -80,6 +84,8 @@ namespace Files.App.Utils.Storage
 					}
 				}
 				isGitRepo = repositoryState is not null && await repositoryState.WaitAsync(cancellationToken);
+				// Counted from here so the pre-scan does not shrink the first batch to a single row
+				var firstBatchSampler = new IntervalSampler(25);
 				foreach (var entry in ReadEntries(entries, complete, rawHandle, findData))
 				{
 					findData = entry;
@@ -145,10 +151,13 @@ namespace Files.App.Utils.Storage
 						UiPerformanceTrace.Mark(performanceOperationId, "FirstItemAvailable", tempList.Count);
 					}
 
+					// The first batch is one viewport of rows (in final order when the listing was pre-sorted), or whatever
+					// slow storage produced in 25 ms. Later batches follow a fixed cadence: each publication copies the
+					// whole listing, so a per-count cadence would make loading large folders quadratic.
 					if (intermediateAction is not null &&
-						(ordered && buffered.Count > 2_000 ? tempList.Count >= (hasFlushedFirstBatch ? 128 : 64) : hasFlushedFirstBatch
+						(hasFlushedFirstBatch
 							? sampler.CheckNow()
-							: tempList.Count > 0 && firstBatchSampler.CheckNow()))
+							: tempList.Count >= FirstBatchSize || tempList.Count > 0 && firstBatchSampler.CheckNow()))
 					{
 						hasFlushedFirstBatch = true;
 						var batch = tempList;

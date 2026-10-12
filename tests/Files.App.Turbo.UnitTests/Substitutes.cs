@@ -9,7 +9,12 @@ global using System.Collections.Concurrent;
 global using System.Collections.Specialized;
 global using System.ComponentModel;
 global using System.Diagnostics;
+global using CommunityToolkit.Mvvm.DependencyInjection;
+global using Files.App.Data.Enums;
+global using Files.App.Data.Items;
+global using Files.App.Extensions;
 global using Files.App.Helpers;
+global using Files.App.Services.DateTimeFormatter;
 global using Files.App.Utils.Storage;
 global using Files.Shared.Extensions;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -74,5 +79,35 @@ namespace Files.App.Utils.Storage
 		public void PausePropertyChangedNotifications() { }
 
 		public void ResumePropertyChangedNotifications(bool triggerPropertyChanged = true) { }
+	}
+}
+
+namespace Files.App.Helpers
+{
+	public static partial class Win32PInvoke
+	{
+		public const uint IO_REPARSE_TAG_SYMLINK = 0xA000000C;
+
+		public struct WIN32_FIND_DATA
+		{
+			public uint dwFileAttributes;
+			public System.Runtime.InteropServices.ComTypes.FILETIME ftCreationTime;
+			public System.Runtime.InteropServices.ComTypes.FILETIME ftLastAccessTime;
+			public System.Runtime.InteropServices.ComTypes.FILETIME ftLastWriteTime;
+			public uint nFileSizeHigh;
+			public uint nFileSizeLow;
+			public uint dwReserved0;
+			public uint dwReserved1;
+			public string cFileName;
+			public string cAlternateFileName;
+		}
+	}
+}
+
+namespace Files.App.Data.Items
+{
+	internal static class ShellLibraryItem
+	{
+		public const string EXTENSION = ".library-ms";
 	}
 }

@@ -6,9 +6,15 @@ using System.Runtime.InteropServices.ComTypes;
 
 namespace Files.App.Utils.Storage
 {
+	/// <summary>
+	/// Orders raw directory records the way <see cref="SortingHelper.OrderFileList"/> orders the listed items,
+	/// so a large folder's first rows can be published in their final position before the rest is sorted.
+	/// </summary>
 	internal static class Win32ListingOrder
 	{
-		private sealed record Entry(Win32PInvoke.WIN32_FIND_DATA Data, string Name, bool IsFile,
+		private const int PrefixSize = 64;
+
+		internal sealed record Entry(Win32PInvoke.WIN32_FIND_DATA Data, int Index, string Name, bool IsFile,
 			DateTimeOffset Modified, DateTimeOffset Created, long Size, int GroupIndex, string? GroupText);
 
 		internal static DateTime FromFileTime(FILETIME time)
@@ -41,18 +47,16 @@ namespace Files.App.Utils.Storage
 						return null;
 
 					var name = item.cFileName;
-					var shortcut = isFile && NativeNameSearch.IsShortcut(name) &&
-						item.dwReserved0 != Win32PInvoke.IO_REPARSE_TAG_SYMLINK;
-					if (shortcut || (isFile && !showExtensions))
+					if (isFile && !showExtensions)
 					{
 						var withoutExtension = Path.GetFileNameWithoutExtension(name);
-						if (shortcut || !string.IsNullOrEmpty(withoutExtension))
+						if (!string.IsNullOrEmpty(withoutExtension))
 							name = withoutExtension;
 					}
 					var modified = FromFileTime(item.ftLastWriteTime);
 					var created = FromFileTime(item.ftCreationTime);
 					var label = formatter?.ToTimeSpanLabel(group == GroupOption.DateCreated ? created : modified, dateUnit);
-					entries.Add(new(item, name, isFile, modified, created, isFile ? item.GetSize() : 0,
+					entries.Add(new(item, entries.Count, name, isFile, modified, created, isFile ? item.GetSize() : 0,
 						label?.Index ?? 0, label?.Text));
 				}
 			}
@@ -61,54 +65,58 @@ namespace Files.App.Utils.Storage
 				return null;
 			}
 
-			object? SortKey(Entry item) => sort switch
-			{
-				SortOption.DateModified => item.Modified,
-				SortOption.DateCreated => item.Created,
-				SortOption.Size => item.Size,
-				_ => item.Name
-			};
-			var natural = NaturalStringComparer.GetForProcessor();
-			var comparer = sort == SortOption.Name ? natural : Comparer<object?>.Default;
-			IOrderedEnumerable<Entry> ordered;
-			if (group != GroupOption.None)
-			{
-				ordered = groupDirection == SortDirection.Ascending
-					? entries.OrderBy(x => x.GroupIndex).ThenBy(x => x.GroupText)
-					: entries.OrderByDescending(x => x.GroupIndex).ThenByDescending(x => x.GroupText);
-				if (!alongside)
-					ordered = ordered.ThenBy(x => x.IsFile ^ filesFirst);
-			}
-			else
-			{
-				ordered = entries.OrderBy(x => !alongside && (x.IsFile ^ filesFirst));
-			}
-			ordered = direction == SortDirection.Ascending
-				? ordered.ThenBy(SortKey, comparer)
-				: ordered.ThenByDescending(SortKey, comparer);
-			if (sort != SortOption.Name)
-				ordered = direction == SortDirection.Ascending
-					? ordered.ThenBy(x => x.Name, natural)
-					: ordered.ThenByDescending(x => x.Name, natural);
-
+			var compare = CreateComparison(sort, direction, alongside, filesFirst, group, groupDirection);
 			token.ThrowIfCancellationRequested();
-			return entries.Count > 2_000 ? ReadOrderedEntries(ordered, token) : ordered.Select(x => x.Data).ToList();
+			if (entries.Count > 2_000)
+				return OrderedPrefix.Read(entries, compare, PrefixSize, token).Select(entry => entry.Data);
+
+			entries.Sort(compare);
+			return entries.Select(entry => entry.Data).ToList();
 		}
 
-		private static IEnumerable<Win32PInvoke.WIN32_FIND_DATA> ReadOrderedEntries(IOrderedEnumerable<Entry> ordered, CancellationToken token)
+		/// <summary>
+		/// The order of <see cref="SortingHelper.OrderFileList"/> (group, folders or files first, sort key, name),
+		/// with the original position last, as LINQ's stable sort would leave ties.
+		/// </summary>
+		internal static Comparison<Entry> CreateComparison(SortOption sort, SortDirection direction, bool alongside,
+			bool filesFirst, GroupOption group, SortDirection groupDirection)
 		{
-			// LINQ sorts only this prefix before the first publication; the remaining sort runs off the UI thread.
-			foreach (var entry in ordered.Take(64))
+			var natural = NaturalStringComparer.GetForProcessor();
+			var descending = direction == SortDirection.Descending;
+			var groupDescending = groupDirection == SortDirection.Descending;
+			return (x, y) =>
 			{
-				token.ThrowIfCancellationRequested();
-				yield return entry.Data;
-			}
-			token.ThrowIfCancellationRequested();
-			foreach (var entry in ordered.Skip(64))
-			{
-				token.ThrowIfCancellationRequested();
-				yield return entry.Data;
-			}
+				int result;
+				if (group != GroupOption.None)
+				{
+					result = x.GroupIndex.CompareTo(y.GroupIndex);
+					if (result == 0)
+						result = string.Compare(x.GroupText, y.GroupText, StringComparison.CurrentCulture);
+					if (result != 0)
+						return groupDescending ? -result : result;
+				}
+
+				if (!alongside)
+				{
+					result = (x.IsFile ^ filesFirst).CompareTo(y.IsFile ^ filesFirst);
+					if (result != 0)
+						return result;
+				}
+
+				result = sort switch
+				{
+					SortOption.DateModified => x.Modified.CompareTo(y.Modified),
+					SortOption.DateCreated => x.Created.CompareTo(y.Created),
+					SortOption.Size => x.Size.CompareTo(y.Size),
+					_ => natural.Compare(x.Name, y.Name),
+				};
+				if (result == 0 && sort != SortOption.Name)
+					result = natural.Compare(x.Name, y.Name);
+				if (result != 0)
+					return descending ? -result : result;
+
+				return x.Index.CompareTo(y.Index);
+			};
 		}
 	}
 }
