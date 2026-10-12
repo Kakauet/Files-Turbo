@@ -136,7 +136,9 @@ namespace Files.App.ViewModels
 			}
 
 			// An image of this same file (e.g. before a layout size change) stays until the better one arrives
-			if (item.FileImage is not null && work != ItemImageWork.None && (item.ImageKey.Path is null || IsSameFile(item.ImageKey, request)))
+			if (item.FileImage is not null && work != ItemImageWork.None &&
+				(request.Thumbnails || item.ImageKey.Kind != ThumbnailImageKind.Thumbnail) &&
+				(item.ImageKey.Path is null || IsSameFile(item.ImageKey, request)))
 				return (work, request);
 
 			if (iconCacheService.TryGetIconImage(item.FileExtension, request.IsFolder, request.Size) is { } generic)
@@ -296,6 +298,11 @@ namespace Files.App.ViewModels
 		/// </summary>
 		public void ReleaseItemImage(ListedItem item)
 		{
+			if (item.ItemPath is { } path && thumbnailRetryDebounce.TryRemove(path, out var retry))
+			{
+				retry.Cancel();
+				retry.Dispose();
+			}
 			item.ImageToken++;
 			item.FileImage = null;
 			item.ImageKey = default;
@@ -409,7 +416,7 @@ namespace Files.App.ViewModels
 
 		// A row showing its thumbnail never goes back to an icon
 		private static bool IsThumbnailOf(in ThumbnailImageKey key, in ItemImageRequest request)
-			=> key.Kind == ThumbnailImageKind.Thumbnail && key.Path is not null && IsSameFile(key, request) && key.PhysicalSize == request.PhysicalSize;
+			=> request.Thumbnails && key.Kind == ThumbnailImageKind.Thumbnail && key.Path is not null && IsSameFile(key, request) && key.PhysicalSize == request.PhysicalSize;
 
 		/// <summary>
 		/// Loads the generic icons of every type in a listing in parallel, so rows paint them in their first frame.
