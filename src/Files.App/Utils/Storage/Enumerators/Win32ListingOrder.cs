@@ -27,7 +27,6 @@ namespace Files.App.Utils.Storage
 
 			var entries = new List<Entry>(data.Count);
 			var formatter = group == GroupOption.None ? null : Ioc.Default.GetRequiredService<IDateTimeFormatter>();
-			var dayLabels = formatter is not null && dateUnit == GroupByDateUnit.Day ? new Dictionary<DateTime, ITimeSpanLabel>() : null;
 			try
 			{
 				foreach (var item in data)
@@ -52,16 +51,7 @@ namespace Files.App.Utils.Storage
 					}
 					var modified = FromFileTime(item.ftLastWriteTime);
 					var created = FromFileTime(item.ftCreationTime);
-					var groupDate = group == GroupOption.DateCreated ? created : modified;
-					ITimeSpanLabel? label = null;
-					if (dayLabels is not null)
-					{
-						var day = groupDate.ToLocalTime().Date;
-						if (!dayLabels.TryGetValue(day, out label))
-							dayLabels.Add(day, label = formatter!.ToTimeSpanLabel(groupDate, dateUnit));
-					}
-					else
-						label = formatter?.ToTimeSpanLabel(groupDate, dateUnit);
+					var label = formatter?.ToTimeSpanLabel(group == GroupOption.DateCreated ? created : modified, dateUnit);
 					entries.Add(new(item, name, isFile, modified, created, isFile ? item.GetSize() : 0,
 						label?.Index ?? 0, label?.Text));
 				}
