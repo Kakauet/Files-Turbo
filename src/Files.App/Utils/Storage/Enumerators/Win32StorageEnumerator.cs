@@ -145,7 +145,7 @@ namespace Files.App.Utils.Storage
 					}
 
 					if (intermediateAction is not null &&
-						(ordered && buffered.Count > 2_000 ? tempList.Count >= 128 : hasFlushedFirstBatch
+						(ordered && buffered.Count > 2_000 ? tempList.Count >= (hasFlushedFirstBatch ? 128 : 64) : hasFlushedFirstBatch
 							? sampler.CheckNow()
 							: tempList.Count > 0 && firstBatchSampler.CheckNow()))
 					{

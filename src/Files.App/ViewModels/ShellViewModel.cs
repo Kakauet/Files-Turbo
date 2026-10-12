@@ -1192,6 +1192,8 @@ namespace Files.App.ViewModels
 					await PreloadGenericIconsAsync(displayedFilesAndFolders, token);
 
 					var dispatchRequested = Stopwatch.GetTimestamp();
+					var priority = preserveSortedPrefix && FilesAndFolders.Count > 0
+						? Microsoft.UI.Dispatching.DispatcherQueuePriority.Low : Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal;
 					await dispatcherQueue.EnqueueOrInvokeAsync(() =>
 					{
 						var dispatchStarted = Stopwatch.GetTimestamp();
@@ -1235,7 +1237,7 @@ namespace Files.App.ViewModels
 							isSemaphoreReleased = true;
 							bulkOperationSemaphore.Release();
 						}
-					});
+					}, priority);
 
 					// The semaphore will be released in UI thread
 					isSemaphoreReleased = true;
