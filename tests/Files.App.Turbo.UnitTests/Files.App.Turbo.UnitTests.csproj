@@ -53,6 +53,7 @@
         <Compile Include="..\..\src\Files.App\Utils\Storage\Collection\IGroupedCollectionHeader.cs" Link="Linked\IGroupedCollectionHeader.cs" />
         <Compile Include="..\..\src\Files.App\Utils\FileTags\FileTagsOperationSync.cs" Link="Linked\FileTagsOperationSync.cs" />
         <Compile Include="..\..\src\Files.App\Utils\Storage\Operations\OperationSourceMatch.cs" Link="Linked\OperationSourceMatch.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Shell\ShellAssociationLookup.cs" Link="Linked\ShellAssociationLookup.cs" />
         <Compile Include="..\..\src\Files.App\Utils\Storage\Enumerators\StorageEnumerationTask.cs" Link="Linked\StorageEnumerationTask.cs" />
         <Compile Include="..\..\src\Files.App\Utils\Storage\Search\NativeNameSearch.cs" Link="Linked\NativeNameSearch.cs" />
         <Compile Include="..\..\src\Files.App\Utils\Storage\Search\ParallelDirectoryWork.cs" Link="Linked\ParallelDirectoryWork.cs" />

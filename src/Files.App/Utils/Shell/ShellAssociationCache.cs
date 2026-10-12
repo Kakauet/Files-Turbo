@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Files.Shared.Helpers;
+using Microsoft.Win32;
 using System.Collections.Concurrent;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -14,9 +15,6 @@ namespace Files.App.Utils.Shell
 	/// </summary>
 	public static class ShellAssociationCache
 	{
-		private const string ThumbnailProviderId = "{E357FCCD-A995-4576-B01F-234630154E96}";
-		private const string ExtractImageId = "{BB2E617C-0920-11D1-9A0B-00C04FC2D6C1}";
-
 		// Types whose icon is embedded in the file itself rather than shared by the extension
 		private static readonly string[] _perFileIconExtensions = [".ico", ".cur", ".ani", ".scr", ".msc", ".appref-ms", ".lnk", ".url", ".library-ms"];
 
@@ -32,8 +30,7 @@ namespace Files.App.Utils.Shell
 				return false;
 
 			return _thumbnailProviders.GetOrAdd(extension, static ext =>
-				QueryAssociation(ext, ASSOCSTR.ASSOCSTR_SHELLEXTENSION, ThumbnailProviderId) is not QueryResult.Missing ||
-				QueryAssociation(ext, ASSOCSTR.ASSOCSTR_SHELLEXTENSION, ExtractImageId) is not QueryResult.Missing);
+				ShellAssociationLookup.HasThumbnailProvider(RegistryAssociationSource.Instance, ext));
 		}
 
 		/// <summary>
@@ -47,33 +44,95 @@ namespace Files.App.Utils.Shell
 			return _perFileIcons.GetOrAdd(extension, static ext =>
 				_perFileIconExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase) ||
 				FileExtensionHelpers.IsExecutableFile(ext) ||
-				QueryAssociation(ext, ASSOCSTR.ASSOCSTR_SHELLEXTENSION, "IconHandler") is QueryResult.Found or QueryResult.Failed ||
-				QueryAssociation(ext, ASSOCSTR.ASSOCSTR_DEFAULTICON, null, value => value.Contains("%1", StringComparison.Ordinal)) is QueryResult.Found or QueryResult.Failed);
+				ShellAssociationLookup.HasPerFileIcon(RegistryAssociationSource.Instance, ext));
 		}
 
-		private enum QueryResult { Found, Missing, Failed }
-
-		private static unsafe QueryResult QueryAssociation(string extension, ASSOCSTR kind, string? extra, Func<string, bool>? accept = null)
+		private sealed class RegistryAssociationSource : IAssociationSource
 		{
-			try
+			public static readonly RegistryAssociationSource Instance = new();
+
+			public AssociationAnswer QueryShellExtension(string extension, string handler)
+				=> QueryAssociation(extension, ASSOCSTR.ASSOCSTR_SHELLEXTENSION, handler);
+
+			public AssociationAnswer QueryDefaultIcon(string extension, Func<string, bool> accept)
+				=> QueryAssociation(extension, ASSOCSTR.ASSOCSTR_DEFAULTICON, null, accept);
+
+			public IEnumerable<string> GetClassKeys(string extension)
 			{
-				const int capacity = 520;
-				var buffer = stackalloc char[capacity];
-				var length = (uint)capacity;
-				HRESULT hr;
-				fixed (char* pszAssoc = extension)
-				fixed (char* pszExtra = extra)
-					hr = PInvoke.AssocQueryString(ASSOCF.ASSOCF_NONE, kind, new PCWSTR(pszAssoc), new PCWSTR(pszExtra), new PWSTR(buffer), &length);
+				var keys = new List<string>(5);
+				try
+				{
+					using (var userChoice = Registry.CurrentUser.OpenSubKey($@"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\{extension}\UserChoice"))
+					{
+						if (userChoice?.GetValue("ProgId") is string { Length: > 0 } userProgId)
+							keys.Add(userProgId);
+					}
 
-				if (hr.Succeeded)
-					return accept is null || accept(new string(buffer)) ? QueryResult.Found : QueryResult.Missing;
+					keys.Add(extension);
+					using (var extensionKey = Registry.ClassesRoot.OpenSubKey(extension))
+					{
+						if (extensionKey?.GetValue(null) is string { Length: > 0 } progId)
+							keys.Add(progId);
+						keys.Add($@"SystemFileAssociations\{extension}");
+						if (extensionKey?.GetValue("PerceivedType") is string { Length: > 0 } perceivedType)
+							keys.Add($@"SystemFileAssociations\{perceivedType}");
+					}
+				}
+				catch (Exception ex) when (ex is System.Security.SecurityException or UnauthorizedAccessException or System.IO.IOException)
+				{
+				}
 
-				// ERROR_NO_ASSOCIATION and ERROR_FILE_NOT_FOUND mean the handler is not registered
-				return hr.Value is unchecked((int)0x80070483) or unchecked((int)0x80070002) ? QueryResult.Missing : QueryResult.Failed;
+				return keys;
 			}
-			catch
+
+			public bool HasShellExtension(string classKey, string handler)
 			{
-				return QueryResult.Failed;
+				try
+				{
+					using var key = Registry.ClassesRoot.OpenSubKey($@"{classKey}\ShellEx\{handler}");
+					return key is not null;
+				}
+				catch (Exception ex) when (ex is System.Security.SecurityException or UnauthorizedAccessException or System.IO.IOException)
+				{
+					return false;
+				}
+			}
+
+			public string? GetDefaultIcon(string classKey)
+			{
+				try
+				{
+					using var key = Registry.ClassesRoot.OpenSubKey($@"{classKey}\DefaultIcon");
+					return key?.GetValue(null) as string;
+				}
+				catch (Exception ex) when (ex is System.Security.SecurityException or UnauthorizedAccessException or System.IO.IOException)
+				{
+					return null;
+				}
+			}
+
+			private static unsafe AssociationAnswer QueryAssociation(string extension, ASSOCSTR kind, string? extra, Func<string, bool>? accept = null)
+			{
+				try
+				{
+					const int capacity = 520;
+					var buffer = stackalloc char[capacity];
+					var length = (uint)capacity;
+					HRESULT hr;
+					fixed (char* pszAssoc = extension)
+					fixed (char* pszExtra = extra)
+						hr = PInvoke.AssocQueryString(ASSOCF.ASSOCF_NONE, kind, new PCWSTR(pszAssoc), new PCWSTR(pszExtra), new PWSTR(buffer), &length);
+
+					if (hr.Succeeded)
+						return accept is null || accept(new string(buffer)) ? AssociationAnswer.Found : AssociationAnswer.Missing;
+
+					// ERROR_NO_ASSOCIATION and ERROR_FILE_NOT_FOUND mean the handler is not registered
+					return hr.Value is unchecked((int)0x80070483) or unchecked((int)0x80070002) ? AssociationAnswer.Missing : AssociationAnswer.Failed;
+				}
+				catch
+				{
+					return AssociationAnswer.Failed;
+				}
 			}
 		}
 	}
