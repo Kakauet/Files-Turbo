@@ -14,8 +14,11 @@ namespace Files.App.ViewModels.Previews
 	{
 		private ImageSource? imageSource;
 		private readonly TaskCompletionSource previewLayoutReady = new(TaskCreationOptions.RunContinuationsAsynchronously);
-		private int decodeWidth = 512;
-		private int decodeHeight = 512;
+		// Used when the preview has no layout yet, e.g. while the Details tab hides it
+		private const int DefaultDecodeSide = 1024;
+		private static readonly TimeSpan LayoutWait = TimeSpan.FromMilliseconds(500);
+		private volatile int decodeWidth = DefaultDecodeSide;
+		private volatile int decodeHeight = DefaultDecodeSide;
 		public ImageSource? ImageSource
 		{
 			get => imageSource;
@@ -30,15 +33,25 @@ namespace Files.App.ViewModels.Previews
 
 		public void SetPreviewSize(double width, double height, double scale)
 		{
-			decodeWidth = Math.Max(1, (int)Math.Ceiling(width * scale));
-			decodeHeight = Math.Max(1, (int)Math.Ceiling(height * scale));
+			if (previewLayoutReady.Task.IsCompleted || width < 1 || height < 1 || scale <= 0)
+				return;
+
+			decodeWidth = (int)Math.Ceiling(width * scale);
+			decodeHeight = (int)Math.Ceiling(height * scale);
 			previewLayoutReady.TrySetResult();
 		}
 
 		public override async Task<List<FileProperty>> LoadPreviewAndDetailsAsync()
 		{
 			var token = LoadCancelledTokenSource.Token;
-			await previewLayoutReady.Task.WaitAsync(token);
+			try
+			{
+				// A hidden preview never gets a size; details must still load
+				await previewLayoutReady.Task.WaitAsync(LayoutWait, token);
+			}
+			catch (TimeoutException)
+			{
+			}
 			using IRandomAccessStream stream = await PreviewFile.OpenAsync(FileAccessMode.Read);
 			var decoder = await BitmapDecoder.CreateAsync(stream).AsTask(token);
 			var scale = Math.Min(1, Math.Min(decodeWidth / (double)Math.Max(1, decoder.OrientedPixelWidth),

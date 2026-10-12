@@ -138,8 +138,8 @@ namespace Files.App.Helpers
 		{
 			try
 			{
-				// Both configuration and output belong only to the experimental app's normal LocalState.
-				if (Windows.ApplicationModel.Package.Current.Id.Name != "FilesTurbo.Experimental")
+				// Both configuration and output belong only to a Files Turbo package's normal LocalState.
+				if (!Windows.ApplicationModel.Package.Current.Id.Name.StartsWith("FilesTurbo.", StringComparison.Ordinal))
 					return null;
 				var file = Path.Combine(ApplicationData.Current.LocalFolder.Path, "phase3-performance.json");
 				if (!File.Exists(file) || new FileInfo(file).Length > 4096)

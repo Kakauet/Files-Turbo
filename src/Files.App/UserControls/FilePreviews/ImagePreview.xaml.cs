@@ -11,10 +11,18 @@ namespace Files.App.UserControls.FilePreviews
 		{
 			ViewModel = model;
 			InitializeComponent();
-			Loaded += (_, _) => ViewModel.SetPreviewSize(Math.Max(1, ActualWidth), Math.Max(1, ActualHeight), XamlRoot.RasterizationScale);
+			Loaded += (_, _) => UpdatePreviewSize();
+			SizeChanged += (_, _) => UpdatePreviewSize();
 			Unloaded += ViewModel.PreviewControlBase_Unloaded;
 		}
 
 		private ImagePreviewViewModel ViewModel { get; set; }
+
+		// A collapsed pane reports no size; the view model then decodes at its default bound
+		private void UpdatePreviewSize()
+		{
+			if (XamlRoot is { } root)
+				ViewModel.SetPreviewSize(ActualWidth, ActualHeight, root.RasterizationScale);
+		}
 	}
 }

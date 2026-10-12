@@ -540,6 +540,51 @@ namespace Files.App.Utils.Storage
 			}
 		}
 
+		/// <summary>
+		/// True when <paramref name="items"/> differs from the current rows by at most <paramref name="maxChanges"/>
+		/// insertions and removals, keeps the remaining rows in their current order and needs no group to change.
+		/// Anything larger, such as a re-sort, is cheaper as one Reset than as per-item notifications.
+		/// </summary>
+		public bool CanReconcile(IReadOnlyList<T> items, int maxChanges)
+		{
+			lock (syncRoot)
+			{
+				if (Math.Abs(collection.Count - items.Count) > maxChanges)
+					return false;
+
+				var current = new HashSet<T>(collection);
+				var wanted = new HashSet<T>(items);
+				if (current.Count != collection.Count || wanted.Count != items.Count)
+					return false;
+
+				var changes = 0;
+				foreach (var item in collection)
+					if (!wanted.Contains(item) && ++changes > maxChanges)
+						return false;
+				foreach (var item in items)
+					if (!current.Contains(item) && ++changes > maxChanges)
+						return false;
+
+				var position = 0;
+				foreach (var item in items)
+				{
+					if (!current.Contains(item))
+						continue;
+					while (position < collection.Count && !wanted.Contains(collection[position]))
+						position++;
+					if (position == collection.Count || !EqualityComparer<T>.Default.Equals(collection[position], item))
+						return false;
+					position++;
+
+					// Reconcile only reorders inside existing groups; a retained row whose key changed needs a regroup
+					if (IsGrouped && item is IGroupableItem groupable && groupable.Key != GetGroupKeyForItem(item))
+						return false;
+				}
+
+				return true;
+			}
+		}
+
 		/// <summary>Updates rows and existing groups with single-item notifications.</summary>
 		public void Reconcile(IEnumerable<T> items)
 		{

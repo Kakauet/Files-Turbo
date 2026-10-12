@@ -1,0 +1,50 @@
+<!--  Copyright (c) Files Community. Licensed under the MIT License.  -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!--
+        Unit tests for the Files Turbo changes that can run without WinUI.
+        Production files are linked unchanged; Substitutes.cs supplies the few app types they reference.
+    -->
+    <PropertyGroup>
+        <TargetFramework>$(WindowsTargetFramework)</TargetFramework>
+        <TargetPlatformMinVersion>$(MinimalWindowsVersion)</TargetPlatformMinVersion>
+        <IsPackable>false</IsPackable>
+        <OutputType>Exe</OutputType>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>x64</Platforms>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <NoWarn>$(NoWarn);CS8305</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MSTest.TestAdapter" />
+        <PackageReference Include="MSTest.TestFramework" />
+        <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Files.App.Storage\Files.App.Storage.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\..\src\Files.App\Helpers\CollectionDebugView.cs" Link="Linked\CollectionDebugView.cs" />
+        <Compile Include="..\..\src\Files.App\Helpers\ViewportWorkQueue.cs" Link="Linked\ViewportWorkQueue.cs" />
+        <Compile Include="..\..\src\Files.App\Helpers\Navigation\LatestPathNavigationCoordinator.cs" Link="Linked\LatestPathNavigationCoordinator.cs" />
+        <Compile Include="..\..\src\Files.App\Services\Storage\ThumbnailImageCache.cs" Link="Linked\ThumbnailImageCache.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Storage\Collection\BlockingListEnumerator.cs" Link="Linked\BlockingListEnumerator.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Storage\Collection\BulkConcurrentObservableCollection.cs" Link="Linked\BulkConcurrentObservableCollection.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Storage\Collection\ConcurrentCollection.cs" Link="Linked\ConcurrentCollection.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Storage\Collection\GroupedCollection.cs" Link="Linked\GroupedCollection.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Storage\Collection\IGroupableItem.cs" Link="Linked\IGroupableItem.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Storage\Collection\IGroupedCollectionHeader.cs" Link="Linked\IGroupedCollectionHeader.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Storage\Enumerators\StorageEnumerationTask.cs" Link="Linked\StorageEnumerationTask.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Storage\Search\NativeNameSearch.cs" Link="Linked\NativeNameSearch.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Storage\Search\ParallelDirectoryWork.cs" Link="Linked\ParallelDirectoryWork.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Storage\Search\SearchSuggestionNarrowing.cs" Link="Linked\SearchSuggestionNarrowing.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Storage\Search\SearchSuggestionPipeline.cs" Link="Linked\SearchSuggestionPipeline.cs" />
+    </ItemGroup>
+
+</Project>

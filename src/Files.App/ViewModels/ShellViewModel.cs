@@ -1273,7 +1273,9 @@ namespace Files.App.ViewModels
 					FilesAndFolders.GroupedCollection!.IsSorted = true;
 					return true;
 				}
-				if (Math.Max(count, displayedFilesAndFolders.Count) > 10_000)
+				// Re-sorts and large changes use one Reset; per-item moves would cost O(n²) work and n UI events
+				if (Math.Max(count, displayedFilesAndFolders.Count) > 10_000 ||
+					!FilesAndFolders.CanReconcile(displayedFilesAndFolders, 128))
 					return false;
 				FilesAndFolders.Reconcile(displayedFilesAndFolders);
 				OrderGroups();
@@ -3250,7 +3252,7 @@ namespace Files.App.ViewModels
 												if (renamed.ItemPath is { } oldPath)
 													imageCache.Rename(oldPath, newPath);
 												if (renamed.ImageKey.Path is not null)
-													renamed.ImageKey = renamed.ImageKey with { Path = newPath.ToUpperInvariant() };
+													renamed.ImageKey = renamed.ImageKey with { Path = newPath };
 												renamed.ItemPath = newPath;
 												renamed.ItemNameRaw = Path.GetFileName(newPath);
 												if (renamed.PrimaryItemAttribute == StorageItemTypes.File)
