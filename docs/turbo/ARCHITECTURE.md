@@ -23,9 +23,13 @@ found in the final audit.
 - **Off-UI work.** Path validation, row metadata, tooltips and Git status run off the UI thread; tooltips are
   created on pointer entry.
 
-Trade-off: in a folder with 100 000 entries Turbo paints the first rows about 100 ms later than upstream,
-because it reads the whole folder before showing an ordered first screen. Upstream paints NTFS order first and
-re-sorts afterwards. Turbo completes the listing 2.5–3× sooner.
+Trade-off: Turbo reads the whole folder (up to the budget) before showing an ordered first screen.
+
+- When NTFS order already equals the final order, as with zero-padded names, upstream can paint about 100 ms
+  earlier in a folder with 100 000 entries.
+- With natural names, the final audit measured Turbo's first screen at 268 ms against about 4 s for upstream.
+  Turbo also completes the listing 3× sooner.
+- See [BENCHMARKS.md](BENCHMARKS.md).
 
 ## Background work
 

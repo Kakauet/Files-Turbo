@@ -53,7 +53,7 @@ requires `Remove-AppxPackage <PackageFullName> -PreserveApplicationData` first.
 ## Tests
 
 ```powershell
-dotnet test tests/Files.App.Turbo.UnitTests -c Release
+dotnet test --project tests/Files.App.Turbo.UnitTests -c Release -p:Platform=x64
 ```
 
 `Files.App.Turbo.UnitTests` compiles the production sources it covers (collection reconciliation, listing order,
