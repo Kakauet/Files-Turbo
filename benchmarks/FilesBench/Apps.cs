@@ -16,6 +16,13 @@ internal abstract class AppDriver : IDisposable
 	public AutomationElement Window => AutomationElement.FromHandle(Hwnd);
 
 	public abstract void Start(string initialFolder);
+
+	/// <summary>Requests a window on <paramref name="folder"/> without waiting for it.</summary>
+	public abstract void Launch(string folder);
+
+	/// <summary>Milliseconds from <paramref name="start"/> until the launched window is visible.</summary>
+	public abstract double WaitForWindow(long start, TimeSpan timeout);
+
 	public abstract string? CurrentFolder();
 	protected abstract AutomationElement FocusAddressBox();
 	public abstract void SetView(string view);
@@ -98,6 +105,162 @@ internal abstract class AppDriver : IDisposable
 		probe.Save(Path.Combine(Program.Output, $"{label}-{Name}-{DateTime.Now:HHmmss-fff}.png"));
 	}
 
+	/// <summary>With FILESBENCH_DEBUG set, saves the window and the focused element at a checkpoint.</summary>
+	public void Checkpoint(string label)
+	{
+		if (Environment.GetEnvironmentVariable("FILESBENCH_DEBUG") is null || Program.Output is null)
+			return;
+		SaveWindow(label);
+		string focus;
+		try
+		{
+			var focused = AutomationElement.FocusedElement;
+			focus = $"{focused.Current.ControlType.ProgrammaticName} '{focused.Current.Name}' id={focused.Current.AutomationId} pid={focused.Current.ProcessId}";
+		}
+		catch (Exception ex) { focus = ex.Message; }
+		File.AppendAllText(Path.Combine(Program.Output, "debug.log"), $"{DateTime.Now:HH:mm:ss.fff} {Name} {label}: focus {focus}{Environment.NewLine}");
+	}
+
+	/// <summary>Throws unless the window shows exactly <paramref name="folder"/>; called before any destructive key.</summary>
+	public void AssertShowing(string folder)
+	{
+		if (!string.Equals(CurrentFolder()?.TrimEnd('\\'), folder.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase))
+			throw new BenchmarkException($"{Name} is not showing {folder}; no input sent.");
+	}
+
+	public AutomationElement FocusSearchBox()
+	{
+		Native.Chord(Native.VK_CONTROL, 'F');
+		return WaitForFocusedEdit();
+	}
+
+	public AutomationElement WaitForFocusedEdit(int timeoutMs = 3000)
+	{
+		var watch = Stopwatch.StartNew();
+		while (watch.ElapsedMilliseconds < timeoutMs)
+		{
+			try
+			{
+				var focused = AutomationElement.FocusedElement;
+				if (focused is not null && focused.Current.ProcessId == ProcessId &&
+					focused.TryGetCurrentPattern(ValuePattern.Pattern, out var pattern) && !((ValuePattern)pattern).Current.IsReadOnly)
+					return focused;
+			}
+			catch (ElementNotAvailableException) { }
+			Thread.Sleep(50);
+		}
+		throw new BenchmarkException($"{Name}: no editable element received focus.");
+	}
+
+	/// <summary>Moves keyboard focus to the items view, the largest list in the window.</summary>
+	public void FocusItemsView()
+	{
+		var lists = Window.FindAll(TreeScope.Descendants, new OrCondition(
+			new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.List),
+			new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.DataGrid)));
+		AutomationElement? best = null;
+		double area = 0;
+		foreach (AutomationElement element in lists)
+		{
+			var r = element.Current.BoundingRectangle;
+			if (!r.IsEmpty && r.Width * r.Height > area)
+			{
+				best = element;
+				area = r.Width * r.Height;
+			}
+		}
+		if (best is null)
+			throw new BenchmarkException($"{Name}: items view not found.");
+		best.SetFocus();
+		Thread.Sleep(250);
+	}
+
+	public void SelectItem(string name)
+	{
+		var watch = Stopwatch.StartNew();
+		while (watch.Elapsed < TimeSpan.FromSeconds(5))
+		{
+			var candidates = Window.FindAll(TreeScope.Descendants, new PropertyCondition(AutomationElement.NameProperty, name));
+			foreach (AutomationElement candidate in candidates)
+			{
+				// The name may sit on a text element inside the selectable list item
+				var walker = TreeWalker.RawViewWalker;
+				for (var element = candidate; element is not null && element.Current.ProcessId == ProcessId; element = walker.GetParent(element))
+				{
+					if (!element.TryGetCurrentPattern(SelectionItemPattern.Pattern, out var pattern))
+						continue;
+					// UI Automation focus does not always move keyboard focus into Explorer's view; a click does.
+					// The point is right of the name, so the click selects instead of starting an in-place rename.
+					var r = element.Current.BoundingRectangle;
+					var window = Native.WindowRect(Hwnd);
+					var point = new Point((int)(r.Right - Math.Min(40, r.Width / 4)), (int)(r.Y + r.Height / 2));
+					if (r.IsEmpty || !window.Contains(point))
+						throw new BenchmarkException($"{Name}: item {name} is not on screen.");
+					Native.Click(point);
+					Thread.Sleep(400);
+					if (!((SelectionItemPattern)pattern).Current.IsSelected)
+						throw new BenchmarkException($"{Name}: item {name} was not selected by the click.");
+					return;
+				}
+			}
+			Thread.Sleep(100);
+		}
+		throw new BenchmarkException($"{Name}: item {name} not selectable.");
+	}
+
+	private static readonly string[] ConfirmNames = ["Eliminar", "Sí", "Delete", "Yes"];
+
+	/// <summary>Finds the confirm button of this process's delete dialog (an in-window dialog in Files, a window in Explorer).</summary>
+	public InvokePattern WaitForConfirmation(int timeoutMs = 10_000)
+	{
+		var watch = Stopwatch.StartNew();
+		var buttons = new AndCondition(
+			new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),
+			new OrCondition(ConfirmNames.Select(name => (Condition)new PropertyCondition(AutomationElement.NameProperty, name)).ToArray()));
+		while (watch.ElapsedMilliseconds < timeoutMs)
+		{
+			try
+			{
+				var windows = AutomationElement.RootElement.FindAll(TreeScope.Children, new PropertyCondition(AutomationElement.ProcessIdProperty, ProcessId));
+				foreach (AutomationElement window in windows)
+				{
+					if (window.FindFirst(TreeScope.Descendants, buttons) is { } button && button.TryGetCurrentPattern(InvokePattern.Pattern, out var pattern))
+						return (InvokePattern)pattern;
+				}
+			}
+			catch (ElementNotAvailableException) { }
+			Thread.Sleep(50);
+		}
+		throw new BenchmarkException($"{Name}: confirmation dialog not shown.");
+	}
+
+	public (Rectangle? Area, int? Count) FindAnyItemCountRegion()
+	{
+		var cache = new CacheRequest { TreeFilter = Automation.RawViewCondition, TreeScope = TreeScope.Subtree };
+		cache.Add(AutomationElement.NameProperty);
+		cache.Add(AutomationElement.BoundingRectangleProperty);
+		cache.Add(AutomationElement.IsOffscreenProperty);
+		AutomationElement root;
+		using (cache.Activate())
+			root = AutomationElement.FromHandle(Hwnd);
+		var window = Native.WindowRect(Hwnd);
+		var stack = new Stack<AutomationElement>([root]);
+		var visits = 0;
+		while (stack.Count > 0 && visits++ < 20000)
+		{
+			var element = stack.Pop();
+			foreach (AutomationElement child in element.CachedChildren)
+				stack.Push(child);
+			var name = element.Cached.Name;
+			if (string.IsNullOrEmpty(name) || element.Cached.IsOffscreen || !System.Text.RegularExpressions.Regex.IsMatch(name, @"^\s*[\d.,\u00A0\u202F ]+\s+(elementos?|items?)\s*$"))
+				continue;
+			var r = element.Cached.BoundingRectangle;
+			if (!r.IsEmpty && r.Top > window.Top + window.Height / 2)
+				return (new Rectangle((int)r.X, (int)r.Y, (int)Math.Min(r.Width, 200), (int)r.Height), int.Parse(new string(name.Where(char.IsDigit).ToArray())));
+		}
+		return (null, null);
+	}
+
 	/// <summary>The status bar text that shows the folder's item count, e.g. "100.000 elementos".</summary>
 	public Rectangle? FindItemCountRegion(int count)
 	{
@@ -125,6 +288,37 @@ internal abstract class AppDriver : IDisposable
 				return new Rectangle((int)r.X, (int)r.Y, (int)Math.Min(r.Width, 200), (int)r.Height);
 		}
 		return null;
+	}
+
+	/// <summary>Whole item tiles (image and label) fully inside <paramref name="viewport"/>, in reading order.</summary>
+	public List<Rectangle> FindItemTiles(ISet<string> names, Rectangle viewport)
+	{
+		var cache = new CacheRequest { TreeFilter = Automation.RawViewCondition, TreeScope = TreeScope.Subtree };
+		cache.Add(AutomationElement.NameProperty);
+		cache.Add(AutomationElement.BoundingRectangleProperty);
+		cache.Add(AutomationElement.IsOffscreenProperty);
+		AutomationElement root;
+		using (cache.Activate())
+			root = AutomationElement.FromHandle(Hwnd);
+		var found = new Dictionary<string, Rectangle>(StringComparer.Ordinal);
+		var stack = new Stack<AutomationElement>([root]);
+		var visits = 0;
+		while (stack.Count > 0 && visits++ < 20000)
+		{
+			var element = stack.Pop();
+			foreach (AutomationElement child in element.CachedChildren)
+				stack.Push(child);
+			var name = element.Cached.Name;
+			if (string.IsNullOrEmpty(name) || element.Cached.IsOffscreen || !names.Contains(name))
+				continue;
+			var r = element.Cached.BoundingRectangle;
+			var rect = new Rectangle((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
+			if (rect.Width < 32 || rect.Height < 32 || !viewport.Contains(rect))
+				continue;
+			if (!found.TryGetValue(name, out var existing) || rect.Width * rect.Height > existing.Width * existing.Height)
+				found[name] = rect;
+		}
+		return found.Values.OrderBy(r => r.Top / 20).ThenBy(r => r.Left).ToList();
 	}
 
 	/// <summary>Name cells of the visible rows, top to bottom, found through UI Automation.</summary>
@@ -192,26 +386,63 @@ internal sealed class FilesDriver(string name, string packageFamily, string layo
 	public string Executable { get; } = Path.Combine(layout, "Files.exe");
 	public string LocalState { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Packages", packageFamily, "LocalState");
 
+	/// <summary>Extra settings written before the next start, identical for every Files build.</summary>
+	public Dictionary<string, bool> Settings { get; set; } = new() { ["LeaveAppRunning"] = false };
+
 	public override void Start(string initialFolder)
 	{
 		foreach (var process in OwnProcesses())
 			throw new BenchmarkException($"{Name} is already running (pid {process.Id}); close it first.");
 		PrepareSettings(initialFolder);
-
-		Process.Start(new ProcessStartInfo("explorer.exe", $"shell:AppsFolder\\{packageFamily}!App") { UseShellExecute = false });
+		var start = Stopwatch.GetTimestamp();
+		Launch(initialFolder);
+		WaitForWindow(start, TimeSpan.FromSeconds(60));
 		var watch = Stopwatch.StartNew();
 		while (watch.Elapsed < TimeSpan.FromSeconds(60))
 		{
-			var process = OwnProcesses().FirstOrDefault(p => p.MainWindowHandle != 0);
-			if (process is not null && FindById(AutomationElement.FromHandle(process.MainWindowHandle), "CurrentPathGet") is not null)
-			{
-				Hwnd = process.MainWindowHandle;
-				ProcessId = process.Id;
+			if (FindById(Window, "CurrentPathGet") is not null)
 				return;
-			}
 			Thread.Sleep(100);
 		}
+		throw new BenchmarkException($"{Name} did not finish opening its window.");
+	}
+
+	// The folder comes from the startup settings written by PrepareSettings
+	public override void Launch(string folder)
+		=> Process.Start(new ProcessStartInfo("explorer.exe", $"shell:AppsFolder\\{packageFamily}!App") { UseShellExecute = false });
+
+	public override double WaitForWindow(long start, TimeSpan timeout)
+	{
+		Process? process = null;
+		while (Stopwatch.GetElapsedTime(start) < timeout)
+		{
+			process ??= OwnProcesses().FirstOrDefault();
+			if (process is not null)
+			{
+				process.Refresh();
+				var hwnd = process.MainWindowHandle;
+				if (hwnd != 0 && Native.IsWindowVisible(hwnd))
+				{
+					var elapsed = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+					Hwnd = hwnd;
+					ProcessId = process.Id;
+					return elapsed;
+				}
+			}
+			Thread.Sleep(process is null ? 10 : 2);
+		}
 		throw new BenchmarkException($"{Name} did not open a window.");
+	}
+
+	/// <summary>Closes the window; with LeaveAppRunning the process stays resident in the background.</summary>
+	public void CloseWindowOnly()
+	{
+		foreach (var process in OwnProcesses())
+			process.CloseMainWindow();
+		var watch = Stopwatch.StartNew();
+		while (watch.Elapsed < TimeSpan.FromSeconds(10) && OwnProcesses().Any(p => { p.Refresh(); return p.MainWindowHandle != 0; }))
+			Thread.Sleep(100);
+		Thread.Sleep(1000);
 	}
 
 	/// <summary>
@@ -230,6 +461,8 @@ internal sealed class FilesDriver(string name, string packageFamily, string layo
 		settings["OpenSpecificPageOnStartup"] = true;
 		settings["TabsOnStartupList"] = new JsonArray(initialFolder);
 		settings["LastSessionTabList"] = new JsonArray();
+		foreach (var (key, value) in Settings)
+			settings[key] = value;
 		Directory.CreateDirectory(Path.GetDirectoryName(path)!);
 		File.WriteAllText(path, settings.ToJsonString(new() { WriteIndented = true }));
 	}
@@ -278,6 +511,7 @@ internal sealed class FilesDriver(string name, string packageFamily, string layo
 			process.CloseMainWindow();
 			if (!process.WaitForExit(5000))
 				process.Kill();
+			process.WaitForExit(5000);
 		}
 	}
 
@@ -293,27 +527,42 @@ internal sealed class ExplorerDriver : AppDriver
 
 	protected override int NameTextOffset => 24;
 
+	private dynamic? shell;
+	private HashSet<long> existing = [];
+
 	public override void Start(string initialFolder)
 	{
-		dynamic shell = Activator.CreateInstance(Type.GetTypeFromProgID("Shell.Application")!)!;
-		var before = new HashSet<long>();
-		foreach (var w in shell.Windows())
-			before.Add((long)w.HWND);
-		shell.Explore(initialFolder);
-		var watch = Stopwatch.StartNew();
-		while (watch.Elapsed < TimeSpan.FromSeconds(20))
+		var start = Stopwatch.GetTimestamp();
+		Launch(initialFolder);
+		WaitForWindow(start, TimeSpan.FromSeconds(20));
+	}
+
+	public override void Launch(string folder)
+	{
+		shell ??= Activator.CreateInstance(Type.GetTypeFromProgID("Shell.Application")!)!;
+		existing = [];
+		foreach (var w in shell!.Windows())
+			existing.Add((long)w.HWND);
+		shell.Explore(folder);
+	}
+
+	public override double WaitForWindow(long start, TimeSpan timeout)
+	{
+		while (Stopwatch.GetElapsedTime(start) < timeout)
 		{
-			foreach (var w in shell.Windows())
+			foreach (var w in shell!.Windows())
 			{
-				if (before.Contains((long)w.HWND))
+				var hwnd = (nint)(long)w.HWND;
+				if (existing.Contains(hwnd) || !Native.IsWindowVisible(hwnd))
 					continue;
+				var elapsed = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
 				window = w;
-				Hwnd = (nint)(long)w.HWND;
+				Hwnd = hwnd;
 				Native.GetWindowThreadProcessId(Hwnd, out var pid);
 				ProcessId = pid;
-				return;
+				return elapsed;
 			}
-			Thread.Sleep(50);
+			Thread.Sleep(2);
 		}
 		throw new BenchmarkException("Explorer window not created.");
 	}

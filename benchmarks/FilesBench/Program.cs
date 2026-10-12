@@ -34,7 +34,7 @@ internal static class Program
 	{
 		if (args.Length < 3)
 		{
-			Console.Error.WriteLine("FilesBench <inspect|nav|idle> <config.json> <output-directory>");
+			Console.Error.WriteLine("FilesBench <inspect|nav|idle|startup|thumbnails|search|operations> <config.json> <output-directory>");
 			return 2;
 		}
 
@@ -48,6 +48,10 @@ internal static class Program
 				"inspect" => Inspect(config, output),
 				"nav" => Navigation.Run(config, output),
 				"idle" => Idle.Run(config, output),
+				"startup" => Startup.Run(config, output),
+				"thumbnails" => Thumbnails.Run(config, output),
+				"search" => Search.Run(config, output),
+				"operations" => Operations.Run(config, output),
 				_ => throw new ArgumentException($"Unknown command {args[0]}"),
 			};
 		}
@@ -83,7 +87,8 @@ internal static class Program
 	}
 
 	/// <summary>
-	/// Waits until every application process stays below 5% of one core for half a second.
+	/// Waits until every application process stays below 15% of one core for half a second
+	/// (upstream Files keeps ~9% busy after its first folder load: its tab loading ring never stops).
 	/// Explorer's process is the desktop shell, so it is held to the same rule but may wait longer.
 	/// </summary>
 	public static double WaitForIdle(IEnumerable<AppDriver> apps, int timeoutMs = 60_000)
@@ -95,7 +100,7 @@ internal static class Program
 			var before = processes.Select(p => { p.Refresh(); return p.TotalProcessorTime; }).ToList();
 			Thread.Sleep(500);
 			var busiest = processes.Select((p, i) => { p.Refresh(); return (p.TotalProcessorTime - before[i]).TotalMilliseconds / 500; }).Max();
-			if (busiest < 0.05)
+			if (busiest < 0.15)
 				return watch.Elapsed.TotalMilliseconds;
 		}
 		return watch.Elapsed.TotalMilliseconds;

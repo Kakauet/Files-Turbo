@@ -39,7 +39,7 @@ internal static partial class Native
 
 	public const uint INPUT_KEYBOARD = 1;
 	public const uint KEYEVENTF_KEYUP = 0x0002;
-	public const ushort VK_RETURN = 0x0D, VK_CONTROL = 0x11, VK_MENU = 0x12, VK_SHIFT = 0x10, VK_ESCAPE = 0x1B, VK_DELETE = 0x2E, VK_F2 = 0x71, VK_F5 = 0x74, VK_F24 = 0x87;
+	public const ushort VK_RETURN = 0x0D, VK_CONTROL = 0x11, VK_MENU = 0x12, VK_SHIFT = 0x10, VK_ESCAPE = 0x1B, VK_DELETE = 0x2E, VK_F2 = 0x71, VK_F5 = 0x74, VK_F24 = 0x87, VK_END = 0x23;
 	public const int SRCCOPY = 0x00CC0020, CAPTUREBLT = 0x40000000;
 	public const uint SWP_NOZORDER = 0x0004, SWP_NOACTIVATE = 0x0010;
 	public const int SW_RESTORE = 9;
@@ -49,9 +49,20 @@ internal static partial class Native
 	[DllImport("user32.dll")] public static extern bool ShowWindow(nint hwnd, int command);
 	[DllImport("user32.dll")] public static extern bool IsIconic(nint hwnd);
 	[DllImport("user32.dll")] public static extern bool IsWindow(nint hwnd);
+	[DllImport("user32.dll")] public static extern bool IsWindowVisible(nint hwnd);
 	[DllImport("user32.dll")] public static extern bool SetWindowPos(nint hwnd, nint after, int x, int y, int width, int height, uint flags);
 	[DllImport("user32.dll")] public static extern bool GetWindowRect(nint hwnd, out RECT rect);
 	[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
+	[DllImport("user32.dll")] public static extern void mouse_event(uint flags, int dx, int dy, uint data, nint extra);
+	public const uint MOUSEEVENTF_LEFTDOWN = 0x0002, MOUSEEVENTF_LEFTUP = 0x0004;
+
+	public static void Click(System.Drawing.Point point)
+	{
+		SetCursorPos(point.X, point.Y);
+		Thread.Sleep(60);
+		mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+		mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+	}
 	[DllImport("user32.dll")] public static extern bool GetLastInputInfo(ref LASTINPUTINFO info);
 	[DllImport("user32.dll")] public static extern uint SendInput(uint count, INPUT[] inputs, int size);
 	[DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(nint hwnd, out int pid);
