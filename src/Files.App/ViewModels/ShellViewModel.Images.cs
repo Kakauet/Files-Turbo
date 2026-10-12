@@ -39,7 +39,7 @@ namespace Files.App.ViewModels
 		}
 
 		internal readonly record struct ItemImageRequest(ListedItem Item, int Token, string Path, DateTimeOffset Modified, uint Size, int PhysicalSize,
-			bool Thumbnails, bool IsFolder, bool ThumbnailExpected, bool IconExpected, long PerformanceOperation, long FileSizeBytes);
+			bool Thumbnails, bool IsFolder, bool ThumbnailExpected, bool IconExpected, long PerformanceOperation, long FileSizeBytes, bool CloudPlaceholder);
 
 		private sealed record PendingImage(ItemImageRequest Request, ShellImageData? Data, ThumbnailImageKind? Kind, bool Final, CancellationToken Token, bool Missing = false);
 
@@ -55,7 +55,17 @@ namespace Files.App.ViewModels
 				(ignoreMissing || !imageCache.IsMissing(path, item.ItemDateModifiedReal));
 			var iconExpected = path.Length > 0 && HasPerItemIcon(item);
 			return new(item, item.ImageToken, path, item.ItemDateModifiedReal, size, FileThumbnailHelper.GetPhysicalSize(size),
-				thumbnails, item.IsFolder && !item.IsArchive, thumbnailExpected, iconExpected, PerformanceOperationId, item.FileSizeBytes);
+				thumbnails, item.IsFolder && !item.IsArchive, thumbnailExpected, iconExpected, PerformanceOperationId, item.FileSizeBytes, IsCloudPlaceholder(item));
+		}
+
+		private static bool IsCloudPlaceholder(ListedItem item)
+		{
+			if (item.SyncStatusUI.SyncStatus == CloudDriveSyncStatus.FileOnline)
+				return true;
+			if (item.SyncStatusUI.SyncStatus is CloudDriveSyncStatus.FileOffline or CloudDriveSyncStatus.FileOfflinePinned)
+				return false;
+			const FileAttributes recall = FileAttributes.Offline | (FileAttributes)0x40000 | (FileAttributes)0x400000;
+			return item.Win32Attributes is { } attributes && (attributes & recall) != 0;
 		}
 
 		private static bool CanHaveThumbnail(ListedItem item)
@@ -173,10 +183,10 @@ namespace Files.App.ViewModels
 						PostImage(new(request, icon, ThumbnailImageKind.Icon, !request.ThumbnailExpected, token));
 				}
 
-				if (!request.ThumbnailExpected)
+				if (!request.ThumbnailExpected || request.CloudPlaceholder)
 					PostImage(new(request, null, null, true, token));
 
-				return request.ThumbnailExpected;
+				return request.ThumbnailExpected && !request.CloudPlaceholder;
 			}
 			catch (OperationCanceledException)
 			{
@@ -191,6 +201,11 @@ namespace Files.App.ViewModels
 		{
 			try
 			{
+				if (request.CloudPlaceholder)
+				{
+					PostImage(new(request, null, null, true, token));
+					return;
+				}
 				var data = await FileThumbnailHelper.GetImageDataAsync(request.Path, request.Size, request.IsFolder,
 					IconOptions.ReturnThumbnailOnly, token, STATaskPriority.Slow, request.PerformanceOperation).ConfigureAwait(false);
 				if (data is not null)

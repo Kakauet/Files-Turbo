@@ -1661,8 +1661,9 @@ namespace Files.App.ViewModels
 				token.ThrowIfCancellationRequested();
 				var syncStatus = loadSyncStatus && matchingStorageFile is not null ? await CheckCloudDriveSyncStatusAsync(matchingStorageFile) : CloudDriveSyncStatus.Unknown;
 				var fileFRN = FileTagsHelper.GetFileFRN(path);
-				var fileTag = FileTagsHelper.ReadFileTag(path);
-				var extraProperties = loadExtraProperties && matchingStorageFile is not null ? await GetExtraProperties(matchingStorageFile) : null;
+				var cloudPlaceholder = syncStatus == CloudDriveSyncStatus.FileOnline || IsCloudPlaceholder(item);
+				var fileTag = cloudPlaceholder ? FileTagsHelper.GetDbInstance().GetTags(path, fileFRN) : FileTagsHelper.ReadFileTag(path);
+				var extraProperties = loadExtraProperties && !cloudPlaceholder && matchingStorageFile is not null ? await GetExtraProperties(matchingStorageFile) : null;
 				var isElevationRequired = syncStatus is CloudDriveSyncStatus.Unknown or CloudDriveSyncStatus.NotSynced && CheckElevationRights(item);
 
 				token.ThrowIfCancellationRequested();
@@ -1793,7 +1794,8 @@ namespace Files.App.ViewModels
 		/// </summary>
 		internal async Task<bool> LoadToolTipPropertiesAsync(ListedItem item)
 		{
-			if (item.ExtraPropertiesRequested || item.PrimaryItemAttribute != StorageItemTypes.File || item.IsShortcut || FtpHelpers.IsFtpPath(item.ItemPath))
+			if (item.ExtraPropertiesRequested || item.PrimaryItemAttribute != StorageItemTypes.File || item.IsShortcut ||
+				FtpHelpers.IsFtpPath(item.ItemPath) || IsCloudPlaceholder(item))
 				return false;
 
 			item.ExtraPropertiesRequested = true;
