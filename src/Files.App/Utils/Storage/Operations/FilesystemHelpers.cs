@@ -616,7 +616,9 @@ namespace Files.App.Utils.Storage
 				App.HistoryWrapper.AddHistory(history);
 			}
 
-			await jumpListService.RemoveFolderAsync(source.Path); // Remove items from jump list
+			// Remove items from jump list; it only holds folders
+			if (source.ItemType != FilesystemItemType.File)
+				await jumpListService.RemoveFolderAsync(source.Path);
 
 			await Task.Yield();
 			return returnStatus;

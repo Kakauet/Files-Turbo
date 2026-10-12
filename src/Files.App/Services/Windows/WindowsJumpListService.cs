@@ -122,8 +122,9 @@ namespace Files.App.Services
 					instance.SystemGroupKind = JumpListSystemGroupKind.None;
 
 					var itemToRemove = instance.Items.Where(x => x.Arguments == path).Select(x => x).FirstOrDefault();
-					instance.Items.Remove(itemToRemove);
-					await instance.SaveAsync();
+					// Saving rewrites the taskbar's jump list; renaming an item that is not in it must not
+					if (itemToRemove is not null && instance.Items.Remove(itemToRemove))
+						await instance.SaveAsync();
 				}
 				catch { }
 			}
