@@ -1276,7 +1276,7 @@ namespace Files.App.Views.Layouts
 		[DynamicWindowsRuntimeCast(typeof(ScrollViewer))]
 		private void HookScrollDeferTracking()
 		{
-			if (performanceViewProbe is null && UiPerformanceTrace.IsEnabled)
+			if (performanceViewProbe is null && UiPerformanceTrace.IsEnabled && ItemsControl.FindDescendant<ScrollViewer>() is not null)
 				performanceViewProbe = new UiPerformanceViewProbe(ItemsControl,
 					() => ParentShellPageInstance?.ShellViewModel?.PerformanceOperationId ?? 0, GetVisibleIndexRange);
 			// Matches the slow STA lane; tier 1 results enqueue here from background threads
