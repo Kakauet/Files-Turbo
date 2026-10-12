@@ -313,7 +313,7 @@ namespace Files.App.ViewModels
 			=> ThumbnailImageKey.Create(request.Path, request.Modified, request.PhysicalSize, kind, request.FileSizeBytes);
 
 		private static bool IsSameFile(in ThumbnailImageKey key, in ItemImageRequest request)
-			=> key.Path == request.Path.ToUpperInvariant() && key.ModifiedTicks == request.Modified.UtcTicks && key.FileSizeBytes == request.FileSizeBytes;
+			=> key.Path == request.Path && key.ModifiedTicks == request.Modified.UtcTicks && key.FileSizeBytes == request.FileSizeBytes;
 
 		private static void SetItemImage(ListedItem item, ImageSource image, ThumbnailImageKey key, bool final)
 		{

@@ -22,7 +22,7 @@ namespace Files.App.Services
 	public readonly record struct ThumbnailImageKey(string Path, long ModifiedTicks, int PhysicalSize, ThumbnailImageKind Kind, long FileSizeBytes = 0)
 	{
 		public static ThumbnailImageKey Create(string path, DateTimeOffset modified, int physicalSize, ThumbnailImageKind kind, long fileSizeBytes = 0)
-			=> new(path.ToUpperInvariant(), modified.UtcTicks, physicalSize, kind, fileSizeBytes);
+			=> new(path, modified.UtcTicks, physicalSize, kind, fileSizeBytes);
 	}
 
 	/// <summary>
@@ -107,7 +107,7 @@ namespace Files.App.Services
 		/// </summary>
 		public void Remove(string path)
 		{
-			var normalized = path.ToUpperInvariant();
+			var normalized = path;
 			RemoveMissing(path);
 			foreach (var key in entries.Keys.Where(key => key.Path == normalized).ToList())
 			{
@@ -126,14 +126,14 @@ namespace Files.App.Services
 		{
 			RemoveMissing(oldPath);
 			RemoveMissing(newPath);
-			var normalized = oldPath.ToUpperInvariant();
+			var normalized = oldPath;
 			foreach (var key in entries.Keys.Where(key => key.Path == normalized).ToList())
 			{
 				if (entries.Remove(key, out var node))
 				{
 					order.Remove(node);
 					UsedBytes -= node.Value.Bytes;
-					Add(key with { Path = newPath.ToUpperInvariant() }, node.Value.Image, node.Value.Bytes);
+					Add(key with { Path = newPath }, node.Value.Image, node.Value.Bytes);
 				}
 			}
 		}
@@ -153,16 +153,16 @@ namespace Files.App.Services
 		{
 			if (missing.Count >= MaximumMissingEntries)
 				missing.Clear();
-			missing[(path.ToUpperInvariant(), modified.UtcTicks)] = tickCount();
+			missing[(path, modified.UtcTicks)] = tickCount();
 		}
 
 		public bool IsMissing(string path, DateTimeOffset modified)
-			=> !missing.IsEmpty && missing.TryGetValue((path.ToUpperInvariant(), modified.UtcTicks), out var marked) &&
+			=> !missing.IsEmpty && missing.TryGetValue((path, modified.UtcTicks), out var marked) &&
 				tickCount() - marked < MissingLifetime.TotalMilliseconds;
 
 		private void RemoveMissing(string path)
 		{
-			var normalized = path.ToUpperInvariant();
+			var normalized = path;
 			foreach (var key in missing.Keys.Where(key => key.Path == normalized))
 				missing.TryRemove(key, out _);
 		}
