@@ -154,6 +154,29 @@ namespace Files.App.Turbo.UnitTests
 		}
 
 		[TestMethod]
+		public void Destination_is_the_created_item_when_a_collision_changed_its_name()
+		{
+			// Rename-on-collision asked for "lote.bin" and created "lote (2).bin"
+			Assert.AreEqual(@"C:\a\lote (2).bin", FileTagsOperationSync.ResolveDestination(FileTagsOperation.Rename, @"C:\a\x.bin", null, "lote.bin", @"C:\a\lote (2).bin"));
+			Assert.AreEqual(@"C:\b\x - copia.txt", FileTagsOperationSync.ResolveDestination(FileTagsOperation.Copy, @"C:\a\x.txt", @"C:\b", "x.txt", @"C:\b\x - copia.txt"));
+		}
+
+		[TestMethod]
+		public void Destination_falls_back_to_the_requested_name()
+		{
+			Assert.AreEqual(@"C:\a\y.txt", FileTagsOperationSync.ResolveDestination(FileTagsOperation.Rename, @"C:\a\x.txt", null, "y.txt", null));
+			Assert.AreEqual(@"C:\b\x.txt", FileTagsOperationSync.ResolveDestination(FileTagsOperation.Move, @"C:\a\x.txt", @"C:\b", "x.txt", ""));
+			Assert.IsNull(FileTagsOperationSync.ResolveDestination(FileTagsOperation.Copy, @"C:\a\x.txt", null, "x.txt", null));
+		}
+
+		[TestMethod]
+		public void Delete_has_a_destination_only_when_recycled()
+		{
+			Assert.IsNull(FileTagsOperationSync.ResolveDestination(FileTagsOperation.Delete, @"C:\a\x.txt", null, null, null));
+			Assert.AreEqual(@"C:\$Recycle.Bin\S-1\$R1.txt", FileTagsOperationSync.ResolveDestination(FileTagsOperation.Delete, @"C:\a\x.txt", null, null, @"C:\$Recycle.Bin\S-1\$R1.txt"));
+		}
+
+		[TestMethod]
 		public void A_failing_frn_read_is_reported_and_does_not_escape()
 		{
 			var target = new FakeTarget { ThrowOnFrn = true };

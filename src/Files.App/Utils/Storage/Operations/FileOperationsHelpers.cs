@@ -366,12 +366,79 @@ namespace Files.App.Utils.Storage
 				op.PostRenameItem += (s, e) =>
 				{
 					var sourcePath = e.SourceItem.GetParsingPath();
-					var sourceFolderPath = sourcePath is null ? null : Path.GetDirectoryName(sourcePath);
 					shellOperationResult.Items.Add(new ShellOperationItemResult()
 					{
 						Succeeded = e.Result.Succeeded,
 						Source = sourcePath,
-						Destination = sourceFolderPath is not null && !string.IsNullOrEmpty(e.Name) ? Path.Combine(sourceFolderPath, e.Name) : null,
+						// The renamed item, whose name differs from the requested one after a collision
+						Destination = FileTagsOperationSync.ResolveDestination(FileTagsOperation.Rename, sourcePath, null, e.Name, e.DestItem.GetParsingPath()),
+						HResult = (int)e.Result
+					});
+				};
+				op.PostRenameItem += (_, e) => UpdateFileTagsDb(e, "rename");
+				op.FinishOperations += (s, e) => renameTcs.TrySetResult(e.Result.Succeeded);
+
+				try
+				{
+					op.PerformOperations();
+				}
+				catch
+				{
+					renameTcs.TrySetResult(false);
+				}
+
+				progressHandler.RemoveOperation(operationID);
+
+				return (await renameTcs.Task, shellOperationResult);
+			}, App.Logger);
+		}
+
+		/// <summary>
+		/// Renames several items in one shell operation, in order, with the same collision handling as <see cref="RenameItemAsync"/>.
+		/// </summary>
+		public static Task<(bool, ShellOperationResult)> RenameItemsAsync(string[] fileToRenamePath, string[] newName, long ownerHwnd)
+		{
+			progressHandler ??= new();
+
+			return STATask.Run(async () =>
+			{
+				using var op = new ShellFileOperations2();
+				var shellOperationResult = new ShellOperationResult();
+
+				op.Options = FILEOPERATION_FLAGS.FOF_SILENT | FILEOPERATION_FLAGS.FOF_NOERRORUI | FILEOPERATION_FLAGS.FOF_RENAMEONCOLLISION;
+				op.OwnerWindow = (HWND)(nint)ownerHwnd;
+
+				for (var i = 0; i < fileToRenamePath.Length; i++)
+				{
+					if (!SafetyExtensions.IgnoreExceptions(() =>
+					{
+						using var shi = new ShellItem(fileToRenamePath[i]);
+						op.QueueRenameOperation(shi, newName[i]);
+					}))
+					{
+						shellOperationResult.Items.Add(new ShellOperationItemResult()
+						{
+							Succeeded = false,
+							Source = fileToRenamePath[i],
+							HResult = -1
+						});
+					}
+				}
+
+				var operationID = Guid.NewGuid().ToString();
+				progressHandler.OwnerWindow = op.OwnerWindow;
+				progressHandler.AddOperation(operationID);
+
+				var renameTcs = new TaskCompletionSource<bool>();
+				op.PostRenameItem += (s, e) =>
+				{
+					var sourcePath = e.SourceItem.GetParsingPath();
+					shellOperationResult.Items.Add(new ShellOperationItemResult()
+					{
+						Succeeded = e.Result.Succeeded,
+						Source = sourcePath,
+						// The renamed item, whose name differs from the requested one after a collision
+						Destination = FileTagsOperationSync.ResolveDestination(FileTagsOperation.Rename, sourcePath, null, e.Name, e.DestItem.GetParsingPath()),
 						HResult = (int)e.Result
 					});
 				};
@@ -973,15 +1040,6 @@ namespace Files.App.Utils.Storage
 		{
 			if (e.Result.Succeeded && e.SourceItem.GetParsingPath() is { } sourcePath)
 			{
-				var destPath = e.DestFolder.GetParsingPath();
-				var sourceFolderPath = Path.GetDirectoryName(sourcePath);
-				var destination = operationType switch
-				{
-					"delete" => e.DestItem.GetParsingPath(),
-					"rename" => sourceFolderPath is not null && !string.IsNullOrEmpty(e.Name) ? Path.Combine(sourceFolderPath, e.Name) : null,
-					"copy" => destPath is not null && !string.IsNullOrEmpty(e.Name) ? Path.Combine(destPath, e.Name) : null,
-					_ => destPath is not null && !string.IsNullOrEmpty(e.Name) ? Path.Combine(destPath, e.Name) : null
-				};
 				var operation = operationType switch
 				{
 					"copy" => FileTagsOperation.Copy,
@@ -989,6 +1047,7 @@ namespace Files.App.Utils.Storage
 					"delete" => FileTagsOperation.Delete,
 					_ => FileTagsOperation.Move,
 				};
+				var destination = FileTagsOperationSync.ResolveDestination(operation, sourcePath, e.DestFolder.GetParsingPath(), e.Name, e.DestItem.GetParsingPath());
 				FileTagsOperationSync.Apply(FileTagsDatabaseSyncTarget.Instance, operation, sourcePath, destination,
 					e.Result == HRESULT.COPYENGINE_S_DONT_PROCESS_CHILDREN, // child items not processed, update manually
 					ex => App.Logger.LogWarning(ex, ex.Message));

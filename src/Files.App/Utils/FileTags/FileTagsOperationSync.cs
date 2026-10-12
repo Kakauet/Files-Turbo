@@ -47,6 +47,20 @@ namespace Files.App.Utils.FileTags
 	/// </remarks>
 	internal static class FileTagsOperationSync
 	{
+		/// <summary>
+		/// Where the item went: the item the copy engine created when it reports one, else the requested name in the
+		/// destination folder (the source folder for a rename). With rename-on-collision the requested name ("x.txt")
+		/// differs from the created one ("x (2).txt"). A delete has a destination only when the item was recycled.
+		/// </summary>
+		public static string? ResolveDestination(FileTagsOperation operation, string? sourcePath, string? destinationFolder, string? requestedName, string? createdItemPath)
+		{
+			if (operation == FileTagsOperation.Delete || !string.IsNullOrEmpty(createdItemPath))
+				return string.IsNullOrEmpty(createdItemPath) ? null : createdItemPath;
+
+			var folder = operation == FileTagsOperation.Rename ? (sourcePath is null ? null : System.IO.Path.GetDirectoryName(sourcePath)) : destinationFolder;
+			return folder is not null && !string.IsNullOrEmpty(requestedName) ? System.IO.Path.Combine(folder, requestedName) : null;
+		}
+
 		public static void Apply(IFileTagsSyncTarget target, FileTagsOperation operation, string sourcePath, string? destination,
 			bool childrenNotProcessed, Action<Exception>? onError = null)
 		{

@@ -114,15 +114,17 @@ namespace Files.App.Helpers
 
 			return true;
 
-			static bool IsPlainFileSystemItem(ListedItem item)
-				=> item is not FtpItem and not ZipItem and not AlternateStreamItem &&
-					item.ItemPath is { } path &&
-					path.Length > 3 && SystemIO.Path.IsPathFullyQualified(path) &&
-					path.IndexOf(':', 2) < 0 &&
-					!FtpHelpers.IsFtpPath(path) &&
-					!path.StartsWith(Constants.UserEnvironmentPaths.RecycleBinPath, StringComparison.OrdinalIgnoreCase) &&
-					(SystemIO.File.Exists(path) || SystemIO.Directory.Exists(path));
 		}
+
+		/// <summary>An existing local or network file or folder, addressed by a plain path (no FTP, archive, recycle bin or stream).</summary>
+		internal static bool IsPlainFileSystemItem(ListedItem item)
+			=> item is not FtpItem and not ZipItem and not AlternateStreamItem &&
+				item.ItemPath is { } path &&
+				path.Length > 3 && SystemIO.Path.IsPathFullyQualified(path) &&
+				path.IndexOf(':', 2) < 0 &&
+				!FtpHelpers.IsFtpPath(path) &&
+				!path.StartsWith(Constants.UserEnvironmentPaths.RecycleBinPath, StringComparison.OrdinalIgnoreCase) &&
+				(SystemIO.File.Exists(path) || SystemIO.Directory.Exists(path));
 
 		[DynamicWindowsRuntimeCast(typeof(StorageFile))]
 		[DynamicWindowsRuntimeCast(typeof(StorageFolder))]
