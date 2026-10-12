@@ -1,6 +1,0 @@
-# Preserve the exact bytes used by the snapshot SHA-256 inventory.
-workspace-snapshot/** -text
-final-tooling/** -text
-final-reports/** -text
-phase4*.json -text
-final-reports-index.json -text

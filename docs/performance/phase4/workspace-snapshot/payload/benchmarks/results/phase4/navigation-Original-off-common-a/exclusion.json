@@ -1,5 +1,0 @@
-{
-  "EligibleForComparison": false,
-  "Reason": "Stopped observer control: ItemNameTextBlock belongs to sidebar; file name text is ItemName in RawView. Replacement uses cached RawView shared with all variants.",
-  "OriginalApplicationFault": false
-}

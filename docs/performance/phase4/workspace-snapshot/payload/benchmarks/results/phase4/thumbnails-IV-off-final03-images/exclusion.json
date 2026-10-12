@@ -1,5 +1,0 @@
-{
-  "ExcludedFromPrimaryComparison": true,
-  "Reason": "Calibration retained only17 Picture rectangles before all52visible images had bounds. Original III baseline has52. This control remains valid only forits17selectedrectangles, not fullviewport or III comparison.",
-  "RecordedUtc": "2026-10-11T16:52:47.4274216Z"
-}
