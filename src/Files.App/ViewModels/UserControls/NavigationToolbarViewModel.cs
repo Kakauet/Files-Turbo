@@ -50,6 +50,7 @@ namespace Files.App.ViewModels.UserControls
 		private PointerRoutedEventArgs? _pointerRoutedEventArgs;
 		private CancellationTokenSource? _suggestSearchCTS;
 		private readonly SearchSuggestionPipeline suggestionPipeline = new();
+		private (string Query, string? Folder, IReadOnlyList<ListedItem> Items)? suggestionSnapshot;
 		private readonly LatestPathNavigationCoordinator<IShellPage> pathNavigationCoordinator = new();
 		internal long SearchSuggestionPerformanceOperationId { get; private set; }
 
@@ -1304,6 +1305,12 @@ namespace Files.App.ViewModels.UserControls
 						Folder = folder,
 						MaxItemCount = 10,
 					};
+					if (suggestionSnapshot is { } snapshot && query is not null &&
+						SearchSuggestionNarrowing.CanReuse(snapshot.Query, query, snapshot.Folder, folder))
+					{
+						var narrowed = SearchSuggestionNarrowing.Filter(snapshot.Items, query, item => Path.GetFileName(item.ItemPath));
+						UpdateSearchSuggestions(narrowed.Select(item => new SuggestionModel(item)).ToList());
+					}
 
 					var results = new List<ListedItem>();
 					await suggestionPipeline.RunAsync(query,
@@ -1317,6 +1324,7 @@ namespace Files.App.ViewModels.UserControls
 						IsCurrent,
 						found =>
 						{
+							suggestionSnapshot = (query!, folder, found.ToArray());
 							newSuggestions.AddRange(found.Select(result => new SuggestionModel(result)
 							{
 								PerformanceOperationId = performanceOperation
