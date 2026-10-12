@@ -1305,7 +1305,7 @@ namespace Files.App.ViewModels.UserControls
 						Folder = folder,
 						MaxItemCount = 10,
 					};
-					if (suggestionSnapshot is { } snapshot && query is not null &&
+					if (suggestionSnapshot is { } snapshot &&
 						SearchSuggestionNarrowing.CanReuse(snapshot.Query, query, snapshot.Folder, folder))
 					{
 						var narrowed = SearchSuggestionNarrowing.Filter(snapshot.Items, query, item => Path.GetFileName(item.ItemPath));
