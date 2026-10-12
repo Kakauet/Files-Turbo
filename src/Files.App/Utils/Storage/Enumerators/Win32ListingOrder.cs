@@ -17,7 +17,7 @@ namespace Files.App.Utils.Storage
 			return DateTime.FromFileTimeUtc(ticks / TimeSpan.TicksPerMillisecond * TimeSpan.TicksPerMillisecond);
 		}
 
-		internal static List<Win32PInvoke.WIN32_FIND_DATA>? TryOrder(List<Win32PInvoke.WIN32_FIND_DATA> data,
+		internal static IEnumerable<Win32PInvoke.WIN32_FIND_DATA>? TryOrder(List<Win32PInvoke.WIN32_FIND_DATA> data,
 			SortOption sort, SortDirection direction, bool alongside, bool filesFirst, GroupOption group,
 			SortDirection groupDirection, GroupByDateUnit dateUnit, bool showExtensions, CancellationToken token)
 		{
@@ -92,7 +92,23 @@ namespace Files.App.Utils.Storage
 					: ordered.ThenByDescending(x => x.Name, natural);
 
 			token.ThrowIfCancellationRequested();
-			return ordered.Select(x => x.Data).ToList();
+			return entries.Count > 2_000 ? ReadOrderedEntries(ordered, token) : ordered.Select(x => x.Data).ToList();
+		}
+
+		private static IEnumerable<Win32PInvoke.WIN32_FIND_DATA> ReadOrderedEntries(IOrderedEnumerable<Entry> ordered, CancellationToken token)
+		{
+			// LINQ sorts only this prefix before the first publication; the remaining sort runs off the UI thread.
+			foreach (var entry in ordered.Take(64))
+			{
+				token.ThrowIfCancellationRequested();
+				yield return entry.Data;
+			}
+			token.ThrowIfCancellationRequested();
+			foreach (var entry in ordered.Skip(64))
+			{
+				token.ThrowIfCancellationRequested();
+				yield return entry.Data;
+			}
 		}
 	}
 }

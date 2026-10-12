@@ -26,7 +26,7 @@ namespace Files.App.Utils.Storage
 			Func<List<ListedItem>, Task> intermediateAction,
 			long performanceOperationId = 0,
 			Task<bool>? repositoryState = null,
-			Func<List<Win32PInvoke.WIN32_FIND_DATA>, List<Win32PInvoke.WIN32_FIND_DATA>?>? prepareOrder = null
+			Func<List<Win32PInvoke.WIN32_FIND_DATA>, IEnumerable<Win32PInvoke.WIN32_FIND_DATA>?>? prepareOrder = null
 		)
 		{
 			var sampler = new IntervalSampler(500);
@@ -50,6 +50,7 @@ namespace Files.App.Utils.Storage
 			try
 			{
 				var buffered = new List<Win32PInvoke.WIN32_FIND_DATA>();
+				IEnumerable<Win32PInvoke.WIN32_FIND_DATA> entries = buffered;
 				var complete = false;
 				var ordered = false;
 				if (prepareOrder is not null && countLimit < 0)
@@ -73,13 +74,13 @@ namespace Files.App.Utils.Storage
 							(!showDotFiles && x.cFileName.StartsWith('.')));
 						if (prepareOrder(buffered) is { } sorted)
 						{
-							buffered = sorted;
+							entries = sorted;
 							ordered = true;
 						}
 					}
 				}
 				isGitRepo = repositoryState is not null && await repositoryState.WaitAsync(cancellationToken);
-				foreach (var entry in ReadEntries(buffered, complete, rawHandle, findData))
+				foreach (var entry in ReadEntries(entries, complete, rawHandle, findData))
 				{
 					findData = entry;
 					cancellationToken.ThrowIfCancellationRequested();
@@ -171,7 +172,7 @@ namespace Files.App.Utils.Storage
 			return tempList;
 		}
 
-		private static IEnumerable<Win32PInvoke.WIN32_FIND_DATA> ReadEntries(List<Win32PInvoke.WIN32_FIND_DATA> buffered,
+		private static IEnumerable<Win32PInvoke.WIN32_FIND_DATA> ReadEntries(IEnumerable<Win32PInvoke.WIN32_FIND_DATA> buffered,
 			bool complete, nint handle, Win32PInvoke.WIN32_FIND_DATA first)
 		{
 			foreach (var entry in buffered)
