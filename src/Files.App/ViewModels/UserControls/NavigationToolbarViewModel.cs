@@ -604,6 +604,16 @@ namespace Files.App.ViewModels.UserControls
 					shellPage.CurrentPageType != typeof(HomePage) && !shellViewModel.IsSearchResults)
 					return true;
 
+				var localFolder = await LocalFolderNavigation.IsAccessibleAsync(normalizedInput);
+				if (!IsCurrentRequest())
+					return true;
+				if (localFolder)
+				{
+					SavePathToHistory(normalizedInput);
+					shellPage.NavigateToPath(normalizedInput);
+					return true;
+				}
+
 				var item = await FilesystemTasks.Wrap(() => DriveHelpers.GetRootFromPathAsync(normalizedInput));
 				if (!IsCurrentRequest())
 					return true;
@@ -930,6 +940,16 @@ namespace Files.App.ViewModels.UserControls
 					normalizedInput = StorageFileExtensions.GetResolvedPath(normalizedInput, isFtp);
 					if (normalizedInput == shellViewModel.WorkingDirectory && !shellViewModel.IsWorkingDirectoryUpdatePending && shellPage.CurrentPageType != typeof(HomePage))
 						return;
+
+					var localFolder = await LocalFolderNavigation.IsAccessibleAsync(normalizedInput);
+					if (!IsCurrentRequest())
+						return;
+					if (localFolder)
+					{
+						SavePathToHistory(normalizedInput);
+						shellPage.NavigateToPath(normalizedInput);
+						return;
+					}
 
 					var item = await FilesystemTasks.WrapNullable(() => DriveHelpers.GetRootFromPathAsync(normalizedInput));
 					if (!IsCurrentRequest())
