@@ -91,7 +91,8 @@ namespace Files.App.Utils.Storage.Operations
 										}
 										else
 										{
-											ComputeFileSize(itemPath);
+											// The find data already holds the size; opening each file again cost a handle per file
+											AddFileSize(itemPath, ((long)findData.nFileSizeHigh << 32) | findData.nFileSizeLow);
 										}
 
 										if (token.IsCancellationRequested)
@@ -124,13 +125,19 @@ namespace Files.App.Utils.Storage.Operations
 				0,
 				null);
 
-			if (!hFile.IsInvalid && PInvoke.GetFileSizeEx(hFile, out size) && _computedFiles.TryAdd(path, size))
+			if (!hFile.IsInvalid && PInvoke.GetFileSizeEx(hFile, out size))
+				AddFileSize(path, size);
+
+			return size;
+		}
+
+		private void AddFileSize(string path, long size)
+		{
+			if (_computedFiles.TryAdd(path, size))
 			{
 				Interlocked.Add(ref _size, size);
 				ItemsCountChanged?.Invoke(ItemsCount);
 			}
-
-			return size;
 		}
 
 		public void ForceComputeFileSize(string path)
