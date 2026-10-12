@@ -79,6 +79,51 @@ namespace Files.App.Helpers
 			}
 		}
 
+		/// <summary>
+		/// Puts plain file system items on the clipboard as a shell data object, the format Explorer uses.
+		/// </summary>
+		/// <remarks>
+		/// The storage item path below opens a WinRT storage item per entry before the clipboard changes, which took
+		/// seconds for a thousand items; a paste in the meantime used the previous clipboard content. Items that need
+		/// a storage item (FTP, archives, recycle bin, alternate streams) keep that path.
+		/// </remarks>
+		private static async Task<bool> TrySetFileSystemClipboardAsync(IReadOnlyList<ListedItem> selected, DataPackageOperation type)
+		{
+			if (selected.Count == 0 || !selected.All(IsPlainFileSystemItem))
+				return false;
+
+			try
+			{
+				await FileOperationsHelpers.SetClipboard(selected.Select(x => x.GetRequiredPath()).ToArray(), type);
+			}
+			catch (Exception ex)
+			{
+				App.Logger.LogWarning(ex, "Failed to place the selection on the clipboard as file system paths.");
+				return false;
+			}
+
+			if (type is DataPackageOperation.Move)
+			{
+				// Dim opacities accordingly
+				await MainWindow.Instance.DispatcherQueue.EnqueueOrInvokeAsync(() =>
+				{
+					foreach (var item in selected)
+						item.Opacity = Constants.UI.DimItemOpacity;
+				});
+			}
+
+			return true;
+
+			static bool IsPlainFileSystemItem(ListedItem item)
+				=> item is not FtpItem and not ZipItem and not AlternateStreamItem &&
+					item.ItemPath is { } path &&
+					path.Length > 3 && SystemIO.Path.IsPathFullyQualified(path) &&
+					path.IndexOf(':', 2) < 0 &&
+					!FtpHelpers.IsFtpPath(path) &&
+					!path.StartsWith(Constants.UserEnvironmentPaths.RecycleBinPath, StringComparison.OrdinalIgnoreCase) &&
+					(SystemIO.File.Exists(path) || SystemIO.Directory.Exists(path));
+		}
+
 		[DynamicWindowsRuntimeCast(typeof(StorageFile))]
 		[DynamicWindowsRuntimeCast(typeof(StorageFolder))]
 		public static async Task ExecuteTransferAsync(IContentPageContext context, StatusCenterViewModel statusViewModel, DataPackageOperation type = DataPackageOperation.Copy)
@@ -89,6 +134,9 @@ namespace Files.App.Helpers
 
 			// Reset cut mode
 			contentPage.ItemManipulationModel.RefreshItemsOpacity();
+
+			if (await TrySetFileSystemClipboardAsync(context.SelectedItems.ToList(), type))
+				return;
 
 			ConcurrentBag<IStorageItem> items = [];
 			var itemsCount = context.SelectedItems.Count;
