@@ -971,7 +971,6 @@ namespace Files.App.Utils.Storage
 
 		private static void UpdateFileTagsDb(ShellFileOperations2.ShellFileOpEventArgs e, string operationType)
 		{
-			var dbInstance = FileTagsHelper.GetDbInstance();
 			if (e.Result.Succeeded && e.SourceItem.GetParsingPath() is { } sourcePath)
 			{
 				var destPath = e.DestFolder.GetParsingPath();
@@ -983,65 +982,45 @@ namespace Files.App.Utils.Storage
 					"copy" => destPath is not null && !string.IsNullOrEmpty(e.Name) ? Path.Combine(destPath, e.Name) : null,
 					_ => destPath is not null && !string.IsNullOrEmpty(e.Name) ? Path.Combine(destPath, e.Name) : null
 				};
-				if (destination is null)
+				var operation = operationType switch
 				{
-					dbInstance.SetTags(sourcePath, null, []); // remove tag from deleted files
-				}
-				else
-				{
-					SafetyExtensions.IgnoreExceptions(() =>
-					{
-						if (operationType == "copy")
-						{
-							var tag = dbInstance.GetTags(sourcePath, null);
-
-							dbInstance.SetTags(destination, FileTagsHelper.GetFileFRN(destination), tag); // copy tag to new files
-							using var si = new ShellItem(destination);
-							if (si.IsFolder) // File tag is not copied automatically for folders
-							{
-								_ = FileTagsHelper.WriteFileTagAsync(destination, tag);
-							}
-						}
-						else
-						{
-							dbInstance.UpdateTag(sourcePath, FileTagsHelper.GetFileFRN(destination), destination); // move tag to new files
-						}
-					}, App.Logger);
-				}
-				if (e.Result == HRESULT.COPYENGINE_S_DONT_PROCESS_CHILDREN) // child items not processed, update manually
-				{
-					var tags = dbInstance.GetAllUnderPath(sourcePath).ToList();
-					if (destination is null) // remove tag for items contained in the folder
-					{
-						tags.ForEach(t => dbInstance.SetTags(t.FilePath, null, []));
-					}
-					else
-					{
-						if (operationType == "copy") // copy tag for items contained in the folder
-						{
-							tags.ForEach(t =>
-							{
-								SafetyExtensions.IgnoreExceptions(() =>
-								{
-									var subPath = t.FilePath.Replace(sourcePath, destination, StringComparison.Ordinal);
-									dbInstance.SetTags(subPath, FileTagsHelper.GetFileFRN(subPath), t.Tags ?? []);
-								}, App.Logger);
-							});
-						}
-						else // move tag to new files
-						{
-							tags.ForEach(t =>
-							{
-								SafetyExtensions.IgnoreExceptions(() =>
-								{
-									var subPath = t.FilePath.Replace(sourcePath, destination, StringComparison.Ordinal);
-									dbInstance.UpdateTag(t.FilePath, FileTagsHelper.GetFileFRN(subPath), subPath);
-								}, App.Logger);
-							});
-						}
-					}
-				}
+					"copy" => FileTagsOperation.Copy,
+					"rename" => FileTagsOperation.Rename,
+					"delete" => FileTagsOperation.Delete,
+					_ => FileTagsOperation.Move,
+				};
+				FileTagsOperationSync.Apply(FileTagsDatabaseSyncTarget.Instance, operation, sourcePath, destination,
+					e.Result == HRESULT.COPYENGINE_S_DONT_PROCESS_CHILDREN, // child items not processed, update manually
+					ex => App.Logger.LogWarning(ex, ex.Message));
 			}
+		}
+
+		private sealed class FileTagsDatabaseSyncTarget : IFileTagsSyncTarget
+		{
+			public static readonly FileTagsDatabaseSyncTarget Instance = new();
+
+			private static FileTagsDatabase Database => FileTagsHelper.GetDbInstance();
+
+			public bool HasEntry(string path) => Database.HasEntry(path);
+
+			public string[] GetTags(string path) => Database.GetTags(path, null);
+
+			public void SetTags(string path, ulong? frn, string[] tags) => Database.SetTags(path, frn, tags);
+
+			public void MoveEntry(string oldPath, ulong? frn, string newPath) => Database.UpdateTag(oldPath, frn, newPath);
+
+			public IReadOnlyList<(string Path, string[] Tags)> GetAllUnderPath(string folderPath)
+				=> Database.GetAllUnderPath(folderPath).Select(t => (t.FilePath, t.Tags ?? [])).ToList();
+
+			public ulong? GetFrn(string path) => FileTagsHelper.GetFileFRN(path);
+
+			public bool IsFolder(string path)
+			{
+				using var si = new ShellItem(path);
+				return si.IsFolder;
+			}
+
+			public void WriteFolderTags(string path, string[] tags) => _ = FileTagsHelper.WriteFileTagAsync(path, tags);
 		}
 
 		public static void WaitForCompletion()

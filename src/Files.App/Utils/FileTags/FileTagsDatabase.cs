@@ -160,6 +160,11 @@ namespace Files.App.Utils.FileTags
 			return FindTag(filePath, frn)?.Tags ?? [];
 		}
 
+		public bool HasEntry(string filePath)
+		{
+			return FindTag(filePath, null) is not null;
+		}
+
 		public IEnumerable<TaggedFile> GetAll()
 		{
 			var list = new List<TaggedFile>();
