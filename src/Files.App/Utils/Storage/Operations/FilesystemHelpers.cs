@@ -162,8 +162,8 @@ namespace Files.App.Utils.Storage
 				App.HistoryWrapper.AddHistory(history);
 
 			// Execute removal tasks concurrently in background
-			var sourcePaths = source.Select(x => x.Path);
-			_ = Task.WhenAll(sourcePaths.Select(jumpListService.RemoveFolderAsync));
+			var sourcePaths = source.Where(x => x.ItemType == FilesystemItemType.Directory).Select(x => x.Path);
+			_ = jumpListService.RemoveFoldersAsync(sourcePaths);
 
 			var itemsCount = banner.TotalItemsCount;
 
@@ -337,15 +337,18 @@ namespace Files.App.Utils.Storage
 				history?.Destination is { } historyDestinations &&
 				source.Any((item) => !string.IsNullOrWhiteSpace(item.Path)))
 			{
-				foreach (var (histSrcItem, histDestItem) in history.Source.Zip(historyDestinations))
+				var conflictsByPath = itemsResult.ToLookup(x => x.SourcePath, StringComparer.Ordinal);
+				for (int historyIndex = 0; historyIndex < Math.Min(history.Source.Count, historyDestinations.Count); historyIndex++)
 				{
-					foreach (var conflictItem in itemsResult)
+					var histSrcItem = history.Source[historyIndex];
+					var histDestItem = historyDestinations[historyIndex];
+					foreach (var conflictItem in conflictsByPath[histSrcItem.Path])
 					{
 						if (!string.IsNullOrEmpty(conflictItem.CustomName) && conflictItem.SourcePath == histSrcItem.Path && Path.GetFileName(conflictItem.SourcePath) != conflictItem.CustomName)
 						{
 							var renameHistory = await filesystemOperations.RenameAsync(histDestItem, conflictItem.CustomName, NameCollisionOption.FailIfExists, banner.ProgressEventSource, token);
 							if (renameHistory?.Destination is { Count: > 0 } renameDestinations)
-								historyDestinations[history.Source.IndexOf(histSrcItem)] = renameDestinations[0];
+								historyDestinations[historyIndex] = renameDestinations[0];
 						}
 					}
 				}
@@ -486,15 +489,18 @@ namespace Files.App.Utils.Storage
 				history?.Destination is { } historyDestinations &&
 				source.Any((item) => !string.IsNullOrWhiteSpace(item.Path)))
 			{
-				foreach (var (histSrcItem, histDestItem) in history.Source.Zip(historyDestinations))
+				var conflictsByPath = itemsResult.ToLookup(x => x.SourcePath, StringComparer.Ordinal);
+				for (int historyIndex = 0; historyIndex < Math.Min(history.Source.Count, historyDestinations.Count); historyIndex++)
 				{
-					foreach (var conflictItem in itemsResult)
+					var histSrcItem = history.Source[historyIndex];
+					var histDestItem = historyDestinations[historyIndex];
+					foreach (var conflictItem in conflictsByPath[histSrcItem.Path])
 					{
 						if (!string.IsNullOrEmpty(conflictItem.CustomName) && conflictItem.SourcePath == histSrcItem.Path)
 						{
 							var renameHistory = await filesystemOperations.RenameAsync(histDestItem, conflictItem.CustomName, NameCollisionOption.FailIfExists, banner.ProgressEventSource, token);
 							if (renameHistory?.Destination is { Count: > 0 } renameDestinations)
-								historyDestinations[history.Source.IndexOf(histSrcItem)] = renameDestinations[0];
+								historyDestinations[historyIndex] = renameDestinations[0];
 						}
 					}
 				}
@@ -503,8 +509,8 @@ namespace Files.App.Utils.Storage
 			}
 
 			// Execute removal tasks concurrently in background
-			var sourcePaths = source.Select(x => x.Path);
-			_ = Task.WhenAll(sourcePaths.Select(jumpListService.RemoveFolderAsync));
+			var sourcePaths = source.Where(x => x.ItemType == FilesystemItemType.Directory).Select(x => x.Path);
+			_ = jumpListService.RemoveFoldersAsync(sourcePaths);
 
 			var itemsCount = banner.TotalItemsCount;
 

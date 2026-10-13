@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Files Community
 // Licensed under the MIT License.
 
-using System.Collections.Concurrent;
+using Files.App.Utils.Storage.Operations;
 using System.Runtime.CompilerServices;
 
 namespace Files.App.Utils.StatusCenter
@@ -18,9 +18,15 @@ namespace Files.App.Utils.StatusCenter
 	{
 		private readonly IProgress<StatusCenterItemProgressModel>? _progress;
 
-		private readonly ConcurrentDictionary<string, bool> _dirtyTracker;
+		private int _dirtyProperties;
+		private static readonly string[] PropertyNames =
+		[
+			nameof(Status), nameof(EnumerationCompleted), nameof(FileName), nameof(TotalSize),
+			nameof(ProcessedSize), nameof(ItemsCount), nameof(ProcessedItemsCount),
+			nameof(ProcessingSizeSpeed), nameof(ProcessingItemsCountSpeed), nameof(StartTime), nameof(CompletedTime)
+		];
 
-		private readonly IntervalSampler _sampler, _sampler2;
+		private readonly ProgressNotificationGate _sampler;
 
 		private bool _criticalReport;
 
@@ -121,8 +127,6 @@ namespace Files.App.Utils.StatusCenter
 			// Initialize
 			_progress = progress;
 			_sampler = new(samplerInterval);
-			_sampler2 = new(samplerInterval);
-			_dirtyTracker = new();
 			EnumerationCompleted = enumerationCompleted;
 			Status = status;
 			ItemsCount = itemsCount;
@@ -133,13 +137,13 @@ namespace Files.App.Utils.StatusCenter
 		public void AddProcessedItemsCount(long value)
 		{
 			Interlocked.Add(ref _ProcessedItemsCount, value);
-			_dirtyTracker[nameof(ProcessedItemsCount)] = true;
+			MarkDirty(nameof(ProcessedItemsCount));
 		}
 
 		public void SetProcessedSize(long value)
 		{
 			Interlocked.Exchange(ref _ProcessedSize, value);
-			_dirtyTracker[nameof(ProcessedSize)] = true;
+			MarkDirty(nameof(ProcessedSize));
 		}
 
 		private void SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
@@ -148,12 +152,18 @@ namespace Files.App.Utils.StatusCenter
 
 			if (propertyName is not null)
 			{
-				_dirtyTracker[propertyName] = true;
+				MarkDirty(propertyName);
 			}
 		}
 
 		public void Report(double? percentage = null)
 		{
+			if (percentage is not null && Percentage != percentage)
+			{
+				SetProcessedSize((long)(TotalSize * percentage / 100));
+				Percentage = percentage;
+			}
+
 			// Set the progress state as success
 			if ((EnumerationCompleted &&
 				ProcessedItemsCount == ItemsCount &&
@@ -162,47 +172,43 @@ namespace Files.App.Utils.StatusCenter
 				(percentage is double p && Math.Abs(p - 100) <= double.Epsilon)) &&
 				_Status is FileSystemStatusCode.InProgress or null)
 			{
-				_Status = FileSystemStatusCode.Success;
+				Status = FileSystemStatusCode.Success;
 			}
 
-			// Set time at completed when succeed
-			if (_Status is FileSystemStatusCode.Success)
-				CompletedTime = DateTimeOffset.Now;
+			if (!_sampler.TryEnter() && !_criticalReport)
+				return;
 
-			if (percentage is not null && Percentage != percentage)
+			_criticalReport = false;
+			var now = DateTimeOffset.Now;
+			if (_Status is FileSystemStatusCode.Success && CompletedTime == default)
+				CompletedTime = now;
+
+			var elapsed = (now - _previousReportTime).TotalSeconds;
+			if (elapsed > 0)
 			{
-				SetProcessedSize((long)(TotalSize * percentage / 100));
-
-				if (_sampler2.CheckNow())
-				{
-					ProcessingSizeSpeed = (ProcessedSize - _previousProcessedSize) / (DateTimeOffset.Now - _previousReportTime).TotalSeconds;
-					ProcessingItemsCountSpeed = (ProcessedItemsCount - _previousProcessedItemsCount) / (DateTimeOffset.Now - _previousReportTime).TotalSeconds;
-
-					_dirtyTracker[nameof(ProcessingSizeSpeed)] = true;
-					_dirtyTracker[nameof(ProcessingItemsCountSpeed)] = true;
-
-					_previousReportTime = DateTimeOffset.Now;
-					_previousProcessedSize = ProcessedSize;
-					_previousProcessedItemsCount = ProcessedItemsCount;
-				}
-
-				Percentage = percentage;
+				ProcessingSizeSpeed = (ProcessedSize - _previousProcessedSize) / elapsed;
+				ProcessingItemsCountSpeed = (ProcessedItemsCount - _previousProcessedItemsCount) / elapsed;
+				MarkDirty(nameof(ProcessingSizeSpeed));
+				MarkDirty(nameof(ProcessingItemsCountSpeed));
 			}
+			_previousReportTime = now;
+			_previousProcessedSize = ProcessedSize;
+			_previousProcessedItemsCount = ProcessedItemsCount;
 
-			if (_criticalReport || _sampler.CheckNow())
+			int dirty = Interlocked.Exchange(ref _dirtyProperties, 0);
+			for (int i = 0; i < PropertyNames.Length; i++)
 			{
-				_criticalReport = false;
-				foreach (var propertyName in _dirtyTracker.Keys)
-				{
-					if (_dirtyTracker[propertyName])
-					{
-						_dirtyTracker[propertyName] = false;
-						PropertyChanged?.Invoke(this, new(propertyName));
-					}
-				}
-
-				_progress?.Report(this);
+				if ((dirty & (1 << i)) != 0)
+					PropertyChanged?.Invoke(this, new(PropertyNames[i]));
 			}
+			_progress?.Report(this);
+		}
+
+		private void MarkDirty(string propertyName)
+		{
+			int index = Array.IndexOf(PropertyNames, propertyName);
+			if (index >= 0)
+				Interlocked.Or(ref _dirtyProperties, 1 << index);
 		}
 
 		public void ReportStatus(FileSystemStatusCode status, double? percentage = null)

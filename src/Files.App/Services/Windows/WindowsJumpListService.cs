@@ -111,8 +111,14 @@ namespace Files.App.Services
 			}
 		}
 
-		public async Task RemoveFolderAsync(string path)
+		public Task RemoveFolderAsync(string path) => RemoveFoldersAsync([path]);
+
+		public async Task RemoveFoldersAsync(IEnumerable<string> paths)
 		{
+			var pathsToRemove = new HashSet<string>(paths, StringComparer.Ordinal);
+			if (pathsToRemove.Count == 0)
+				return;
+
 			if (JumpList.IsSupported())
 			{
 				try
@@ -121,9 +127,10 @@ namespace Files.App.Services
 					// Disable automatic jumplist. It doesn't work.
 					instance.SystemGroupKind = JumpListSystemGroupKind.None;
 
-					var itemToRemove = instance.Items.Where(x => x.Arguments == path).Select(x => x).FirstOrDefault();
-					// Saving rewrites the taskbar's jump list; renaming an item that is not in it must not
-					if (itemToRemove is not null && instance.Items.Remove(itemToRemove))
+					var itemsToRemove = instance.Items.Where(x => pathsToRemove.Contains(x.Arguments)).ToList();
+					foreach (var item in itemsToRemove)
+						instance.Items.Remove(item);
+					if (itemsToRemove.Count > 0)
 						await instance.SaveAsync();
 				}
 				catch { }
