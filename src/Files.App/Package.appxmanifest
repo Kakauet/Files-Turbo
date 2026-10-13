@@ -21,7 +21,7 @@
 
     <Properties>
         <DisplayName>Files Turbo</DisplayName>
-        <PublisherDisplayName>Yair A</PublisherDisplayName>
+        <PublisherDisplayName>Files Turbo (unofficial fork of Files)</PublisherDisplayName>
         <Logo>Assets\AppTiles\Dev\StoreLogo.png</Logo>
         <desktop6:FileSystemWriteVirtualization>disabled</desktop6:FileSystemWriteVirtualization>
         <virtualization:RegistryWriteVirtualization>
