@@ -426,6 +426,7 @@ namespace Files.App.Views
 
 			SidebarControl.HoverToOpenDelay = TimeSpan.FromMilliseconds(Constants.DragAndDrop.HoverToOpenTimespan);
 			SidebarControl.HoverToExpandDelay = TimeSpan.FromMilliseconds(Constants.DragAndDrop.HoverToExpandTimespan);
+			SidebarControl.MaximumOpenPaneLength = Constants.UI.MaximumSidebarWidth;
 
 			// VM.SidebarDisplayMode rejects Minimal (it only tracks user preference) so the flat tree mirrors SidebarView.DisplayMode separately.
 			SidebarAdaptiveViewModel.ActualDisplayMode = SidebarControl.DisplayMode;

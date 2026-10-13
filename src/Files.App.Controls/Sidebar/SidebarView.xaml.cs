@@ -158,7 +158,7 @@ namespace Files.App.Controls
 
 		private void SidebarResizer_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
 		{
-			var newWidth = preManipulationSidebarWidth + e.Cumulative.Translation.X;
+			var newWidth = Math.Min(preManipulationSidebarWidth + e.Cumulative.Translation.X, MaximumOpenPaneLength);
 			if (draggingSidebarResizer && DisplayMode == SidebarDisplayMode.Expanded && newWidth > COMPACT_MAX_WIDTH)
 			{
 				// OpenPaneLength is bound TwoWay to a persisted setting: writing it on every delta saved the settings file

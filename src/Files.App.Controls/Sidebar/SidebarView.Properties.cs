@@ -89,6 +89,9 @@ namespace Files.App.Controls
 		public static readonly DependencyProperty NegativeOpenPaneLengthProperty =
 			DependencyProperty.Register(nameof(NegativeOpenPaneLength), typeof(double), typeof(SidebarView), new PropertyMetadata(-240d));
 
+		// Upper bound applied while dragging the resizer; the hosting app supplies the limit of its persisted width.
+		public double MaximumOpenPaneLength { get; set; } = double.PositiveInfinity;
+
 		public bool CanResizePane
 		{
 			get => (bool)GetValue(CanResizePaneProperty);
