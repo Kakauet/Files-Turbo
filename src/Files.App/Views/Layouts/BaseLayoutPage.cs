@@ -70,6 +70,7 @@ namespace Files.App.Views.Layouts
 		private readonly Dictionary<ListedItem, int> metadataFailures = new(ReferenceEqualityComparer.Instance);
 		private readonly Dictionary<ListedItem, ItemImageJob> imageJobs = new(ReferenceEqualityComparer.Instance);
 		private ViewportWorkQueue<ItemImageJob>? slowImageWork;
+		private ViewportWorkQueue<ItemImageJob>? searchIconWork;
 		private ViewportWorkQueue<ListedItem>? metadataWork;
 		private bool viewportRefillQueued;
 
@@ -1294,6 +1295,8 @@ namespace Files.App.Views.Layouts
 		{
 			scrollSettleTimer?.Stop();
 			CancelAllItemImages();
+			searchIconWork?.Dispose();
+			searchIconWork = null;
 			slowImageWork?.Dispose();
 			slowImageWork = null;
 			metadataWork?.Dispose();
@@ -1352,14 +1355,17 @@ namespace Files.App.Views.Layouts
 		// Runs once per scroll gesture, not per scroll event, so pending work follows the new viewport.
 		private void ReprioritizeViewportWork()
 		{
-			if (slowImageWork is null && metadataWork is null)
+			if (slowImageWork is null && searchIconWork is null && metadataWork is null)
 				return;
 
 			foreach (var (container, item) in realizedItems)
 			{
 				var priority = GetWorkPriority(ItemsControl.IndexFromContainer(container));
 				if (imageJobs.TryGetValue(item, out var job))
+				{
+					searchIconWork?.SetPriority(job, priority);
 					slowImageWork?.SetPriority(job, priority);
+				}
 				metadataWork?.SetPriority(item, priority);
 			}
 		}
@@ -1377,18 +1383,30 @@ namespace Files.App.Views.Layouts
 
 			var job = new ItemImageJob { Attempts = attempts };
 			imageJobs[item] = job;
-			_ = RunItemImageAsync(container, item, shellViewModel, request, work, GetWorkPriority(index), job);
+			var priority = GetWorkPriority(index);
+			if (navigationArguments?.IsSearchResultPage == true)
+			{
+				searchIconWork ??= new ViewportWorkQueue<ItemImageJob>(8, 4096,
+					action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () => action()),
+					faulted: exception => App.Logger.LogWarning(exception, "Failed to load a search result icon."), newestFirst: false);
+				if (!searchIconWork.Enqueue(job, token => RunItemImageAsync(container, item, shellViewModel, request, work, priority, job, token), priority))
+					job.Completed = true;
+			}
+			else
+				_ = RunItemImageAsync(container, item, shellViewModel, request, work, priority, job);
 		}
 
 		private async Task RunItemImageAsync(SelectorItem container, ListedItem item, ShellViewModel shellViewModel,
-			ShellViewModel.ItemImageRequest request, ShellViewModel.ItemImageWork work, int priority, ItemImageJob job)
+			ShellViewModel.ItemImageRequest request, ShellViewModel.ItemImageWork work, int priority, ItemImageJob job, CancellationToken queuedToken = default)
 		{
 			var token = job.Token;
+			using var fastCTS = queuedToken.CanBeCanceled ? CancellationTokenSource.CreateLinkedTokenSource(token, queuedToken) : null;
+			var fastToken = fastCTS?.Token ?? token;
 			var queued = false;
 			try
 			{
 				// Continues off the UI thread; results reach rows through the view model's batched apply
-				if (!await shellViewModel.LoadFastImageAsync(request, work, token).ConfigureAwait(false) || token.IsCancellationRequested)
+				if (!await shellViewModel.LoadFastImageAsync(request, work, fastToken).ConfigureAwait(false) || fastToken.IsCancellationRequested)
 					return;
 
 				queued = slowImageWork?.Enqueue(job, async queueToken =>
@@ -1421,6 +1439,7 @@ namespace Files.App.Views.Layouts
 
 			job.Cancellation.Cancel();
 			job.Cancellation.Dispose();
+			searchIconWork?.Cancel(job);
 			slowImageWork?.Cancel(job);
 		}
 
@@ -1432,6 +1451,7 @@ namespace Files.App.Views.Layouts
 				job.Cancellation.Dispose();
 			}
 			imageJobs.Clear();
+			searchIconWork?.CancelAll();
 			slowImageWork?.CancelAll();
 		}
 
