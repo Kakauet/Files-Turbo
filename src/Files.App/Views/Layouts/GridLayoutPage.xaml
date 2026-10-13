@@ -1010,6 +1010,7 @@
 					SelectionChanged="FileList_SelectionChanged"
 					SelectionMode="Extended"
 					ShowsScrollingPlaceholders="True"
+					SizeChanged="FileList_SizeChanged"
 					Tapped="FileList_ItemTapped">
 
 					<GridView.GroupStyle>
