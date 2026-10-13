@@ -47,13 +47,14 @@ namespace Files.App.Utils.Storage
 		/// </summary>
 		public event EventHandler<IReadOnlyList<ListedItem>>? SearchTick;
 
-		private readonly IntervalSampler tickSampler = new(500);
+		private readonly IntervalSampler tickSampler = new(50);
 		private readonly HashSet<string> resultPaths = new(StringComparer.Ordinal);
 		private readonly object resultSync = new();
 		private string? resultRoot;
 		private readonly List<ShortcutItem> shortcutResults = [];
 		private List<ListedItem> pendingResults = [];
 		private bool hasRaisedTick;
+		private CancellationTokenSource? resultLimitCTS;
 
 		private bool IsAQSQuery => Query is not null && (Query.StartsWith('$') || Query.Contains(':', StringComparison.Ordinal));
 
@@ -96,29 +97,44 @@ namespace Files.App.Utils.Storage
 		public async Task SearchAsync(IList<ListedItem> results, CancellationToken token, bool loadSuggestionIcons = true)
 		{
 			HasIncompleteResults = false;
+			using var limitCTS = CancellationTokenSource.CreateLinkedTokenSource(token);
+			resultLimitCTS = MaxItemCount > 0 ? limitCTS : null;
+			var enumerationToken = limitCTS.Token;
+			using var ticksCTS = CancellationTokenSource.CreateLinkedTokenSource(token);
+			var ticks = SearchTick is null ? Task.CompletedTask : PumpSearchTicksAsync(ticksCTS.Token);
 			try
 			{
 				if (App.LibraryManager.TryGetLibrary(Folder, out var library))
 				{
-					await AddItemsForLibraryAsync(library, results, token);
+					await AddItemsForLibraryAsync(library, results, enumerationToken);
 				}
 				else if (Folder == "Home")
 				{
-					await AddItemsForHomeAsync(results, token);
+					await AddItemsForHomeAsync(results, enumerationToken);
 				}
 				else
 				{
-					await AddItemsAsync(Folder ?? throw new InvalidOperationException("The search folder has not been set."), results, token);
+					await AddItemsAsync(Folder ?? throw new InvalidOperationException("The search folder has not been set."), results, enumerationToken);
 				}
 			}
-			catch (OperationCanceledException)
+			catch (OperationCanceledException) when (token.IsCancellationRequested)
 			{
 				return;
+			}
+			catch (OperationCanceledException) when (limitCTS.IsCancellationRequested)
+			{
 			}
 			catch (Exception e)
 			{
 				HasIncompleteResults = true;
 				App.Logger.LogWarning(e, "Search failure");
+			}
+			finally
+			{
+				ticksCTS.Cancel();
+				await ticks;
+				RaiseSearchTickIfDue(token, force: true);
+				resultLimitCTS = null;
 			}
 
 			try
@@ -197,14 +213,27 @@ namespace Files.App.Utils.Storage
 					shortcutResults.Add(shortcutItem);
 
 				RaiseSearchTickIfDue(token);
+				if (results.Count >= UsedMaxItemCount)
+					resultLimitCTS?.Cancel();
 			}
 		}
 
-		private void RaiseSearchTickIfDue(CancellationToken token)
+		private async Task PumpSearchTicksAsync(CancellationToken token)
+		{
+			using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(50));
+			try
+			{
+				while (await timer.WaitForNextTickAsync(token).ConfigureAwait(false))
+					RaiseSearchTickIfDue(token, force: true);
+			}
+			catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+		}
+
+		private void RaiseSearchTickIfDue(CancellationToken token, bool force = false)
 		{
 			lock (resultSync)
 			{
-				if (pendingResults.Count == 0 || token.IsCancellationRequested || (hasRaisedTick && !tickSampler.CheckNow()))
+				if (pendingResults.Count == 0 || token.IsCancellationRequested || (!force && hasRaisedTick && !tickSampler.CheckNow()))
 					return;
 
 				var batch = pendingResults;
@@ -217,6 +246,8 @@ namespace Files.App.Utils.Storage
 
 		private uint GetRemainingItemCount(IList<ListedItem> results)
 		{
+			if (MaxItemCount == 0)
+				return uint.MaxValue;
 			lock (resultSync)
 				return results.Count >= UsedMaxItemCount ? 0 : UsedMaxItemCount - (uint)results.Count;
 		}
@@ -227,14 +258,14 @@ namespace Files.App.Utils.Storage
 				return resultPaths.Contains(NativeNameSearch.GetResultPathKey(path, resultRoot));
 		}
 
-		private async Task SearchAsync(BaseStorageFolder folder, IList<ListedItem> results, CancellationToken token)
+		private async Task SearchAsync(BaseStorageFolder folder, IList<ListedItem> results, CancellationToken token, bool supplementingNative = false)
 		{
 			uint index = 0;
-			var stepSize = Math.Min(defaultStepSize, GetRemainingItemCount(results));
+			var stepSize = Math.Min(64u, GetRemainingItemCount(results));
 			if (stepSize == 0)
 				return;
 
-			var options = ToQueryOptions();
+			var options = ToQueryOptions(prefetchProperties: !supplementingNative);
 			var nameExpression = IsAQSQuery ? null : FileSystemName.TranslateWin32Expression($"*{QueryWithWildcard}");
 
 			var queryResult = folder.CreateItemQueryWithOptions(options);
@@ -570,7 +601,7 @@ namespace Files.App.Utils.Storage
 					async Task Indexed()
 					{
 						if (await IsFullyIndexedAsync(storageFolder, token))
-							await SearchAsync(storageFolder, results, token);
+							await SearchAsync(storageFolder, results, token, supplementingNative: true);
 					}
 					await Task.WhenAll(native, Task.Run(Indexed, token));
 					return;
@@ -1042,7 +1073,7 @@ namespace Files.App.Utils.Storage
 				?? throw new InvalidOperationException($"The search result '{item.Path}' is neither a file nor a folder.");
 		}
 
-		private QueryOptions ToQueryOptions()
+		private QueryOptions ToQueryOptions(bool prefetchProperties = true)
 		{
 			var query = new QueryOptions
 			{
@@ -1055,7 +1086,9 @@ namespace Files.App.Utils.Storage
 			query.SortOrder.Clear();
 			query.SortOrder.Add(new SortEntry { PropertyName = "System.Search.Rank", AscendingOrder = false });
 
-			query.SetPropertyPrefetch(PropertyPrefetchOptions.BasicProperties, null);
+			// The parallel walk supplies most rows. Fetch paths first and read properties only for new results.
+			if (prefetchProperties)
+				query.SetPropertyPrefetch(PropertyPrefetchOptions.BasicProperties, null);
 
 			return query;
 		}
