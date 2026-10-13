@@ -130,13 +130,10 @@ namespace Files.App.Turbo.UnitTests
 		[TestMethod]
 		public void Records_named_by_the_shell_disable_the_early_order()
 		{
-			foreach (var special in new[] { "shortcut.lnk", "site.url", "Documents.library-ms" })
-			{
-				var records = Records(10, 1);
-				records.Add(new() { cFileName = special, dwFileAttributes = (uint)FileAttributes.Archive });
-				Assert.IsNull(Win32ListingOrder.TryOrder(records, SortOption.Name, SortDirection.Ascending, false, false, GroupOption.None,
-					SortDirection.Ascending, GroupByDateUnit.Day, true, CancellationToken.None), special);
-			}
+			var records = Records(10, 1);
+			records.Add(new() { cFileName = "Documents.library-ms", dwFileAttributes = (uint)FileAttributes.Archive });
+			Assert.IsNull(Win32ListingOrder.TryOrder(records, SortOption.Name, SortDirection.Ascending, false, false, GroupOption.None,
+				SortDirection.Ascending, GroupByDateUnit.Day, true, CancellationToken.None));
 
 			// desktop.ini can rename ReadOnly or System folders
 			var withCustomFolder = Records(10, 1);
@@ -146,6 +143,41 @@ namespace Files.App.Turbo.UnitTests
 
 			Assert.IsNull(Win32ListingOrder.TryOrder(Records(10, 1), SortOption.FileType, SortDirection.Ascending, false, false, GroupOption.None,
 				SortDirection.Ascending, GroupByDateUnit.Day, true, CancellationToken.None));
+		}
+
+		[TestMethod]
+		public void Shortcuts_sort_by_their_name_without_extension_as_files()
+		{
+			// "b.lnk" shows as "b" even with extensions visible; a symlink keeps the name rules of other files
+			var records = new List<Win32PInvoke.WIN32_FIND_DATA>
+			{
+				new() { cFileName = "b.lnk", dwFileAttributes = (uint)FileAttributes.Archive },
+				new() { cFileName = "b.txt", dwFileAttributes = (uint)FileAttributes.Archive },
+				new() { cFileName = "a.url", dwFileAttributes = (uint)FileAttributes.Archive },
+				new() { cFileName = "c.lnk", dwFileAttributes = (uint)(FileAttributes.Archive | FileAttributes.ReparsePoint), dwReserved0 = Win32PInvoke.IO_REPARSE_TAG_SYMLINK },
+				new() { cFileName = "c", dwFileAttributes = (uint)FileAttributes.Archive },
+				new() { cFileName = "z", dwFileAttributes = (uint)FileAttributes.Directory },
+			};
+			var actual = Win32ListingOrder.TryOrder(records, SortOption.Name, SortDirection.Ascending, false, false, GroupOption.None,
+				SortDirection.Ascending, GroupByDateUnit.Day, true, CancellationToken.None)!.Select(r => r.cFileName).ToList();
+			CollectionAssert.AreEqual(new[] { "z", "a.url", "b.lnk", "b.txt", "c", "c.lnk" }, actual);
+		}
+
+		[TestMethod]
+		public void Order_check_accepts_sorted_items_and_rejects_a_misplaced_one()
+		{
+			var date = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero);
+			var sorted = new List<(string Name, bool IsFile, DateTimeOffset Modified, DateTimeOffset Created, long Size)>
+			{
+				("z", false, date, date, 0), ("a", true, date, date, 1), ("b", true, date, date, 1), ("b", true, date, date, 1), ("c10", true, date, date, 1),
+			};
+			Assert.IsTrue(Win32ListingOrder.IsInOrder(sorted, SortOption.Name, SortDirection.Ascending, false, false, GroupOption.None,
+				SortDirection.Ascending, GroupByDateUnit.Day));
+
+			var misplaced = sorted.ToList();
+			(misplaced[1], misplaced[4]) = (misplaced[4], misplaced[1]);
+			Assert.IsFalse(Win32ListingOrder.IsInOrder(misplaced, SortOption.Name, SortDirection.Ascending, false, false, GroupOption.None,
+				SortDirection.Ascending, GroupByDateUnit.Day));
 		}
 
 		[TestMethod]

@@ -1248,12 +1248,15 @@ namespace Files.App.ViewModels
 
 		private bool TryPublishFilesAndFoldersWithoutReset(List<ListedItem> displayedFilesAndFolders, bool preserveSortedPrefix = false)
 		{
+			// WinUI requires individual Add events; bound the event burst before falling back to Reset. A prepared order
+			// only appends below the rows already shown, and a Reset there would rebuild every visible item.
+			var appendCap = preserveSortedPrefix ? 1_000 : 128;
 			if (FilesAndFolders.IsGrouped || folderSettings.DirectoryGroupOption != GroupOption.None)
 			{
 				if (!FilesAndFolders.IsGrouped || FilesAndFolders.Count == 0)
 					return false;
 				var count = FilesAndFolders.Count;
-				if (preserveSortedPrefix && displayedFilesAndFolders.Count >= count && displayedFilesAndFolders.Count - count <= 128 &&
+				if (preserveSortedPrefix && displayedFilesAndFolders.Count >= count && displayedFilesAndFolders.Count - count <= appendCap &&
 					Enumerable.Range(0, count).All(index => ReferenceEquals(FilesAndFolders[index], displayedFilesAndFolders[index])))
 				{
 					for (var index = count; index < displayedFilesAndFolders.Count; index++)
@@ -1284,8 +1287,7 @@ namespace Files.App.ViewModels
 				return false;
 
 			var appendedCount = displayedFilesAndFolders.Count - currentCount;
-			// WinUI requires individual Add events; bound the event burst before falling back to Reset.
-			if (appendedCount > 128)
+			if (appendedCount > appendCap)
 				return false;
 			for (var index = currentCount; index < displayedFilesAndFolders.Count; index++)
 				FilesAndFolders.Add(displayedFilesAndFolders[index]);
@@ -1309,6 +1311,19 @@ namespace Files.App.ViewModels
 			{
 				OnSelectionRequestedEvent?.Invoke(this, itemsToSelect);
 			});
+		}
+
+		private bool IsInPreparedOrder(SortOption sort, SortDirection direction, bool alongside, bool filesFirst,
+			GroupOption group, SortDirection groupDirection, GroupByDateUnit dateUnit)
+		{
+			List<ListedItem> items;
+			lock (loadCollectionSync)
+				items = filesAndFolders.ToList();
+
+			return Win32ListingOrder.IsInOrder(items.Select(item => (item.Name ?? string.Empty,
+				item.PrimaryItemAttribute == StorageItemTypes.File || item.IsShortcut || item.IsArchive,
+				item.ItemDateModifiedReal, item.ItemDateCreatedReal, item.FileSizeBytes)).ToList(),
+				sort, direction, alongside, filesFirst, group, groupDirection, dateUnit);
 		}
 
 		private async Task OrderFilesAndFoldersAsync(CancellationToken cancellationToken = default)
@@ -2577,6 +2592,9 @@ namespace Files.App.ViewModels
 							filesAndFolders.AddRange(fileList);
 						}
 
+						// The early order is predicted from the directory records; a display name that differs falls back to a full sort
+						if (preparedOrder)
+							preparedOrder = IsInPreparedOrder(sortOption, sortDirection, alongside, filesFirst, groupOption, groupDirection, dateUnit);
 						if (!preparedOrder)
 							await OrderFilesAndFoldersAsync(cancellationToken);
 						await ApplyFilesAndFoldersChangesAsync(cancellationToken, preparedOrder);
