@@ -184,7 +184,7 @@ namespace Files.App.Utils.Storage
 		{
 			return AsyncInfo.Run<IReadOnlyList<IStorageItem>>(async (cancellationToken) =>
 			{
-				var items = await StorageItemQueryResult.GetItemsAsync(startIndex, maxNumberOfItems);
+				var items = await StorageItemQueryResult.GetItemsAsync(startIndex, maxNumberOfItems).AsTask(cancellationToken);
 				return items.Select<IStorageItem, IStorageItem>(x => x switch
 				{
 					StorageFolder folder => new SystemStorageFolder(folder),

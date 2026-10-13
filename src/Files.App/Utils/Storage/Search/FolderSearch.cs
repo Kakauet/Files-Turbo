@@ -294,12 +294,16 @@ namespace Files.App.Utils.Storage
 
 						if (!item.Name.StartsWith('.') || UserSettingsService.FoldersSettingsService.ShowDotFiles)
 						{
-							var listedItem = await GetListedItemAsync(item);
+							var listedItem = await GetListedItemAsync(item).WaitAsync(token);
 							if (nameExpression is not null && !FileSystemName.MatchesWin32Expression(nameExpression, listedItem.ItemNameRaw ?? string.Empty))
 								continue;
 
 							AddResult(results, listedItem, token);
 						}
+					}
+					catch (OperationCanceledException) when (token.IsCancellationRequested)
+					{
+						return;
 					}
 					catch (Exception ex)
 					{
