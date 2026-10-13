@@ -69,7 +69,7 @@ namespace Files.App.ViewModels.Dialogs
 		/// <returns>The items left for the per-item path: all of them for other item types, else those that failed.</returns>
 		private async Task<List<ListedItem>> RenamePlainItemsAsync(List<ListedItem> selected)
 		{
-			if (selected.Count < 2 || !selected.All(TransferHelpers.IsPlainFileSystemItem))
+			if (selected.Count < 2 || !selected.All(IsPlainFileSystemItem))
 				return selected;
 
 			var paths = selected.Select(x => x.GetRequiredPath()).ToArray();
@@ -110,5 +110,15 @@ namespace Files.App.ViewModels.Dialogs
 
 			return pending;
 		}
+
+		/// <summary>An existing local or network file or folder, addressed by a plain path (no FTP, archive, recycle bin or stream).</summary>
+		private static bool IsPlainFileSystemItem(ListedItem item)
+			=> item is not FtpItem and not ZipItem and not AlternateStreamItem &&
+				item.ItemPath is { } path &&
+				path.Length > 3 && SystemIO.Path.IsPathFullyQualified(path) &&
+				path.IndexOf(':', 2) < 0 &&
+				!FtpHelpers.IsFtpPath(path) &&
+				!path.StartsWith(Constants.UserEnvironmentPaths.RecycleBinPath, StringComparison.OrdinalIgnoreCase) &&
+				(SystemIO.File.Exists(path) || SystemIO.Directory.Exists(path));
 	}
 }
