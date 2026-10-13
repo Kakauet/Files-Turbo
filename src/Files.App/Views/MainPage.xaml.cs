@@ -39,6 +39,7 @@ namespace Files.App.Views
 
 		private DispatcherQueueTimer _updateDateDisplayTimer;
 		private WindowMessageMonitor? _titleBarMessageMonitor;
+		private bool _titleBarDragRegionUpdateQueued;
 
 		private readonly Dictionary<TabBarItem, double> _sidebarScrollByTab = new();
 		private TabBarItem? _previousSidebarTab;
@@ -124,14 +125,29 @@ namespace Files.App.Views
 
 		private void HorizontalMultitaskingControl_Loaded(object sender, RoutedEventArgs e)
 		{
-			TabControl.DragArea.SizeChanged += (_, _) => MainWindow.Instance.RaiseSetTitleBarDragRegion(SetTitleBarDragRegion);
-			TabControl.SizeChanged += (_, _) => MainWindow.Instance.RaiseSetTitleBarDragRegion(SetTitleBarDragRegion);
+			TabControl.DragArea.SizeChanged += (_, _) => QueueTitleBarDragRegionUpdate();
+			TabControl.SizeChanged += (_, _) => QueueTitleBarDragRegionUpdate();
 			if (ViewModel.MultitaskingControl is not TabBar)
 			{
 				ViewModel.MultitaskingControl = TabControl;
 				ViewModel.MultitaskingControls.Add(TabControl);
 				ViewModel.MultitaskingControl.CurrentInstanceChanged += MultitaskingControl_CurrentInstanceChanged;
 			}
+		}
+
+		// A window resize changes the window, the tab bar and its drag area in the same frame, and each used to
+		// rebuild every non-client region on its own. Rebuild them once, after the layout pass that caused them.
+		private void QueueTitleBarDragRegionUpdate()
+		{
+			if (_titleBarDragRegionUpdateQueued)
+				return;
+
+			_titleBarDragRegionUpdateQueued = DispatcherQueue.TryEnqueue(() =>
+			{
+				_titleBarDragRegionUpdateQueued = false;
+				if (!App.AppModel.IsMainWindowClosed)
+					MainWindow.Instance.RaiseSetTitleBarDragRegion(SetTitleBarDragRegion);
+			});
 		}
 
 		private int SetTitleBarDragRegion(InputNonClientPointerSource source, SizeInt32 size, double scaleFactor, Func<UIElement, RectInt32?, RectInt32> getScaledRect)
@@ -334,7 +350,12 @@ namespace Files.App.Views
 		{
 			ViewModel.OnPageLoaded();
 
-			MainWindow.Instance.AppWindow.Changed += (_, _) => MainWindow.Instance.RaiseSetTitleBarDragRegion(SetTitleBarDragRegion);
+			MainWindow.Instance.AppWindow.Changed += (_, args) =>
+			{
+				// The regions are relative to the window, so moving it needs no update
+				if (args.DidSizeChange || args.DidPresenterChange || args.DidVisibilityChange)
+					QueueTitleBarDragRegionUpdate();
+			};
 
 			MainWindow.Instance.RaiseSetTitleBarDragRegion(SetTitleBarDragRegion);
 
