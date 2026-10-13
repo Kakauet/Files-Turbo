@@ -58,7 +58,6 @@ namespace Files.App.ViewModels
 		private readonly object loadCollectionSync = new();
 
 		// Search results waiting to be displayed, only accessed on the UI thread
-		private readonly Queue<ListedItem> pendingSearchResults = new();
 
 		private readonly IWindowsIniService WindowsIniService = Ioc.Default.GetRequiredService<IWindowsIniService>();
 		private readonly IWindowsJumpListService jumpListService = Ioc.Default.GetRequiredService<IWindowsJumpListService>();
@@ -1198,8 +1197,7 @@ namespace Files.App.ViewModels
 							if (token.IsCancellationRequested || FilesAndFoldersFilter != filter)
 								return;
 
-							pendingSearchResults.Clear();
-							AppMemoryHelper.NotifyActivity();
+								AppMemoryHelper.NotifyActivity();
 
 							if (!TryPublishFilesAndFoldersWithoutReset(displayedFilesAndFolders, preserveSortedPrefix))
 							{
@@ -3755,7 +3753,8 @@ namespace Files.App.ViewModels
 				// Stops late ticks from appending after the final apply
 				using var tickCTS = CancellationTokenSource.CreateLinkedTokenSource(token);
 				var tickToken = tickCTS.Token;
-				void Search_SearchTick(object? sender, IReadOnlyList<ListedItem> newItems) => _ = AppendSearchResultsAsync(newItems, tickToken);
+				var pendingSearchResults = new SearchResultBuffer<ListedItem>();
+				void Search_SearchTick(object? sender, IReadOnlyList<ListedItem> newItems) => _ = AppendSearchResultsAsync(newItems, pendingSearchResults, tickToken);
 
 				var results = new List<ListedItem>();
 				search.DispatcherQueue = dispatcherQueue;
@@ -3772,6 +3771,7 @@ namespace Files.App.ViewModels
 				{
 					search.SearchTick -= Search_SearchTick;
 					tickCTS.Cancel();
+					pendingSearchResults.Cancel();
 				}
 
 				try
@@ -3783,7 +3783,8 @@ namespace Files.App.ViewModels
 					}
 
 					await OrderFilesAndFoldersAsync(token);
-					await ApplyFilesAndFoldersChangesAsync(token);
+					if (!await TryAppendSearchTailAsync(token))
+						await ApplyFilesAndFoldersChangesAsync(token);
 					token.ThrowIfCancellationRequested();
 					if (search.HasIncompleteResults)
 						SearchHeaderTitle += $" — {Strings.SearchResultsIncomplete.GetLocalizedResource()}";
@@ -3814,57 +3815,86 @@ namespace Files.App.ViewModels
 			}
 		}
 
-		private async Task AppendSearchResultsAsync(IReadOnlyList<ListedItem> newItems, CancellationToken token)
+		private async Task AppendSearchResultsAsync(IReadOnlyList<ListedItem> newItems, SearchResultBuffer<ListedItem> pending, CancellationToken token)
 		{
+			if (!pending.Enqueue(newItems)) return;
 			try
 			{
-				await bulkOperationSemaphore.WaitAsync(token);
-			}
-			catch (OperationCanceledException)
-			{
-				return;
-			}
-
-			try
-			{
-				await PreloadGenericIconsAsync(newItems, token);
-				await dispatcherQueue.EnqueueOrInvokeAsync(() =>
+				// The producer can hold its result lock. Start icon/UI work after that callback returns.
+				await Task.Yield();
+				while (!token.IsCancellationRequested && pending.TryTake(MaxSearchResultsAppendedPerTick, out var batch))
 				{
-					if (token.IsCancellationRequested)
-						return;
-
-					filesAndFolders.AddRange(newItems);
-					foreach (var item in newItems)
-						pendingSearchResults.Enqueue(item);
-
-					var filter = FilesAndFoldersFilter;
-					var appendedCount = 0;
-					while (appendedCount < MaxSearchResultsAppendedPerTick && pendingSearchResults.TryDequeue(out var item))
+					await bulkOperationSemaphore.WaitAsync(token);
+					try
 					{
-						if (!MatchesFilter(item, filter))
-							continue;
-
-						FilesAndFolders.Add(item);
-						appendedCount++;
+						await PreloadGenericIconsAsync(batch, token);
+						await dispatcherQueue.EnqueueOrInvokeAsync(() =>
+						{
+							if (token.IsCancellationRequested) return;
+							filesAndFolders.AddRange(batch);
+							foreach (var item in batch)
+								if (MatchesFilter(item, FilesAndFoldersFilter)) FilesAndFolders.Add(item);
+							UpdateEmptyTextType();
+							DirectoryInfoUpdated?.Invoke(this, EventArgs.Empty);
+						}, Microsoft.UI.Dispatching.DispatcherQueuePriority.Low);
 					}
-
-					UpdateEmptyTextType();
-					DirectoryInfoUpdated?.Invoke(this, EventArgs.Empty);
-				});
+					finally { bulkOperationSemaphore.Release(); }
+					// Yield to input and layout even when all icons are cached.
+					await Task.Delay(1, token).ConfigureAwait(false);
+				}
 			}
-			catch (OperationCanceledException) when (token.IsCancellationRequested)
-			{
-			}
+			catch (OperationCanceledException) when (token.IsCancellationRequested) { }
 			catch (Exception ex)
 			{
+				pending.Cancel();
 				App.Logger.LogWarning(ex, ex.Message);
-			}
-			finally
-			{
-				bulkOperationSemaphore.Release();
 			}
 		}
 
+		private async Task<bool> TryAppendSearchTailAsync(CancellationToken token)
+		{
+			await bulkOperationSemaphore.WaitAsync(token);
+			try
+			{
+				var filter = FilesAndFoldersFilter;
+				var ordered = filesAndFolders.Where(item => MatchesFilter(item, filter)).ToList();
+				var index = 0;
+				var matches = await dispatcherQueue.EnqueueOrInvokeAsync(() =>
+				{
+					if (token.IsCancellationRequested || FilesAndFoldersFilter != filter || !SearchResultPublication.HasSamePrefix(FilesAndFolders, ordered)
+						|| FilesAndFolders.IsGrouped && !FilesAndFolders.CanReconcile(FilesAndFolders.ToList(), 0)) return false;
+					index = FilesAndFolders.Count;
+					return true;
+				});
+				if (!matches) return false;
+				while (index < ordered.Count)
+				{
+					var batch = ordered.GetRange(index, Math.Min(MaxSearchResultsAppendedPerTick, ordered.Count - index));
+					await PreloadGenericIconsAsync(batch, token);
+					if (!await dispatcherQueue.EnqueueOrInvokeAsync(() =>
+					{
+						if (token.IsCancellationRequested || FilesAndFoldersFilter != filter) return false;
+						foreach (var item in batch) FilesAndFolders.Add(item);
+						return true;
+					}, Microsoft.UI.Dispatching.DispatcherQueuePriority.Low)) return false;
+					index += batch.Count;
+					await Task.Delay(1, token).ConfigureAwait(false);
+				}
+				await dispatcherQueue.EnqueueOrInvokeAsync(() =>
+				{
+					if (token.IsCancellationRequested) return;
+					if (FilesAndFolders.GroupedCollection is { } groups)
+					{
+						foreach (var group in groups) group.IsSorted = true;
+						OrderGroups(token);
+					}
+					UpdateEmptyTextType();
+					DirectoryInfoUpdated?.Invoke(this, EventArgs.Empty);
+				});
+				return true;
+			}
+			finally { bulkOperationSemaphore.Release(); }
+		}
 
 		public void CancelSearch()
 		{

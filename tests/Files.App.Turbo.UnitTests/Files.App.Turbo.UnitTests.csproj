@@ -61,6 +61,7 @@
         <Compile Include="..\..\src\Files.App\Utils\Storage\Search\ParallelDirectoryWork.cs" Link="Linked\ParallelDirectoryWork.cs" />
         <Compile Include="..\..\src\Files.App\Utils\Storage\Search\SearchSuggestionNarrowing.cs" Link="Linked\SearchSuggestionNarrowing.cs" />
         <Compile Include="..\..\src\Files.App\Utils\Storage\Search\SearchSuggestionPipeline.cs" Link="Linked\SearchSuggestionPipeline.cs" />
+        <Compile Include="..\..\src\Files.App\Utils\Storage\Search\SearchResultBuffer.cs" Link="Linked\SearchResultBuffer.cs" />
     </ItemGroup>
 
 </Project>
