@@ -80,7 +80,7 @@
 			Height="0"
 			x:Load="False">
 			<!--  Contains the current path  -->
-			<TextBox AutomationProperties.AutomationId="CurrentPathGet" Text="{x:Bind ViewModel.PathControlDisplayText, Mode=OneWay}" />
+			<TextBox x:Name="CurrentPathGetTextBox" AutomationProperties.AutomationId="CurrentPathGet" />
 
 			<!--  Modifies the current path  -->
 			<TextBox

@@ -51,8 +51,45 @@ namespace Files.App.UserControls
 
 		// Methods
 
+		private bool listaryTextQueued;
+		private NavigationToolbarViewModel? listaryViewModel;
+
+		partial void OnViewModelChanged(NavigationToolbarViewModel? newValue)
+		{
+			if (listaryViewModel is not null)
+				listaryViewModel.PropertyChanged -= ViewModel_PathControlDisplayTextChanged;
+			listaryViewModel = newValue;
+			if (newValue is not null)
+				newValue.PropertyChanged += ViewModel_PathControlDisplayTextChanged;
+			UpdateListaryPathText();
+		}
+
+		private void ViewModel_PathControlDisplayTextChanged(object? sender, PropertyChangedEventArgs e)
+		{
+			if (e.PropertyName != nameof(NavigationToolbarViewModel.PathControlDisplayText) || listaryTextQueued)
+				return;
+
+			// The hidden Listary text box re-measured inside the frame that shows a newly opened folder;
+			// it now follows the path once that frame has rendered
+			listaryTextQueued = DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+			{
+				listaryTextQueued = false;
+				UpdateListaryPathText();
+			});
+		}
+
+		private void UpdateListaryPathText()
+		{
+			if (CurrentPathGetTextBox is not null)
+				CurrentPathGetTextBox.Text = ViewModel?.PathControlDisplayText ?? string.Empty;
+		}
+
 		private void NavToolbar_Loaded(object sender, RoutedEventArgs e)
-			=> this.RunAfterNextRender(() => FindName(nameof(ListaryIntegration)));
+			=> this.RunAfterNextRender(() =>
+			{
+				FindName(nameof(ListaryIntegration));
+				UpdateListaryPathText();
+			});
 
 		private void NavToolbar_Loading(FrameworkElement _, object e)
 		{

@@ -29,6 +29,8 @@ namespace Files.App.UserControls
 		private OpenWithMenu? openWithMenu;
 		private int openWithFlyoutRequestId;
 		private readonly List<Action> toggleButtonDetachActions = new();
+		private readonly List<(AppBarButton Button, CommandGroup Group)> groupButtons = new();
+		private string? populatedSignature;
 
 		[GeneratedDependencyProperty]
 		public partial NavigationToolbarViewModel? ViewModel { get; set; }
@@ -46,6 +48,7 @@ namespace Files.App.UserControls
 
 		private void Toolbar_Loaded(object sender, RoutedEventArgs e)
 		{
+			populatedSignature = null;
 			App.AppModel.PropertyChanged += AppModel_PropertyChanged;
 			foreach (var cmd in Commands) cmd.PropertyChanged += Command_PropertyChanged;
 			RequestToolbarRefresh(true);
@@ -111,7 +114,10 @@ namespace Files.App.UserControls
 		private void AppearanceSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName is nameof(IAppearanceSettingsService.CustomToolbarItems))
+			{
+				populatedSignature = null;
 				RequestToolbarRefresh(true);
+			}
 		}
 
 		private async void EditTagsMenu_TagsChanged(object? sender, EventArgs e)
@@ -141,11 +147,22 @@ namespace Files.App.UserControls
 			if (App.AppModel.IsMainWindowClosed || !IsLoaded || ContextCommandBar is null)
 				return;
 
-			DetachToggleButtons();
-			ContextCommandBar.PrimaryCommands.Clear();
-
 			var active = GetActiveToolbarContexts();
 			var itemsByContext = ToolbarDefaultsTemplate.ResolveToolbarItemsByContext(UserSettingsService.AppearanceSettingsService);
+
+			var signature = GetToolbarSignature(itemsByContext, active);
+			// Opening a folder refreshes the toolbar; rebuilding identical buttons cost a layout pass in the first frame
+			if (signature == populatedSignature && ContextCommandBar.PrimaryCommands.Count > 0)
+			{
+				foreach (var (button, group) in groupButtons)
+					button.IsEnabled = IsGroupButtonEnabled(group);
+				return;
+			}
+
+			populatedSignature = signature;
+			groupButtons.Clear();
+			DetachToggleButtons();
+			ContextCommandBar.PrimaryCommands.Clear();
 
 			foreach (var contextId in ToolbarDefaultsTemplate.ContextOrder)
 			{
@@ -169,6 +186,30 @@ namespace Files.App.UserControls
 			}
 
 			UpdateCommandBarSeparatorVisibility(ContextCommandBar.PrimaryCommands);
+		}
+
+		private bool IsGroupButtonEnabled(CommandGroup group)
+			=> group is EditTagsCommandGroup
+				? PageContext.SelectedItems.Count > 0
+					&& PageContext.PageType is not ContentPageTypes.Home
+						and not ContentPageTypes.RecycleBin
+						and not ContentPageTypes.None
+				: group.Commands.Any(c => c is not CommandCodes.None && Commands[c].IsExecutable);
+
+		// The visible sections and their entries decide which elements the toolbar holds; command state is bound or refreshed
+		private string GetToolbarSignature(Dictionary<string, List<ToolbarItemSettingsEntry>> itemsByContext, ISet<string> active)
+		{
+			var builder = new System.Text.StringBuilder();
+			foreach (var contextId in ToolbarDefaultsTemplate.ContextOrder)
+			{
+				if (!itemsByContext.TryGetValue(contextId, out var entries) || entries.Count == 0 || !ShouldShowContext(contextId, active))
+					continue;
+				builder.Append(contextId).Append('[');
+				foreach (var entry in entries)
+					builder.Append(entry.CommandCode).Append('/').Append(entry.CommandGroup).Append('/').Append(entry.ShowIcon ? '1' : '0').Append(entry.ShowLabel ? '1' : '0').Append(';');
+				builder.Append(']');
+			}
+			return builder.ToString();
 		}
 
 		private HashSet<string> GetActiveToolbarContexts()
@@ -220,10 +261,7 @@ namespace Files.App.UserControls
 						editTagsMenu.TagsChanged += EditTagsMenu_TagsChanged;
 					}
 					btn.Flyout = editTagsMenu;
-					btn.IsEnabled = PageContext.SelectedItems.Count > 0
-						&& PageContext.PageType is not ContentPageTypes.Home
-							and not ContentPageTypes.RecycleBin
-							and not ContentPageTypes.None;
+					btn.IsEnabled = IsGroupButtonEnabled(group);
 				}
 				else
 				{
@@ -247,13 +285,14 @@ namespace Files.App.UserControls
 						}
 					};
 
-					btn.IsEnabled = group.Commands.Any(c => c is not CommandCodes.None && Commands[c].IsExecutable);
+					btn.IsEnabled = IsGroupButtonEnabled(group);
 				}
 
 				btn.Style = (Style)Resources["ToolBarAppBarButtonFlyoutStyle"];
 
 				if (showIcon)
 					ApplyIcon(btn, group.Glyph, setContent: true);
+				groupButtons.Add((btn, group));
 
 				return btn;
 			}

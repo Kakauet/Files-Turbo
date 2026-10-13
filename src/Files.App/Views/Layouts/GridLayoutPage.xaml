@@ -221,6 +221,7 @@
 						Checked="ItemSelected_Checked"
 						DoubleTapped="SelectionCheckbox_DoubleTapped"
 						Opacity="0"
+						Style="{StaticResource FileItemSelectionCheckBoxStyle}"
 						Unchecked="ItemSelected_Unchecked" />
 
 					<Popup
@@ -342,6 +343,7 @@
 							Checked="ItemSelected_Checked"
 							DoubleTapped="SelectionCheckbox_DoubleTapped"
 							Opacity="0"
+							Style="{StaticResource FileItemSelectionCheckBoxStyle}"
 							Unchecked="ItemSelected_Unchecked" />
 					</Grid>
 
@@ -494,6 +496,7 @@
 								Checked="ItemSelected_Checked"
 								DoubleTapped="SelectionCheckbox_DoubleTapped"
 								Opacity="0"
+								Style="{StaticResource FileItemSelectionCheckBoxStyle}"
 								Unchecked="ItemSelected_Unchecked" />
 						</Grid>
 

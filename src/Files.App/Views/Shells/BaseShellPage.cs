@@ -482,7 +482,8 @@ namespace Files.App.Views.Shells
 				if (newWorkingDir is null)
 					throw new InvalidOperationException("The working directory is not available for the path bar.");
 
-				var components = await StorageFileExtensions.GetDirectoryPathComponentsWithDisplayNameAsync(newWorkingDir);
+				// Display names come from the shell, which held the UI thread while a folder was opening
+				var components = await Task.Run(() => StorageFileExtensions.GetDirectoryPathComponentsWithDisplayNameAsync(newWorkingDir));
 
 				if (isDisposed || revision != pathUiRevision)
 					return;
