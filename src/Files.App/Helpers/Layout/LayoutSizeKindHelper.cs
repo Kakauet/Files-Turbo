@@ -44,11 +44,19 @@ namespace Files.App.Helpers
 				FolderLayoutModes.CardsView when LayoutSettingsService.CardsViewSize == CardsViewSizeKind.ExtraLarge => 96,
 
 				// Grid
-				FolderLayoutModes.GridView when LayoutSettingsService.GridViewSize <= GridViewSizeKind.Small => 96,
-				FolderLayoutModes.GridView when LayoutSettingsService.GridViewSize <= GridViewSizeKind.Large => 128,
+				FolderLayoutModes.GridView => GetGridViewIconSize(LayoutSettingsService.GridViewSize),
 
 				_ => 256,
 			};
+		}
+
+		private static uint GetGridViewIconSize(GridViewSizeKind gridViewSizeKind)
+		{
+			var iconSize = gridViewSizeKind <= GridViewSizeKind.Small ? 96u : gridViewSizeKind <= GridViewSizeKind.Large ? 128u : 256u;
+
+			// The image is drawn inside the item width minus a 12 px margin on each side, so a larger request
+			// only makes the shell extract and scale pixels that are thrown away (small items asked for 96 in a 56 px box)
+			return Math.Min(iconSize, (uint)(GetGridViewItemWidth(gridViewSizeKind) - 24));
 		}
 
 		/// <summary>
