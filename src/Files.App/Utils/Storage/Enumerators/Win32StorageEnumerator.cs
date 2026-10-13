@@ -27,7 +27,6 @@ namespace Files.App.Utils.Storage
 			int countLimit,
 			uint iconSize,
 			Func<List<ListedItem>, Task> intermediateAction,
-			long performanceOperationId = 0,
 			Task<bool>? repositoryState = null,
 			Func<List<Win32PInvoke.WIN32_FIND_DATA>, IEnumerable<Win32PInvoke.WIN32_FIND_DATA>?>? prepareOrder = null
 		)
@@ -37,7 +36,6 @@ namespace Files.App.Utils.Storage
 			var hasFlushedFirstBatch = false;
 			var tempList = new List<ListedItem>();
 			var count = 0;
-			var firstItemReported = false;
 
 			IUserSettingsService userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 			bool CalculateFolderSizes = userSettingsService.FoldersSettingsService.CalculateFolderSizes;
@@ -54,7 +52,6 @@ namespace Files.App.Utils.Storage
 				var buffered = new List<Win32PInvoke.WIN32_FIND_DATA>();
 				IEnumerable<Win32PInvoke.WIN32_FIND_DATA> entries = buffered;
 				var complete = false;
-				var ordered = false;
 				if (prepareOrder is not null && countLimit < 0)
 				{
 					var scanStarted = Stopwatch.GetTimestamp();
@@ -68,8 +65,6 @@ namespace Files.App.Utils.Storage
 							break;
 						}
 					} while (buffered.Count < 200_000 && Stopwatch.GetElapsedTime(scanStarted).TotalMilliseconds < 150);
-					UiPerformanceTrace.Mark(performanceOperationId, "ScanCompleted", buffered.Count,
-						Stopwatch.GetElapsedTime(scanStarted).TotalMilliseconds, complete ? 1 : 0);
 					if (complete)
 					{
 						buffered.RemoveAll(x => x.cFileName is "." or ".." ||
@@ -77,10 +72,7 @@ namespace Files.App.Utils.Storage
 								(!showHiddenItems || !showProtectedSystemFiles && ((FileAttributes)x.dwFileAttributes & FileAttributes.System) != 0)) ||
 							(!showDotFiles && x.cFileName.StartsWith('.')));
 						if (prepareOrder(buffered) is { } sorted)
-						{
 							entries = sorted;
-							ordered = true;
-						}
 					}
 				}
 				isGitRepo = repositoryState is not null && await repositoryState.WaitAsync(cancellationToken);
@@ -145,11 +137,6 @@ namespace Files.App.Utils.Storage
 					cancellationToken.ThrowIfCancellationRequested();
 					if (count == countLimit)
 						break;
-					if (!firstItemReported && tempList.Count > 0)
-					{
-						firstItemReported = true;
-						UiPerformanceTrace.Mark(performanceOperationId, "FirstItemAvailable", tempList.Count);
-					}
 
 					// The first batch is one viewport of rows (in final order when the listing was pre-sorted), or whatever
 					// slow storage produced in 25 ms. Later batches follow a fixed cadence: each publication copies the

@@ -75,7 +75,6 @@ namespace Files.App.ViewModels
 
 		// Only used for Binding and ApplyFilesAndFoldersChangesAsync, don't manipulate on this!
 		public BulkConcurrentObservableCollection<ListedItem> FilesAndFolders { get; }
-		internal long PerformanceOperationId { get; private set; }
 
 		private readonly LayoutPreferencesManager folderSettings;
 
@@ -1169,7 +1168,6 @@ namespace Files.App.ViewModels
 		{
 			using var applyCTS = CancellationTokenSource.CreateLinkedTokenSource(addFilesCTS.Token, cancellationToken);
 			var token = applyCTS.Token;
-			var performanceOperation = PerformanceOperationId;
 			try
 			{
 				// Preserve realized rows for unchanged snapshots and ungrouped tail additions.
@@ -1191,12 +1189,10 @@ namespace Files.App.ViewModels
 					// Every published row must find its generic icon ready in its first frame
 					await PreloadGenericIconsAsync(displayedFilesAndFolders, token);
 
-					var dispatchRequested = Stopwatch.GetTimestamp();
 					var priority = preserveSortedPrefix && FilesAndFolders.Count > 0
 						? Microsoft.UI.Dispatching.DispatcherQueuePriority.Low : Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal;
 					await dispatcherQueue.EnqueueOrInvokeAsync(() =>
 					{
-						var dispatchStarted = Stopwatch.GetTimestamp();
 						try
 						{
 							if (token.IsCancellationRequested || FilesAndFoldersFilter != filter)
@@ -1205,7 +1201,7 @@ namespace Files.App.ViewModels
 							pendingSearchResults.Clear();
 							AppMemoryHelper.NotifyActivity();
 
-							if (!TryPublishFilesAndFoldersWithoutReset(displayedFilesAndFolders, performanceOperation, preserveSortedPrefix))
+							if (!TryPublishFilesAndFoldersWithoutReset(displayedFilesAndFolders, preserveSortedPrefix))
 							{
 								FilesAndFolders.BeginBulkOperation();
 								try
@@ -1220,17 +1216,11 @@ namespace Files.App.ViewModels
 								{
 									FilesAndFolders.EndBulkOperation();
 								}
-								if (UiPerformanceTrace.IsEnabled)
-									UiPerformanceTrace.Mark(performanceOperation, "DataPublicationReset", FilesAndFolders.Count);
 							}
 
 							UpdateEmptyTextType();
 							UpdateNetworkAvailabilityInfoBar();
 							DirectoryInfoUpdated?.Invoke(this, EventArgs.Empty);
-							UiPerformanceTrace.Mark(performanceOperation, "DataPublished", FilesAndFolders.Count,
-								Stopwatch.GetElapsedTime(dispatchStarted).TotalMilliseconds);
-							UiPerformanceTrace.Mark(performanceOperation, "PublicationQueueDelay", durationMs:
-								Stopwatch.GetElapsedTime(dispatchRequested, dispatchStarted).TotalMilliseconds);
 						}
 						finally
 						{
@@ -1256,7 +1246,7 @@ namespace Files.App.ViewModels
 			}
 		}
 
-		private bool TryPublishFilesAndFoldersWithoutReset(List<ListedItem> displayedFilesAndFolders, long performanceOperation, bool preserveSortedPrefix = false)
+		private bool TryPublishFilesAndFoldersWithoutReset(List<ListedItem> displayedFilesAndFolders, bool preserveSortedPrefix = false)
 		{
 			if (FilesAndFolders.IsGrouped || folderSettings.DirectoryGroupOption != GroupOption.None)
 			{
@@ -1289,11 +1279,7 @@ namespace Files.App.ViewModels
 					return false;
 
 			if (currentCount == displayedFilesAndFolders.Count)
-			{
-				if (UiPerformanceTrace.IsEnabled)
-					UiPerformanceTrace.Mark(performanceOperation, "DataPublicationUnchanged", currentCount);
 				return true;
-			}
 			if (currentCount == 0)
 				return false;
 
@@ -1303,8 +1289,6 @@ namespace Files.App.ViewModels
 				return false;
 			for (var index = currentCount; index < displayedFilesAndFolders.Count; index++)
 				FilesAndFolders.Add(displayedFilesAndFolders[index]);
-			if (UiPerformanceTrace.IsEnabled)
-				UiPerformanceTrace.Mark(performanceOperation, "DataPublicationAppended", FilesAndFolders.Count, value: appendedCount);
 			return true;
 		}
 
@@ -1505,10 +1489,10 @@ namespace Files.App.ViewModels
 			return shieldIcon;
 		}
 
-		private async Task LoadThumbnailOverlayAsync(ListedItem item, uint thumbnailSize, CancellationToken cancellationToken, long performanceOperation)
+		private async Task LoadThumbnailOverlayAsync(ListedItem item, uint thumbnailSize, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
-			var iconOverlay = await FileThumbnailHelper.GetIconOverlayAsync(item.ItemPath, thumbnailSize, item.IsFolder, cancellationToken, performanceOperation, STATaskPriority.Background);
+			var iconOverlay = await FileThumbnailHelper.GetIconOverlayAsync(item.ItemPath, thumbnailSize, item.IsFolder, cancellationToken, STATaskPriority.Background);
 			cancellationToken.ThrowIfCancellationRequested();
 
 			await dispatcherQueue.EnqueueOrInvokeAsync(async () =>
@@ -1644,7 +1628,7 @@ namespace Files.App.ViewModels
 		/// </summary>
 		private async Task<(bool SyncStatusLoaded, BaseStorageFile? File)> LoadStorageItemPropertiesAsync(ListedItem item, CancellationToken token)
 		{
-			await LoadThumbnailOverlayAsync(item, LayoutSizeKindHelper.GetIconSize(folderSettings.LayoutMode), token, PerformanceOperationId);
+			await LoadThumbnailOverlayAsync(item, LayoutSizeKindHelper.GetIconSize(folderSettings.LayoutMode), token);
 
 			var path = item.GetRequiredPath();
 			var isItemNetwork = await DriveHelpers.IsNetworkStorageItemAsync(path);
@@ -2173,8 +2157,6 @@ namespace Files.App.ViewModels
 
 			CancelLoadAndClearFiles();
 			var token = addFilesCTS.Token;
-			var performanceOperation = UiPerformanceTrace.BeginOperation("Navigation", path ?? string.Empty);
-			PerformanceOperationId = performanceOperation;
 
 			if (string.IsNullOrEmpty(path))
 				return;
@@ -2199,7 +2181,6 @@ namespace Files.App.ViewModels
 				semaphoreCTS = new CancellationTokenSource();
 
 				IsLoadingItems = true;
-				UiPerformanceTrace.Mark(performanceOperation, "EnumerationStarted");
 
 				filesAndFolders.Clear();
 				desktopIniUpdateTask = null;
@@ -2223,16 +2204,12 @@ namespace Files.App.ViewModels
 				token.ThrowIfCancellationRequested();
 				ItemLoadStatusChanged?.Invoke(this, new ItemLoadStatusChangedEventArgs() { Status = ItemLoadStatusChangedEventArgs.ItemLoadStatus.Complete, PreviousDirectory = previousDir, Path = path });
 				IsLoadingItems = false;
-				UiPerformanceTrace.Mark(performanceOperation, "ListingCompleted", FilesAndFolders.Count);
 
 				if (Interlocked.Exchange(ref desktopIniUpdateTask, null) is Task task)
 					await task;
 
 				token.ThrowIfCancellationRequested();
-				var adaptiveLayoutStarted = Stopwatch.GetTimestamp();
 				AdaptiveLayoutHelpers.ApplyAdaptativeLayout(folderSettings, filesAndFolders.ToList());
-				UiPerformanceTrace.Mark(performanceOperation, "AdaptiveLayoutCompleted", FilesAndFolders.Count,
-					Stopwatch.GetElapsedTime(adaptiveLayoutStarted).TotalMilliseconds);
 			}
 			catch (OperationCanceledException) when (token.IsCancellationRequested)
 			{
@@ -2583,7 +2560,7 @@ namespace Files.App.ViewModels
 								await OrderFilesAndFoldersAsync(cancellationToken);
 
 							await ApplyFilesAndFoldersChangesAsync(cancellationToken, preparedOrder);
-						}, performanceOperationId: PerformanceOperationId, repositoryState: GitRepositoryState,
+						}, repositoryState: GitRepositoryState,
 							prepareOrder: canPrepareOrder ? data =>
 							{
 								var sorted = Win32ListingOrder.TryOrder(data, sortOption, sortDirection, alongside, filesFirst,
@@ -2681,7 +2658,7 @@ namespace Files.App.ViewModels
 								await OrderFilesAndFoldersAsync(cancellationToken);
 
 							await ApplyFilesAndFoldersChangesAsync(cancellationToken);
-						}, performanceOperationId: PerformanceOperationId);
+						});
 
 					lock (loadCollectionSync)
 					{
@@ -3734,8 +3711,6 @@ namespace Files.App.ViewModels
 			using var currentSearchCTS = CancellationTokenSource.CreateLinkedTokenSource(addFilesCTS.Token);
 			searchCTS = currentSearchCTS;
 			var token = currentSearchCTS.Token;
-			var performanceOperation = UiPerformanceTrace.BeginOperation("Search", WorkingDirectory ?? string.Empty);
-			PerformanceOperationId = performanceOperation;
 			try
 			{
 				filesAndFolders.Clear();
@@ -3768,9 +3743,7 @@ namespace Files.App.ViewModels
 				search.SearchTick += Search_SearchTick;
 				try
 				{
-					UiPerformanceTrace.Mark(performanceOperation, "ProviderStarted");
 					await search.SearchAsync(results, token);
-					UiPerformanceTrace.Mark(performanceOperation, "ProviderCompleted", results.Count);
 				}
 				catch (OperationCanceledException) when (token.IsCancellationRequested)
 				{
@@ -3806,7 +3779,6 @@ namespace Files.App.ViewModels
 				{
 					ItemLoadStatusChanged?.Invoke(this, new ItemLoadStatusChangedEventArgs() { Status = ItemLoadStatusChangedEventArgs.ItemLoadStatus.Complete });
 					IsLoadingItems = false;
-					UiPerformanceTrace.Mark(performanceOperation, "SearchCompleted", FilesAndFolders.Count);
 				}
 			}
 			catch (OperationCanceledException) when (token.IsCancellationRequested)
@@ -3817,10 +3789,7 @@ namespace Files.App.ViewModels
 				if (ReferenceEquals(searchCTS, currentSearchCTS))
 				{
 					if (token.IsCancellationRequested && IsSearchResults)
-					{
 						IsLoadingItems = false;
-						UiPerformanceTrace.Mark(performanceOperation, "Canceled");
-					}
 					searchCTS = null;
 				}
 			}
@@ -3828,7 +3797,6 @@ namespace Files.App.ViewModels
 
 		private async Task AppendSearchResultsAsync(IReadOnlyList<ListedItem> newItems, CancellationToken token)
 		{
-			var performanceOperation = PerformanceOperationId;
 			try
 			{
 				await bulkOperationSemaphore.WaitAsync(token);
@@ -3845,7 +3813,6 @@ namespace Files.App.ViewModels
 				{
 					if (token.IsCancellationRequested)
 						return;
-					var dispatchStarted = Stopwatch.GetTimestamp();
 
 					filesAndFolders.AddRange(newItems);
 					foreach (var item in newItems)
@@ -3864,8 +3831,6 @@ namespace Files.App.ViewModels
 
 					UpdateEmptyTextType();
 					DirectoryInfoUpdated?.Invoke(this, EventArgs.Empty);
-					UiPerformanceTrace.Mark(performanceOperation, "DataPublished", FilesAndFolders.Count,
-						Stopwatch.GetElapsedTime(dispatchStarted).TotalMilliseconds);
 				});
 			}
 			catch (OperationCanceledException) when (token.IsCancellationRequested)

@@ -358,7 +358,7 @@
 				UpdateTextOnSelect="False">
 				<controls:OmnibarMode.ItemTemplate>
 					<DataTemplate x:DataType="datamodels:SuggestionModel">
-						<Grid ColumnSpacing="8" Loaded="SearchSuggestion_Loaded" Tag="{x:Bind ItemPath}">
+						<Grid ColumnSpacing="8" Tag="{x:Bind ItemPath}">
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="Auto" />
 								<ColumnDefinition Width="*" />

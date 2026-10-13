@@ -52,7 +52,6 @@ namespace Files.App.ViewModels.UserControls
 		private readonly SearchSuggestionPipeline suggestionPipeline = new();
 		private (string Query, string? Folder, IReadOnlyList<ListedItem> Items)? suggestionSnapshot;
 		private readonly LatestPathNavigationCoordinator<IShellPage> pathNavigationCoordinator = new();
-		internal long SearchSuggestionPerformanceOperationId { get; private set; }
 
 		// Events
 
@@ -1278,9 +1277,6 @@ namespace Files.App.ViewModels.UserControls
 			var token = currentSearchCTS.Token;
 			var query = OmnibarSearchModeText;
 			var folder = shellViewModel.WorkingDirectory;
-			var performanceOperation = UiPerformanceTrace.BeginOperation("SearchSuggestions", folder ?? string.Empty);
-			SearchSuggestionPerformanceOperationId = performanceOperation;
-			UiPerformanceTrace.Mark(performanceOperation, "QueryChanged", query?.Length ?? 0);
 			bool IsCurrent() => !_isDisposed && !token.IsCancellationRequested
 				&& ReferenceEquals(_suggestSearchCTS, currentSearchCTS)
 				&& (string.IsNullOrWhiteSpace(query) || OmnibarCurrentSelectedModeName == OmnibarSearchModeName)
@@ -1316,21 +1312,15 @@ namespace Files.App.ViewModels.UserControls
 					await suggestionPipeline.RunAsync(query,
 						async () =>
 						{
-							UiPerformanceTrace.Mark(performanceOperation, "ProviderStarted");
 							await search.SearchAsync(results, token, loadSuggestionIcons: false);
-							UiPerformanceTrace.Mark(performanceOperation, "ProviderCompleted", results.Count);
 							return (IReadOnlyList<ListedItem>)results;
 						},
 						IsCurrent,
 						found =>
 						{
 							suggestionSnapshot = (query!, folder, found.ToArray());
-							newSuggestions.AddRange(found.Select(result => new SuggestionModel(result)
-							{
-								PerformanceOperationId = performanceOperation
-							}));
+							newSuggestions.AddRange(found.Select(result => new SuggestionModel(result)));
 							UpdateSearchSuggestions(newSuggestions);
-							UiPerformanceTrace.Mark(performanceOperation, "DataPublished", newSuggestions.Count);
 						},
 						(found, iconToken) => search.LoadSuggestionIconsAsync(found, iconToken, item =>
 						{
@@ -1338,8 +1328,6 @@ namespace Files.App.ViewModels.UserControls
 								newSuggestions[index].FileImage = item.FileImage;
 						}),
 						token);
-					if (IsCurrent())
-						UiPerformanceTrace.Mark(performanceOperation, "IconsCompleted", newSuggestions.Count);
 					return;
 				}
 
@@ -1347,16 +1335,13 @@ namespace Files.App.ViewModels.UserControls
 					return;
 
 				UpdateSearchSuggestions(newSuggestions);
-				UiPerformanceTrace.Mark(performanceOperation, "DataPublished", newSuggestions.Count);
 			}
 			catch (OperationCanceledException)
 			{
-				UiPerformanceTrace.Mark(performanceOperation, "Canceled");
 			}
 			catch (Exception ex)
 			{
 				App.Logger.LogWarning(ex, "Failed to update search suggestions");
-				UiPerformanceTrace.Mark(performanceOperation, "Failed");
 			}
 			finally
 			{
@@ -1431,7 +1416,6 @@ namespace Files.App.ViewModels.UserControls
 			if (!_isDisposed)
 			{
 				_suggestSearchCTS?.Cancel();
-				SearchSuggestionPerformanceOperationId = 0;
 			}
 		}
 

@@ -11,8 +11,6 @@ namespace Files.App.Data.Models
 {
 	public sealed partial class SuggestionModel : ObservableObject, IOmnibarTextMemberPathProvider
 	{
-		internal long PerformanceOperationId { get; set; }
-
 		public bool IsRecentSearch { get; set; } = false;
 
 		public bool IsShortcut { get; set; } = false;

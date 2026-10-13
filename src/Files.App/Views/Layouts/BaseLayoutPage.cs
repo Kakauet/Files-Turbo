@@ -72,7 +72,6 @@ namespace Files.App.Views.Layouts
 		private ViewportWorkQueue<ItemImageJob>? slowImageWork;
 		private ViewportWorkQueue<ListedItem>? metadataWork;
 		private bool viewportRefillQueued;
-		private UiPerformanceViewProbe? performanceViewProbe;
 
 		private bool shiftPressed;
 		private bool itemDragging;
@@ -1256,8 +1255,6 @@ namespace Files.App.Views.Layouts
 
 		protected void FileList_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
 		{
-			if (!args.InRecycleQueue && args.Phase == 0)
-				UiPerformanceViewProbe.RecordContainerRealized(ParentShellPageInstance?.ShellViewModel?.PerformanceOperationId ?? 0);
 			HookScrollDeferTracking();
 			RefreshContainer(args.ItemContainer, args.InRecycleQueue);
 			RefreshItem(args.ItemContainer, args.Item, args.InRecycleQueue, args);
@@ -1276,9 +1273,6 @@ namespace Files.App.Views.Layouts
 		[DynamicWindowsRuntimeCast(typeof(ScrollViewer))]
 		private void HookScrollDeferTracking()
 		{
-			if (performanceViewProbe is null && UiPerformanceTrace.IsEnabled && ItemsControl.FindDescendant<ScrollViewer>() is not null)
-				performanceViewProbe = new UiPerformanceViewProbe(ItemsControl,
-					() => ParentShellPageInstance?.ShellViewModel?.PerformanceOperationId ?? 0, GetVisibleIndexRange);
 			// Matches the slow STA lane; tier 1 results enqueue here from background threads
 			slowImageWork ??= new ViewportWorkQueue<ItemImageJob>(8, 4096,
 				action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () => action()),
@@ -1304,8 +1298,6 @@ namespace Files.App.Views.Layouts
 			slowImageWork = null;
 			metadataWork?.Dispose();
 			metadataWork = null;
-			performanceViewProbe?.Dispose();
-			performanceViewProbe = null;
 			realizedItems.Clear();
 			metadataFailures.Clear();
 			ParentShellPageInstance?.ShellViewModel?.NotifyScrollStateChanged(false);
@@ -1563,25 +1555,12 @@ namespace Files.App.Views.Layouts
 				ParentShellPageInstance?.ShellViewModel is not { IsScrollInFlight: false } shellViewModel)
 				return;
 			viewportRefillQueued = true;
-			var performanceOperation = shellViewModel.PerformanceOperationId;
-			var requestedAt = UiPerformanceTrace.IsEnabled ? Stopwatch.GetTimestamp() : 0;
-			if (requestedAt != 0)
-				UiPerformanceTrace.Mark(performanceOperation, "ViewportPassQueued", realizedItems.Count);
 			if (!DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
 			{
 				viewportRefillQueued = false;
 				if (!isDisposed && navigationArguments is not null && shellViewModel.IsScrollInFlight is false &&
 					ReferenceEquals(ParentShellPageInstance?.ShellViewModel, shellViewModel))
-				{
-					var startedAt = requestedAt != 0 ? Stopwatch.GetTimestamp() : 0;
-					if (startedAt != 0)
-						UiPerformanceTrace.Mark(performanceOperation, "ViewportPassStarted", realizedItems.Count,
-							durationMs: Stopwatch.GetElapsedTime(requestedAt, startedAt).TotalMilliseconds);
 					LoadVisibleItemsAfterScrollSettled();
-					if (startedAt != 0)
-						UiPerformanceTrace.Mark(performanceOperation, "ViewportPassCompleted", realizedItems.Count,
-							durationMs: Stopwatch.GetElapsedTime(startedAt).TotalMilliseconds);
-				}
 			}))
 				viewportRefillQueued = false;
 		}
@@ -1621,17 +1600,11 @@ namespace Files.App.Views.Layouts
 				if (shellViewModel?.IsScrollInFlight is true && !e.IsIntermediate)
 				{
 					// The final event may repeat the last offset; it still closes the gesture's debounce window.
-					if (UiPerformanceTrace.IsEnabled)
-						UiPerformanceTrace.Mark(shellViewModel.PerformanceOperationId, "ScrollFinalWithoutMovement", realizedItems.Count);
 					scrollSettleTimer?.Stop();
 					scrollSettleTimer?.Start();
 				}
 				else if (shellViewModel?.IsScrollInFlight is false)
-				{
-					if (UiPerformanceTrace.IsEnabled)
-						UiPerformanceTrace.Mark(shellViewModel.PerformanceOperationId, "ScrollGeometryIgnored", realizedItems.Count);
 					RefillVisibleItemWork();
-				}
 				return;
 			}
 
@@ -1639,8 +1612,6 @@ namespace Files.App.Views.Layouts
 			slowImageWork?.SetPaused(true);
 			metadataWork?.SetPaused(true);
 			shellViewModel?.NotifyScrollStateChanged(true);
-			if (UiPerformanceTrace.IsEnabled)
-				UiPerformanceTrace.Mark(shellViewModel?.PerformanceOperationId ?? 0, "ScrollDeferred", realizedItems.Count, value: e.IsIntermediate ? 1 : 0);
 			AppMemoryHelper.NotifyActivity();
 
 			if (scrollSettleTimer is null)
@@ -1653,8 +1624,6 @@ namespace Files.App.Views.Layouts
 					if (isDisposed || deferScrollViewer is null)
 						return;
 					ParentShellPageInstance?.ShellViewModel?.NotifyScrollStateChanged(false);
-					if (UiPerformanceTrace.IsEnabled)
-						UiPerformanceTrace.Mark(ParentShellPageInstance?.ShellViewModel?.PerformanceOperationId ?? 0, "ScrollSettled", realizedItems.Count);
 					metadataFailures.Clear();
 					ReprioritizeViewportWork();
 					LoadVisibleItemsAfterScrollSettled();
@@ -1666,8 +1635,6 @@ namespace Files.App.Views.Layouts
 			// Debounce real movement; extent-only changes must not postpone initial image work.
 			scrollSettleTimer.Stop();
 			scrollSettleTimer.Start();
-			if (UiPerformanceTrace.IsEnabled)
-				UiPerformanceTrace.Mark(shellViewModel?.PerformanceOperationId ?? 0, "ScrollSettleScheduled", realizedItems.Count, value: e.IsIntermediate ? 1 : 0);
 		}
 
 		private void RefreshContainer(SelectorItem container, bool inRecycleQueue)
@@ -1719,12 +1686,7 @@ namespace Files.App.Views.Layouts
 					StartItemImage(container, listedItem, imageShellViewModel, args.ItemIndex);
 
 				if (args.Phase == 0 && NeedsDeferredProperties(listedItem))
-				{
-					if (UiPerformanceTrace.IsEnabled)
-						UiPerformanceTrace.Mark(ParentShellPageInstance?.ShellViewModel?.PerformanceOperationId ?? 0,
-							"ViewportWorkRequested", realizedItems.Count, value: args.ItemIndex);
 					RefillVisibleItemWork();
-				}
 				InitializeDrag(container, listedItem);
 
 				if (NeedsDeferredProperties(listedItem))

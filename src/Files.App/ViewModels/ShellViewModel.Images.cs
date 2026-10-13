@@ -39,7 +39,7 @@ namespace Files.App.ViewModels
 		}
 
 		internal readonly record struct ItemImageRequest(ListedItem Item, int Token, string Path, DateTimeOffset Modified, uint Size, int PhysicalSize,
-			bool Thumbnails, bool IsFolder, bool ThumbnailExpected, bool IconExpected, long PerformanceOperation, long FileSizeBytes, bool CloudPlaceholder);
+			bool Thumbnails, bool IsFolder, bool ThumbnailExpected, bool IconExpected, long FileSizeBytes, bool CloudPlaceholder);
 
 		private sealed record PendingImage(ItemImageRequest Request, ShellImageData? Data, ThumbnailImageKind? Kind, bool Final, CancellationToken Token, bool Missing = false);
 
@@ -55,7 +55,7 @@ namespace Files.App.ViewModels
 				(ignoreMissing || !imageCache.IsMissing(path, item.ItemDateModifiedReal));
 			var iconExpected = path.Length > 0 && HasPerItemIcon(item);
 			return new(item, item.ImageToken, path, item.ItemDateModifiedReal, size, FileThumbnailHelper.GetPhysicalSize(size),
-				thumbnails, item.IsFolder && !item.IsArchive, thumbnailExpected, iconExpected, PerformanceOperationId, item.FileSizeBytes, IsCloudPlaceholder(item));
+				thumbnails, item.IsFolder && !item.IsArchive, thumbnailExpected, iconExpected, item.FileSizeBytes, IsCloudPlaceholder(item));
 		}
 
 		private static bool IsCloudPlaceholder(ListedItem item)
@@ -169,7 +169,7 @@ namespace Files.App.ViewModels
 				if (work.HasFlag(ItemImageWork.CachedThumbnail))
 				{
 					var cached = await FileThumbnailHelper.GetImageDataAsync(request.Path, request.Size, request.IsFolder,
-						IconOptions.ReturnThumbnailOnly | IconOptions.ReturnOnlyIfCached, token, STATaskPriority.Fast, request.PerformanceOperation).ConfigureAwait(false);
+						IconOptions.ReturnThumbnailOnly | IconOptions.ReturnOnlyIfCached, token, STATaskPriority.Fast).ConfigureAwait(false);
 					if (cached is not null)
 					{
 						PostImage(new(request, cached, ThumbnailImageKind.Thumbnail, true, token));
@@ -181,7 +181,7 @@ namespace Files.App.ViewModels
 				{
 					var options = IconOptions.ReturnIconOnly | (request.CloudPlaceholder ? IconOptions.ReturnOnlyIfCached : IconOptions.None);
 					var icon = await FileThumbnailHelper.GetImageDataAsync(request.Path, request.Size, request.IsFolder,
-						options, token, STATaskPriority.Fast, request.PerformanceOperation).ConfigureAwait(false);
+						options, token, STATaskPriority.Fast).ConfigureAwait(false);
 					if (icon is not null)
 						PostImage(new(request, icon, ThumbnailImageKind.Icon, !request.ThumbnailExpected, token));
 				}
@@ -210,7 +210,7 @@ namespace Files.App.ViewModels
 					return;
 				}
 				var data = await FileThumbnailHelper.GetImageDataAsync(request.Path, request.Size, request.IsFolder,
-					IconOptions.ReturnThumbnailOnly, token, STATaskPriority.Slow, request.PerformanceOperation).ConfigureAwait(false);
+					IconOptions.ReturnThumbnailOnly, token, STATaskPriority.Slow).ConfigureAwait(false);
 				if (data is not null)
 				{
 					PostImage(new(request, data, ThumbnailImageKind.Thumbnail, true, token));
@@ -346,17 +346,12 @@ namespace Files.App.ViewModels
 		private void ApplyPendingImages()
 		{
 			var started = Stopwatch.GetTimestamp();
-			var applied = 0;
 			while (pendingImages.TryDequeue(out var pending))
 			{
 				ApplyPendingImage(pending);
-				applied++;
 				if (Stopwatch.GetElapsedTime(started).TotalMilliseconds >= 4)
 					break;
 			}
-
-			if (UiPerformanceTrace.IsEnabled && applied > 0)
-				UiPerformanceTrace.Mark(PerformanceOperationId, "ImageBatchApplied", applied, Stopwatch.GetElapsedTime(started).TotalMilliseconds);
 
 			Volatile.Write(ref pendingImagesScheduled, 0);
 			if (!pendingImages.IsEmpty && Interlocked.Exchange(ref pendingImagesScheduled, 1) == 0 && !dispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, ApplyPendingImages))

@@ -21,15 +21,13 @@ namespace Files.App.Utils.Storage
 			int countLimit,
 			uint iconSize,
 			Func<List<ListedItem>, Task> intermediateAction,
-			Dictionary<string, BitmapImage>? defaultIconPairs = null,
-			long performanceOperationId = 0)
+			Dictionary<string, BitmapImage>? defaultIconPairs = null)
 		{
 			var sampler = new IntervalSampler(500);
 			var tempList = new List<ListedItem>();
 			uint count = 0;
 			var firstRound = true;
 			var hasPublishedFirstBatch = false;
-			var firstItemReported = false;
 
 			IUserSettingsService userSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 			bool calculateFolderSizes = userSettingsService.FoldersSettingsService.CalculateFolderSizes;
@@ -140,11 +138,6 @@ namespace Files.App.Utils.Storage
 					}
 
 					cancellationToken.ThrowIfCancellationRequested();
-					if (!firstItemReported && tempList.Count > 0)
-					{
-						firstItemReported = true;
-						UiPerformanceTrace.Mark(performanceOperationId, "FirstItemAvailable", tempList.Count);
-					}
 				}
 
 				count += maxItemsToRetrieve;

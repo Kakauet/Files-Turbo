@@ -54,21 +54,6 @@ namespace Files.App.UserControls
 		private void NavToolbar_Loaded(object sender, RoutedEventArgs e)
 			=> this.RunAfterNextRender(() => FindName(nameof(ListaryIntegration)));
 
-		private void SearchSuggestion_Loaded(object sender, RoutedEventArgs e)
-		{
-			if (sender is not FrameworkElement { DataContext: SuggestionModel { PerformanceOperationId: > 0 } suggestion } element
-				|| ViewModel?.SearchSuggestionPerformanceOperationId != suggestion.PerformanceOperationId)
-				return;
-
-			UiPerformanceTrace.Mark(suggestion.PerformanceOperationId, "SuggestionContainerLoaded", 1);
-			element.RunAfterNextRender(() =>
-			{
-				if (element.IsLoaded && ReferenceEquals(element.DataContext, suggestion)
-					&& ViewModel?.SearchSuggestionPerformanceOperationId == suggestion.PerformanceOperationId)
-					UiPerformanceTrace.Mark(suggestion.PerformanceOperationId, "SuggestionAfterRender", 1);
-			});
-		}
-
 		private void NavToolbar_Loading(FrameworkElement _, object e)
 		{
 			Loading -= NavToolbar_Loading;
