@@ -51,15 +51,12 @@ namespace Files.App.Views.Layouts
 
 		private volatile bool shouldSetVerticalScrollMode;
 
-		private bool isResizingItems;
-		private Microsoft.UI.Dispatching.DispatcherQueueTimer? reorderAnimationResumeTimer;
-
 		// Properties
 
 		public ScrollViewer? ContentScroller { get; private set; }
 
 		public TimeSpan GetReorderAnimationDuration(bool canRefresh)
-			=> canRefresh && !isResizingItems ? TimeSpan.FromMilliseconds(350) : TimeSpan.Zero;
+			=> canRefresh ? TimeSpan.FromMilliseconds(350) : TimeSpan.Zero;
 
 		protected override ListViewBase ListViewBase => FileList;
 		protected override SemanticZoom RootZoom => RootGridZoom;
@@ -270,7 +267,6 @@ namespace Files.App.Views.Layouts
 
 		public override void Dispose()
 		{
-			reorderAnimationResumeTimer?.Stop();
 			Bindings.StopTracking();
 			if (FolderSettings is not null)
 				FolderSettings.LayoutModeChangeRequested -= FolderSettings_LayoutModeChangeRequested;
@@ -417,28 +413,6 @@ namespace Files.App.Views.Layouts
 		private void FileList_Loaded(object sender, RoutedEventArgs e)
 		{
 			ContentScroller = FileList.FindDescendant<ScrollViewer>(x => x.Name == "ScrollViewer");
-		}
-
-		private void FileList_SizeChanged(object sender, SizeChangedEventArgs e)
-		{
-			if (e.PreviousSize.Width == 0 || e.PreviousSize.Height == 0)
-				return;
-
-			// Each resize step reflows the wrap grid, and the reorder animation slid every realized item to its new
-			// slot over 350 ms, so a window or sidebar drag stacked overlapping slides that lagged behind the pointer.
-			// Items jump to their new slot while the size is changing; the animation comes back once it settles.
-			if (!isResizingItems)
-			{
-				isResizingItems = true;
-				CommunityToolkit.WinUI.Animations.ItemsReorderAnimation.SetDuration(FileList, TimeSpan.Zero);
-			}
-
-			reorderAnimationResumeTimer ??= DispatcherQueue.CreateTimer();
-			reorderAnimationResumeTimer.Debounce(() =>
-			{
-				isResizingItems = false;
-				CommunityToolkit.WinUI.Animations.ItemsReorderAnimation.SetDuration(FileList, GetReorderAnimationDuration(ParentShellPageInstance?.ToolbarViewModel.CanRefresh ?? false));
-			}, TimeSpan.FromMilliseconds(250));
 		}
 
 		protected override void OnSelectionChanged(SelectionChangedEventArgs e)
