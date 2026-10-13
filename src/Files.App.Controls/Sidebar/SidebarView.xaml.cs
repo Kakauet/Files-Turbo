@@ -24,6 +24,7 @@ namespace Files.App.Controls
 
 		private bool draggingSidebarResizer;
 		private double preManipulationSidebarWidth = 0;
+		private double? pendingOpenPaneLength;
 
 		public SidebarView()
 		{
@@ -158,8 +159,28 @@ namespace Files.App.Controls
 		private void SidebarResizer_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
 		{
 			var newWidth = preManipulationSidebarWidth + e.Cumulative.Translation.X;
-			UpdateDisplayModeForPaneWidth(newWidth);
+			if (draggingSidebarResizer && DisplayMode == SidebarDisplayMode.Expanded && newWidth > COMPACT_MAX_WIDTH)
+			{
+				// OpenPaneLength is bound TwoWay to a persisted setting: writing it on every delta saved the settings file
+				// and notified its listeners on the UI thread once per pointer move. Only move the column while dragging.
+				PaneColumnDefinition.Width = new GridLength(newWidth);
+				pendingOpenPaneLength = newWidth;
+			}
+			else
+			{
+				CommitPendingOpenPaneLength();
+				UpdateDisplayModeForPaneWidth(newWidth);
+			}
 			e.Handled = true;
+		}
+
+		private void CommitPendingOpenPaneLength()
+		{
+			if (pendingOpenPaneLength is not double length)
+				return;
+
+			pendingOpenPaneLength = null;
+			OpenPaneLength = length;
 		}
 
 		private void SidebarResizerControl_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -264,6 +285,7 @@ namespace Files.App.Controls
 		private void SidebarResizer_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
 		{
 			draggingSidebarResizer = false;
+			CommitPendingOpenPaneLength();
 			VisualStateManager.GoToState(this, "ResizerNormal", true);
 			e.Handled = true;
 		}
