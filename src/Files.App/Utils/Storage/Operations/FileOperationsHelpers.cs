@@ -238,12 +238,13 @@ namespace Files.App.Utils.Storage
 				}
 
 				var shellOperationResult = new ShellOperationResult();
+				using var shellItems = new ShellItemFactory();
 
 				for (var i = 0; i < fileToDeletePath.Length; i++)
 				{
 					if (!SafetyExtensions.IgnoreExceptions(() =>
 					{
-						using var shi = new ShellItem(fileToDeletePath[i]);
+						using var shi = shellItems.CreateItem(fileToDeletePath[i]);
 
 						op.QueueDeleteOperation(shi);
 					}))
@@ -407,12 +408,13 @@ namespace Files.App.Utils.Storage
 
 				op.Options = FILEOPERATION_FLAGS.FOF_SILENT | FILEOPERATION_FLAGS.FOF_NOERRORUI | FILEOPERATION_FLAGS.FOF_RENAMEONCOLLISION;
 				op.OwnerWindow = (HWND)(nint)ownerHwnd;
+				using var shellItems = new ShellItemFactory();
 
 				for (var i = 0; i < fileToRenamePath.Length; i++)
 				{
 					if (!SafetyExtensions.IgnoreExceptions(() =>
 					{
-						using var shi = new ShellItem(fileToRenamePath[i]);
+						using var shi = shellItems.CreateItem(fileToRenamePath[i]);
 						op.QueueRenameOperation(shi, newName[i]);
 					}))
 					{
@@ -506,15 +508,16 @@ namespace Files.App.Utils.Storage
 				op.OwnerWindow = (HWND)(nint)ownerHwnd;
 
 				op.Options |= !overwriteOnMove ? FILEOPERATION_FLAGS.FOFX_PRESERVEFILEEXTENSIONS | FILEOPERATION_FLAGS.FOF_RENAMEONCOLLISION : FILEOPERATION_FLAGS.FOF_NOCONFIRMATION;
+				using var shellItems = new ShellItemFactory();
 
 				for (var i = 0; i < fileToMovePath.Length; i++)
 				{
 					if (!SafetyExtensions.IgnoreExceptions(() =>
 					{
-						using ShellItem shi = new(fileToMovePath[i]);
+						using var shi = shellItems.CreateItem(fileToMovePath[i]);
 						var destinationFolderPath = Path.GetDirectoryName(moveDestination[i])
 							?? throw new ArgumentException("The move destination must include a parent folder.", nameof(moveDestination));
-						using ShellFolder shd = new(destinationFolderPath);
+						var shd = shellItems.GetFolder(destinationFolderPath);
 
 						op.QueueMoveOperation(shi, shd, Path.GetFileName(moveDestination[i]));
 					}))
@@ -645,15 +648,16 @@ namespace Files.App.Utils.Storage
 				op.OwnerWindow = (HWND)(nint)ownerHwnd;
 
 				op.Options |= !overwriteOnCopy ? FILEOPERATION_FLAGS.FOFX_PRESERVEFILEEXTENSIONS | FILEOPERATION_FLAGS.FOF_RENAMEONCOLLISION : FILEOPERATION_FLAGS.FOF_NOCONFIRMATION;
+				using var shellItems = new ShellItemFactory();
 
 				for (var i = 0; i < fileToCopyPath.Length; i++)
 				{
 					if (!SafetyExtensions.IgnoreExceptions(() =>
 					{
-						using ShellItem shi = new(fileToCopyPath[i]);
+						using var shi = shellItems.CreateItem(fileToCopyPath[i]);
 						var destinationFolderPath = Path.GetDirectoryName(copyDestination[i])
 							?? throw new ArgumentException("The copy destination must include a parent folder.", nameof(copyDestination));
-						using ShellFolder shd = new(destinationFolderPath);
+						var shd = shellItems.GetFolder(destinationFolderPath);
 
 						var fileName = GetIncrementalName(overwriteOnCopy, copyDestination[i], fileToCopyPath[i]);
 						// Perform a copy operation

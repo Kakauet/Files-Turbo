@@ -98,6 +98,7 @@ CoCreateInstance
 FileOpenDialog
 IFileOpenDialog
 SHCreateItemFromParsingName
+SHCreateItemFromRelativeName
 FileSaveDialog
 IFileSaveDialog
 D3D_DRIVER_TYPE

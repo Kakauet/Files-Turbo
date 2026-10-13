@@ -219,6 +219,10 @@ namespace Files.App.Utils.Shell
 			return CreateSpecializedItem(shellItem);
 		}
 
+		/// <summary>Wraps <paramref name="item"/> as a plain item, without the link and folder checks of <see cref="Open(IShellItem)"/>.</summary>
+		internal static ShellItem Wrap(IShellItem item)
+			=> new(item);
+
 		public unsafe static ShellItem Open(ShellPidl pidl)
 		{
 			byte[] bytes = pidl.GetBytes();
