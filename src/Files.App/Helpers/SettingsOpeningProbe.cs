@@ -25,7 +25,7 @@ internal static class SettingsOpeningProbe
     private static TaskCompletionSource? ready;
     internal static SettingsPage? Page;
     private static string F(double value) => value.ToString("F2", CultureInfo.InvariantCulture);
-    internal static void Stage(string name, long start) { if (request != 0) lines.Add($"STAGE|{label}|{name}|{F(Stopwatch.GetElapsedTime(start).TotalMilliseconds)}|at={F(Stopwatch.GetElapsedTime(request).TotalMilliseconds)}"); }
+    internal static void Stage(string name, long start) { if (request != 0) lines.Add($"STAGE|{label}|{name}|{F(Stopwatch.GetElapsedTime(start).TotalMilliseconds)}"); }
     private static void Log(string value) => lines.Add(value);
 
     internal static void Start()

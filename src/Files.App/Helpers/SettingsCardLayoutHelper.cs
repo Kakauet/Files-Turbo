@@ -13,6 +13,7 @@ namespace Files.App.Helpers;
 internal static class SettingsCardLayoutHelper
 {
 	[DynamicWindowsRuntimeCast(typeof(Panel))]
+	[DynamicWindowsRuntimeCast(typeof(UIElement))]
 	internal static void Prepare(object? content)
 	{
 		if (content is UIElement { Visibility: Visibility.Collapsed })
@@ -22,9 +23,6 @@ internal static class SettingsCardLayoutHelper
 		{
 			case SettingsCard card:
 				card.Loading += Card_Loading;
-				break;
-			case SettingsExpander expander:
-				expander.Loading += Expander_Loading;
 				break;
 			case Panel panel:
 				foreach (var child in panel.Children)
@@ -40,32 +38,10 @@ internal static class SettingsCardLayoutHelper
 			PrepareCard(card);
 	}
 
-	private static void Expander_Loading(FrameworkElement sender, object args)
-	{
-		sender.Loading -= Expander_Loading;
-		PrepareHeader(sender);
-	}
-
-	[DynamicWindowsRuntimeCast(typeof(Control))]
-	private static void PrepareHeader(DependencyObject element)
-	{
-		if (element is SettingsCard card)
-		{
-			PrepareCard(card);
-			return;
-		}
-
-		(element as Control)?.ApplyTemplate();
-		for (var i = 0; i < VisualTreeHelper.GetChildrenCount(element); i++)
-			PrepareHeader(VisualTreeHelper.GetChild(element, i));
-	}
-
 	[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
 	private static void PrepareCard(SettingsCard card)
 	{
-		var probeCard = Stopwatch.GetTimestamp();
 		card.ApplyTemplate();
-		SettingsOpeningProbe.Stage("card-template-" + VisualTreeHelper.GetChildrenCount(card), probeCard);
 		if (VisualTreeHelper.GetChildrenCount(card) == 0 ||
 			VisualTreeHelper.GetChild(card, 0) is not FrameworkElement root || root.ActualWidth > 0)
 			return;
@@ -74,25 +50,33 @@ internal static class SettingsCardLayoutHelper
 			.SelectMany(group => group.States)
 			.SelectMany(state => state.StateTriggers)
 			.OfType<ControlSizeTrigger>()
-			.Where(trigger => trigger.CanTrigger && ReferenceEquals(trigger.TargetElement, root))
+			.Where(trigger => trigger.CanTrigger && ReferenceEquals(trigger.TargetElement, root) &&
+				trigger.ReadLocalValue(ControlSizeTrigger.CanTriggerProperty) == DependencyProperty.UnsetValue)
 			.ToArray();
 		if (triggers.Length == 0)
 			return;
-		SettingsOpeningProbe.Stage("card-triggers-" + triggers.Length, probeCard);
 
 		// Zero is not the offered width: avoid wrapping before the first arrange.
 		foreach (var trigger in triggers)
 			trigger.CanTrigger = false;
 
+		void Restore()
+		{
+			root.SizeChanged -= RestoreSizeTriggers;
+			root.Unloaded -= Root_Unloaded;
+			foreach (var trigger in triggers)
+				trigger.ClearValue(ControlSizeTrigger.CanTriggerProperty);
+		}
+
 		void RestoreSizeTriggers(object sender, SizeChangedEventArgs args)
 		{
 			if (root.ActualWidth <= 0)
 				return;
-
-			root.SizeChanged -= RestoreSizeTriggers;
-			foreach (var trigger in triggers)
-				trigger.CanTrigger = true;
+			Restore();
 		}
+		void Root_Unloaded(object sender, RoutedEventArgs args) => Restore();
+
 		root.SizeChanged += RestoreSizeTriggers;
+		root.Unloaded += Root_Unloaded;
 	}
 }

@@ -371,21 +371,5 @@ namespace Files.App.Views.Shells
 				SlimContentPage is BaseGroupableLayoutPage { IsLoaded: true } svb)
 				SlimContentPage.ItemManipulationModel.FocusFileList();
 		}
-		protected override global::Windows.Foundation.Size MeasureOverride(global::Windows.Foundation.Size size)
-		{
-			var probeLayout = Stopwatch.GetTimestamp();
-			var result = base.MeasureOverride(size);
-			SettingsOpeningProbe.Stage("Measure-ModernShellPage.xaml-" + size.Width + "x" + size.Height, probeLayout);
-			return result;
-		}
-
-		protected override global::Windows.Foundation.Size ArrangeOverride(global::Windows.Foundation.Size size)
-		{
-			var probeLayout = Stopwatch.GetTimestamp();
-			var result = base.ArrangeOverride(size);
-			SettingsOpeningProbe.Stage("Arrange-ModernShellPage.xaml-" + size.Width + "x" + size.Height, probeLayout);
-			return result;
-		}
-
 	}
 }
