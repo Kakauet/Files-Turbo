@@ -4743,4 +4743,7 @@
   <data name="SearchResultsIncomplete" xml:space="preserve">
     <value>Some locations could not be searched. Results may be incomplete.</value>
   </data>
+  <data name="TurboCustomizationAuthor" xml:space="preserve">
+    <value>Files Turbo — customized by</value>
+  </data>
 </root>

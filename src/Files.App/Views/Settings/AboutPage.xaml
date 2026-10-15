@@ -47,6 +47,10 @@
 				</Button>
 			</wctcontrols:SettingsCard>
 
+			<wctcontrols:SettingsCard Header="{helpers:ResourceString Name=TurboCustomizationAuthor}">
+				<HyperlinkButton Content="Kakauet" NavigateUri="https://github.com/Kakauet" />
+			</wctcontrols:SettingsCard>
+
 			<!--  GitHub Sponsor  -->
 			<wctcontrols:SettingsCard
 				Command="{x:Bind ViewModel.SupportUsCommand}"
