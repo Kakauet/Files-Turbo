@@ -19,6 +19,9 @@ internal static class SettingsOpeningProbe
     private static bool started;
     private static string label = "", target = "", previous = "";
     private static int stable;
+    private static double observerMs;
+    private static Microsoft.UI.Xaml.Controls.Page? observedPage;
+    private static FrameworkElement[] observed = [];
     private static TaskCompletionSource? ready;
     internal static SettingsPage? Page;
     private static string F(double value) => value.ToString("F2", CultureInfo.InvariantCulture);
@@ -34,13 +37,15 @@ internal static class SettingsOpeningProbe
         _ = Script();
     }
 
-    private static IEnumerable<FrameworkElement> Descendants(DependencyObject parent)
+    private static IEnumerable<FrameworkElement> LogicalElements(object parent)
     {
-        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        if (parent is Panel panel)
         {
-            var child = VisualTreeHelper.GetChild(parent, i);
-            if (child is FrameworkElement element) yield return element;
-            foreach (var item in Descendants(child)) yield return item;
+            foreach (var child in panel.Children)
+            {
+                if (child is FrameworkElement element) yield return element;
+                foreach (var item in LogicalElements(child)) yield return item;
+            }
         }
     }
 
@@ -49,12 +54,17 @@ internal static class SettingsOpeningProbe
         if (Page?.FindName("SettingsContentFrame") is not Frame { Content: Microsoft.UI.Xaml.Controls.Page content } ||
             content.GetType().Name != target || !content.IsLoaded || content.ActualWidth < 100 || content.ActualHeight < 30 ||
             Page.FindName("SettingsContentScrollViewer") is not ScrollViewer { ViewportHeight: > 100 } scroll) return "";
-        var elements = Descendants(content).Where(e => e is Control && e.IsLoaded && e.ActualWidth > 0 && e.ActualHeight > 0).ToArray();
+        if (!ReferenceEquals(observedPage, content))
+        {
+            observedPage = content;
+            observed = LogicalElements(content.Content).ToArray();
+        }
         if (target == "GeneralPage" && (content.FindName("AppLanguagesComboBox") is not ComboBox { IsEnabled: true, SelectedIndex: >= 0, ActualWidth: > 0 } ||
             content.FindName("DateFormatChooser") is not ComboBox { IsEnabled: true, SelectedIndex: >= 0, ActualWidth: > 0 })) return "";
         var geometry = new List<string> { F(content.ActualWidth), F(content.ActualHeight), F(scroll.ViewportHeight), F(scroll.ExtentHeight) };
-        foreach (var e in elements)
+        foreach (var e in observed)
         {
+            if (!e.IsLoaded || e.Visibility != Visibility.Visible || e.ActualWidth <= 0 || e.ActualHeight <= 0) continue;
             var p = e.TransformToVisual(Page).TransformPoint(new Point());
             if (p.Y + e.ActualHeight < 0 || p.Y > Page.ActualHeight) continue;
             geometry.Add($"{e.GetType().Name}:{F(p.X)},{F(p.Y)},{F(e.ActualWidth)},{F(e.ActualHeight)}");
@@ -65,10 +75,13 @@ internal static class SettingsOpeningProbe
     private static void Render(object? sender, object args)
     {
         if (ready is null || ready.Task.IsCompleted) return;
+        var observer = Stopwatch.GetTimestamp();
         var geometry = Geometry();
+        observerMs += Stopwatch.GetElapsedTime(observer).TotalMilliseconds;
         if (geometry.Length == 0) { stable = 0; return; }
         stable = geometry == previous ? stable + 1 : 0;
         previous = geometry;
+        Log($"LAYOUT|{label}|{F(Stopwatch.GetElapsedTime(request).TotalMilliseconds)}|stable={stable}");
         if (stable < 1) return;
         Log($"READY|{label}|{F(Stopwatch.GetElapsedTime(request).TotalMilliseconds)}|{geometry}");
         ready.TrySetResult();
@@ -77,6 +90,7 @@ internal static class SettingsOpeningProbe
     private static async Task Measure(string name, string page, Func<Task> action)
     {
         label = name; target = page; previous = ""; stable = 0;
+        observerMs = 0;
         ready = new(); request = Stopwatch.GetTimestamp();
         await action();
         var timeout = Task.Delay(15000);
@@ -84,7 +98,9 @@ internal static class SettingsOpeningProbe
         var atReady = previous;
         await Task.Delay(300);
         Log($"VERIFY|{name}|stable={atReady == Geometry()}");
+        Log($"OBSERVER|{name}|{F(observerMs)}");
         request = 0; ready = null;
+        observedPage = null; observed = [];
     }
 
     private static void Memory(string name)
@@ -100,6 +116,7 @@ internal static class SettingsOpeningProbe
         try
         {
             await MainPageViewModel.StartupTabsLoadedTask;
+            Log($"STARTUP-LOADED|{F((DateTime.Now - Process.GetCurrentProcess().StartTime).TotalMilliseconds)}");
             MainWindow.Instance.AppWindow.Resize(new Windows.Graphics.SizeInt32(1440, 1000));
             await Task.Delay(3000);
             Log($"STARTUP|{F(Stopwatch.GetElapsedTime(origin).TotalMilliseconds)}|tabs={MainPageViewModel.AppInstances.Count}");
