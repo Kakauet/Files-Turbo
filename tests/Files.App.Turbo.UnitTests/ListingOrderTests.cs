@@ -74,6 +74,26 @@ namespace Files.App.Turbo.UnitTests
 		}
 
 		[TestMethod]
+		[DataRow(64)]
+		[DataRow(128)]
+		[DataRow(512)]
+		public void Requested_first_screen_is_ordered_before_sorting_the_tail(int prefix)
+		{
+			var records = Records(5000, 19);
+			var expected = Reference(records, SortOption.Name, SortDirection.Ascending, false, false, true);
+			using var cancellation = new CancellationTokenSource();
+			using var rows = Win32ListingOrder.TryOrder(records, SortOption.Name, SortDirection.Ascending, false, false,
+				GroupOption.None, SortDirection.Ascending, GroupByDateUnit.Day, true, cancellation.Token, prefix)!.GetEnumerator();
+			for (var i = 0; i < prefix; i++)
+			{
+				Assert.IsTrue(rows.MoveNext());
+				Assert.AreEqual(expected[i], rows.Current.cFileName);
+			}
+			cancellation.Cancel();
+			Assert.ThrowsExactly<OperationCanceledException>(() => rows.MoveNext());
+		}
+
+		[TestMethod]
 		public void Listing_order_matches_the_app_sort_for_every_option()
 		{
 			foreach (var count in new[] { 1500, 5000 })

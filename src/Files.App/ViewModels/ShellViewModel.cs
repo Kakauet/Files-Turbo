@@ -1187,6 +1187,9 @@ namespace Files.App.ViewModels
 						? filesAndFoldersLocal
 						: await Task.Run(() => filesAndFoldersLocal.Where(x => MatchesFilter(x, filter)).ToList(), token);
 
+					if (preserveSortedPrefix && await AppendPreparedTailAsync(displayedFilesAndFolders, filter, token))
+						return;
+
 					// Every published row must find its generic icon ready in its first frame
 					await PreloadGenericIconsAsync(displayedFilesAndFolders, token);
 
@@ -1244,6 +1247,58 @@ namespace Files.App.ViewModels
 				if (ex is not (OperationCanceledException or ObjectDisposedException))
 					App.Logger.LogWarning(ex, ex.Message);
 			}
+		}
+
+		private async Task<bool> AppendPreparedTailAsync(List<ListedItem> items, string? filter, CancellationToken token)
+		{
+			var index = -1;
+			do
+			{
+				await dispatcherQueue.EnqueueOrInvokeAsync(() =>
+				{
+					token.ThrowIfCancellationRequested();
+					if (FilesAndFoldersFilter != filter)
+						return;
+					if (index < 0)
+					{
+						var count = FilesAndFolders.Count;
+						if (count == 0 || count > items.Count)
+							return;
+						for (var i = 0; i < count; i++)
+							if (!ReferenceEquals(FilesAndFolders[i], items[i]))
+								return;
+						index = count;
+					}
+
+					var started = Stopwatch.GetTimestamp();
+					var end = Math.Min(items.Count, index + 64);
+					while (index < end)
+					{
+						FilesAndFolders.Add(items[index++]);
+						if (Stopwatch.GetElapsedTime(started).TotalMilliseconds >= 4)
+							break;
+					}
+					if (FilesAndFolders.GroupedCollection is { } groups)
+					{
+						foreach (var group in groups)
+							group.IsSorted = true;
+						groups.IsSorted = true;
+					}
+					if (index == items.Count)
+					{
+						UpdateEmptyTextType();
+						UpdateNetworkAvailabilityInfoBar();
+						DirectoryInfoUpdated?.Invoke(this, EventArgs.Empty);
+					}
+				}, Microsoft.UI.Dispatching.DispatcherQueuePriority.Low);
+				if (index < 0)
+					return false;
+				if (FilesAndFoldersFilter != filter)
+					return true;
+				if (index < items.Count)
+					await Task.Delay(1, token).ConfigureAwait(false);
+			} while (index < items.Count);
+			return true;
 		}
 
 		private bool TryPublishFilesAndFoldersWithoutReset(List<ListedItem> displayedFilesAndFolders, bool preserveSortedPrefix = false)
@@ -1499,7 +1554,10 @@ namespace Files.App.ViewModels
 				if (isLoadingItems == value)
 					return;
 				isLoadingItems = value;
-				UpdateEmptyTextType();
+				if (dispatcherQueue.HasThreadAccess)
+					UpdateEmptyTextType();
+				else
+					dispatcherQueue.TryEnqueue(UpdateEmptyTextType);
 			}
 		}
 

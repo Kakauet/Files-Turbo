@@ -73,6 +73,13 @@ namespace Files.App.Views.Layouts
 		private ViewportWorkQueue<ItemImageJob>? fastImageWork;
 		private ViewportWorkQueue<ListedItem>? metadataWork;
 		private bool viewportRefillQueued;
+		private readonly ConditionalWeakTable<UIElement, ContainerHandlers> containerHandlers = new();
+
+		private sealed class ContainerHandlers
+		{
+			public bool InputAttached;
+			public bool DropAttached;
+		}
 
 		private bool shiftPressed;
 		private bool itemDragging;
@@ -1664,16 +1671,21 @@ namespace Files.App.Views.Layouts
 
 		private void RefreshContainer(SelectorItem container, bool inRecycleQueue)
 		{
-			container.PointerPressed -= FileListItem_PointerPressed;
-			container.PointerEntered -= FileListItem_PointerEntered;
-			container.PointerExited -= FileListItem_PointerExited;
-			container.Tapped -= FileListItem_Tapped;
-			container.DoubleTapped -= FileListItem_DoubleTapped;
-			container.RightTapped -= FileListItem_RightTapped;
+			var handlers = containerHandlers.GetValue(container, static _ => new());
+			if (inRecycleQueue)
+				UninitializeDrag(container);
+			if (handlers.InputAttached == !inRecycleQueue)
+				return;
+			handlers.InputAttached = !inRecycleQueue;
 
 			if (inRecycleQueue)
 			{
-				UninitializeDrag(container);
+				container.PointerPressed -= FileListItem_PointerPressed;
+				container.PointerEntered -= FileListItem_PointerEntered;
+				container.PointerExited -= FileListItem_PointerExited;
+				container.Tapped -= FileListItem_Tapped;
+				container.DoubleTapped -= FileListItem_DoubleTapped;
+				container.RightTapped -= FileListItem_RightTapped;
 			}
 			else
 			{
@@ -1888,16 +1900,22 @@ namespace Files.App.Views.Layouts
 			if (item is null)
 				return;
 
-			UninitializeDrag(container);
 			// Ordinary rows already carry their type; checking Directory.Exists here stalls realization.
-			var isDropTargetFile = item is IShortcutItem
+			var isDropTargetFile = item.PrimaryItemAttribute == StorageItemTypes.File && (item is IShortcutItem
 				? item.IsExecutable || item.IsScriptFile
-				: item.PrimaryItemAttribute == StorageItemTypes.File &&
+				:
 					((ReadOnlySpan<string>)[".exe", ".bat", ".cmd", ".ahk", ".py", ".ps1"]).Contains(
-						item.FileExtension ?? Path.GetExtension(item.ItemPath), StringComparer.OrdinalIgnoreCase);
-			if ((item.PrimaryItemAttribute == StorageItemTypes.Folder && !StorageTrashBinService.IsUnderTrashBin(item.ItemPath))
-				|| isDropTargetFile)
+						item.FileExtension ?? Path.GetExtension(item.ItemPath), StringComparer.OrdinalIgnoreCase));
+			var acceptsDrop = (item.PrimaryItemAttribute == StorageItemTypes.Folder && !StorageTrashBinService.IsUnderTrashBin(item.ItemPath))
+				|| isDropTargetFile;
+			var handlers = containerHandlers.GetValue(container, static _ => new());
+			if (handlers.DropAttached == acceptsDrop)
+				return;
+			if (!acceptsDrop)
+				UninitializeDrag(container);
+			else
 			{
+				handlers.DropAttached = true;
 				container.AllowDrop = true;
 				container.AddHandler(UIElement.DragOverEvent, Item_DragOverEventHandler, true);
 				container.DragLeave += Item_DragLeave;
@@ -1907,6 +1925,9 @@ namespace Files.App.Views.Layouts
 
 		protected void UninitializeDrag(UIElement element)
 		{
+			if (!containerHandlers.TryGetValue(element, out var handlers) || !handlers.DropAttached)
+				return;
+			handlers.DropAttached = false;
 			element.AllowDrop = false;
 			element.RemoveHandler(UIElement.DragOverEvent, Item_DragOverEventHandler);
 			element.DragLeave -= Item_DragLeave;

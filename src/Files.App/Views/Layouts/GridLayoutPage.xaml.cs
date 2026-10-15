@@ -235,8 +235,11 @@ namespace Files.App.Views.Layouts
 			if (FolderSettings?.LayoutMode == FolderLayoutModes.GridView)
 				return FirstScreenBatch.GetCount(width, height, ItemWidthGridView, ItemWidthGridView + 40);
 			if (FolderSettings?.LayoutMode == FolderLayoutModes.CardsView)
-				return FirstScreenBatch.GetCount(width, height, CardsViewIconBoxWidth + CardsViewDetailsBoxWidth,
-					Math.Max(CardsViewIconBoxHeight, CardsViewDetailsBoxHeight));
+				return CardsViewOrientation == Orientation.Horizontal
+					? FirstScreenBatch.GetCount(width, height, CardsViewIconBoxWidth + CardsViewDetailsBoxWidth,
+						Math.Max(CardsViewIconBoxHeight, CardsViewDetailsBoxHeight))
+					: FirstScreenBatch.GetCount(width, height, Math.Max(CardsViewIconBoxWidth, CardsViewDetailsBoxWidth),
+						CardsViewIconBoxHeight + CardsViewDetailsBoxHeight);
 			return FirstScreenBatch.GetCount(width, height, 200, LayoutSizeKindHelper.GetListViewRowHeight(LayoutSettingsService.ListViewSize));
 		}
 
@@ -830,7 +833,16 @@ namespace Files.App.Views.Layouts
 			if (selectionCheckboxCache.TryGetValue(container, out var cached) && ReferenceEquals(cached.Item1, root))
 				return cached.Item2;
 
+			if (cached is not null)
+			{
+				cached.Item2.PointerEntered -= SelectionCheckbox_PointerEntered;
+				cached.Item2.PointerExited -= SelectionCheckbox_PointerExited;
+				cached.Item2.PointerCanceled -= SelectionCheckbox_PointerCanceled;
+			}
 			var checkbox = (CheckBox)container.FindDescendant("SelectionCheckbox")!;
+			checkbox.PointerEntered += SelectionCheckbox_PointerEntered;
+			checkbox.PointerExited += SelectionCheckbox_PointerExited;
+			checkbox.PointerCanceled += SelectionCheckbox_PointerCanceled;
 			selectionCheckboxCache.AddOrUpdate(container, new Tuple<object?, CheckBox>(root, checkbox));
 			return checkbox;
 		}
@@ -841,9 +853,6 @@ namespace Files.App.Views.Layouts
 		{
 			var selectionCheckbox = GetSelectionCheckbox(args.ItemContainer);
 
-			selectionCheckbox.PointerEntered -= SelectionCheckbox_PointerEntered;
-			selectionCheckbox.PointerExited -= SelectionCheckbox_PointerExited;
-			selectionCheckbox.PointerCanceled -= SelectionCheckbox_PointerCanceled;
 			selectionCheckbox.Checked -= ItemSelected_Checked;
 			selectionCheckbox.Unchecked -= ItemSelected_Unchecked;
 
@@ -853,9 +862,6 @@ namespace Files.App.Views.Layouts
 
 			SetCheckboxSelectionState(args.Item, args.ItemContainer as GridViewItem);
 
-			selectionCheckbox.PointerEntered += SelectionCheckbox_PointerEntered;
-			selectionCheckbox.PointerExited += SelectionCheckbox_PointerExited;
-			selectionCheckbox.PointerCanceled += SelectionCheckbox_PointerCanceled;
 		}
 
 		[DynamicWindowsRuntimeCast(typeof(GridViewItem))]
@@ -911,19 +917,22 @@ namespace Files.App.Views.Layouts
 		[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
 		private void SelectionCheckbox_PointerEntered(object sender, PointerRoutedEventArgs e)
 		{
-			UpdateCheckboxVisibility((sender as FrameworkElement)!.FindAscendant<GridViewItem>()!, true);
+			if ((sender as FrameworkElement)?.FindAscendant<GridViewItem>() is { } container)
+				UpdateCheckboxVisibility(container, true);
 		}
 
 		[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
 		private void SelectionCheckbox_PointerExited(object sender, PointerRoutedEventArgs e)
 		{
-			UpdateCheckboxVisibility((sender as FrameworkElement)!.FindAscendant<GridViewItem>()!, false);
+			if ((sender as FrameworkElement)?.FindAscendant<GridViewItem>() is { } container)
+				UpdateCheckboxVisibility(container, false);
 		}
 
 		[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
 		private void SelectionCheckbox_PointerCanceled(object sender, PointerRoutedEventArgs e)
 		{
-			UpdateCheckboxVisibility((sender as FrameworkElement)!.FindAscendant<GridViewItem>()!, false);
+			if ((sender as FrameworkElement)?.FindAscendant<GridViewItem>() is { } container)
+				UpdateCheckboxVisibility(container, false);
 		}
 
 		// To avoid crashes, disable scrolling when drag-and-drop if grouped. (#14484)

@@ -140,8 +140,8 @@ namespace Files.App.Utils.Storage
 					if (count == countLimit)
 						break;
 
-					// The first batch is one viewport of rows (in final order when the listing was pre-sorted), or whatever
-					// slow storage produced in 25 ms. Later batches follow a fixed cadence: each publication copies the
+					// Fill the first viewport at 25 ms intervals; a short first batch must not start the 500 ms tail cadence.
+					// Later batches follow a fixed cadence: each publication copies the
 					// whole listing, so a per-count cadence would make loading large folders quadratic.
 					if (intermediateAction is not null &&
 						(publishedCount >= firstBatchSize
