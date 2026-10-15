@@ -1165,7 +1165,7 @@ namespace Files.App.ViewModels
 			=> string.IsNullOrEmpty(filter) || item.Name?.Contains(filter, StringComparison.OrdinalIgnoreCase) == true;
 
 		// Apply changes immediately after manipulating on filesAndFolders completed
-		public async Task ApplyFilesAndFoldersChangesAsync(CancellationToken cancellationToken = default, bool preserveSortedPrefix = false)
+		public async Task ApplyFilesAndFoldersChangesAsync(CancellationToken cancellationToken = default, bool preserveSortedPrefix = false, bool deferSortedTail = false)
 		{
 			using var applyCTS = CancellationTokenSource.CreateLinkedTokenSource(addFilesCTS.Token, cancellationToken);
 			var token = applyCTS.Token;
@@ -1187,7 +1187,7 @@ namespace Files.App.ViewModels
 						? filesAndFoldersLocal
 						: await Task.Run(() => filesAndFoldersLocal.Where(x => MatchesFilter(x, filter)).ToList(), token);
 
-					if (preserveSortedPrefix && await AppendPreparedTailAsync(displayedFilesAndFolders, filter, token))
+					if (preserveSortedPrefix && deferSortedTail && await AppendPreparedTailAsync(displayedFilesAndFolders, filter, token))
 						return;
 
 					// Every published row must find its generic icon ready in its first frame
@@ -1262,7 +1262,7 @@ namespace Files.App.ViewModels
 					if (index < 0)
 					{
 						var count = FilesAndFolders.Count;
-						if (count < InitialItemsBatchSize || items.Count - count <= 1_000)
+						if (count < InitialItemsBatchSize || items.Count - count <= 1_000 || items.Count - count > 10_000)
 							return;
 						for (var i = 0; i < count; i++)
 							if (!ReferenceEquals(FilesAndFolders[i], items[i]))
@@ -2218,6 +2218,8 @@ namespace Files.App.ViewModels
 			return groupImage;
 		}
 
+		private Task? listingPublicationTask;
+
 		internal int InitialItemsBatchSize { get; set; } = 64;
 
 		public void RefreshItems(string? previousDir, Action? postLoadCallback = null)
@@ -2266,6 +2268,7 @@ namespace Files.App.ViewModels
 
 				filesAndFolders.Clear();
 				desktopIniUpdateTask = null;
+				listingPublicationTask = null;
 
 				ItemLoadStatusChanged?.Invoke(this, new ItemLoadStatusChangedEventArgs() { Status = ItemLoadStatusChangedEventArgs.ItemLoadStatus.InProgress });
 
@@ -2320,9 +2323,6 @@ namespace Files.App.ViewModels
 			var enumerated = await EnumerateItemsFromStandardFolderAsync(path, cancellationToken, library);
 			cancellationToken.ThrowIfCancellationRequested();
 
-			// Hide progressbar after enumeration
-			IsLoadingItems = false;
-
 			switch (enumerated)
 			{
 				// Enumerated with FindFirstFileExFromApp
@@ -2365,6 +2365,12 @@ namespace Files.App.ViewModels
 				default:
 					break;
 			}
+
+			// Start watching before a long UI tail finishes so changes during publication are queued.
+			if (Interlocked.Exchange(ref listingPublicationTask, null) is Task publication)
+				await publication;
+			cancellationToken.ThrowIfCancellationRequested();
+			IsLoadingItems = false;
 
 			stopwatch.Stop();
 			Debug.WriteLine($"Loading of items in {path} completed in {stopwatch.ElapsedMilliseconds} milliseconds.\n");
@@ -2665,7 +2671,11 @@ namespace Files.App.ViewModels
 							preparedOrder = IsInPreparedOrder(sortOption, sortDirection, alongside, filesFirst, groupOption, groupDirection, dateUnit);
 						if (!preparedOrder)
 							await OrderFilesAndFoldersAsync(cancellationToken);
-						await ApplyFilesAndFoldersChangesAsync(cancellationToken, preparedOrder);
+						var publication = ApplyFilesAndFoldersChangesAsync(cancellationToken, preparedOrder, deferSortedTail: true);
+						if (preparedOrder && fileList.Count is > 1_000 and <= 10_000)
+							listingPublicationTask = publication;
+						else
+							await publication;
 						// Not awaited here: with Low priority these don't run until the UI thread goes idle
 						// after the final list update, which would delay load completion and watcher setup.
 						// The desktop.ini task is awaited before applying the adaptive layout, which reads DesktopIni.
