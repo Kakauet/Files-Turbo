@@ -786,6 +786,16 @@ namespace Files.App.Utils.Storage
 			{
 				if (FileExtensionHelpers.IsShortcutFile(linkPath))
 				{
+					if (!resolveTarget && !includeFileInfo)
+					{
+						// Keep the apartment-threaded link and all its getters on one STA thread.
+						return await STATask.RunPooled(() =>
+						{
+							using var storedLink = new ShellLink(linkPath, resolve: false);
+							return ShellFolderExtensions.GetShellLinkItem(storedLink, includeFileInfo: false);
+						}, App.Logger, priority: STATaskPriority.Fast);
+					}
+
 					using var link = resolveTarget
 						? new ShellLink(linkPath, SLR_FLAGS.SLR_NO_UI_WITH_MSG_PUMP, timeout: TimeSpan.FromMilliseconds(100))
 						: new ShellLink(linkPath, resolve: false);
