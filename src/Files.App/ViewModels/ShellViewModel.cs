@@ -2676,8 +2676,7 @@ namespace Files.App.ViewModels
 							listingPublicationTask = publication;
 						else
 							await publication;
-						// Not awaited here: with Low priority these don't run until the UI thread goes idle
-						// after the final list update, which would delay load completion and watcher setup.
+						// Keep auxiliary folder work off the publication and watcher setup path.
 						// The desktop.ini task is awaited before applying the adaptive layout, which reads DesktopIni.
 						_ = dispatcherQueue.EnqueueOrInvokeAsync(() =>
 						{
