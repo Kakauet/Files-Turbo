@@ -149,6 +149,8 @@ namespace Files.App.Views
 
 			var probeNavigate = Stopwatch.GetTimestamp();
 			SettingsContentFrame.Navigate(pageType, null, new SuppressNavigationTransitionInfo());
+			if (SettingsContentFrame.Content is Page page)
+				SettingsCardLayoutHelper.Prepare(page.Content);
 			SettingsOpeningProbe.Stage("section-construct-" + selectedPage, probeNavigate);
 		}
 
