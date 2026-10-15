@@ -3471,6 +3471,22 @@ namespace Files.App.ViewModels
 
 		private async Task<(ListedItem Item, CloudDriveSyncStatus? SyncStatus, long? Size, DateTimeOffset Created, DateTimeOffset Modified)?> GetFileOrFolderUpdateInfoAsync(ListedItem item, bool hasSyncStatus)
 		{
+			// Local watcher updates need only metadata, without constructing WinRT storage objects.
+			var path = item.GetRequiredPath();
+			if (!hasSyncStatus && item.PrimaryItemAttribute == StorageItemTypes.File &&
+				Path.IsPathFullyQualified(path) && !path.StartsWith(@"\\", StringComparison.Ordinal))
+			{
+				try
+				{
+					var info = new FileInfo(path);
+					info.Refresh();
+					if (info.Exists)
+						return (item, null, info.Length, info.CreationTimeUtc, info.LastWriteTimeUtc);
+				}
+				catch (IOException) { }
+				catch (UnauthorizedAccessException) { }
+			}
+
 			IStorageItem? storageItem = null;
 			if (item.PrimaryItemAttribute == StorageItemTypes.File)
 				storageItem = (await GetFileFromPathAsync(item.GetRequiredPath())).Result;
