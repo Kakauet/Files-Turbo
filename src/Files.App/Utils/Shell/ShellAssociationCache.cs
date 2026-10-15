@@ -21,6 +21,9 @@ namespace Files.App.Utils.Shell
 		private static readonly ConcurrentDictionary<string, bool> _thumbnailProviders = new(StringComparer.OrdinalIgnoreCase);
 		private static readonly ConcurrentDictionary<string, bool> _perFileIcons = new(StringComparer.OrdinalIgnoreCase);
 
+		internal static bool AreImageTraitsCached(string? extension)
+			=> string.IsNullOrEmpty(extension) || _thumbnailProviders.ContainsKey(extension) && _perFileIcons.ContainsKey(extension);
+
 		/// <summary>
 		/// False only when no thumbnail or image extractor is registered; lookup failures answer true.
 		/// </summary>

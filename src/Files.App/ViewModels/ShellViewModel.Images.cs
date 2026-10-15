@@ -435,7 +435,8 @@ namespace Files.App.ViewModels
 			try
 			{
 				// A stuck shell extension must not hold the listing back
-				var associations = Task.Run(() =>
+				var associations = types.All(type => type.Item2 || ShellAssociationCache.AreImageTraitsCached(type.Item1))
+					? Task.CompletedTask : Task.Run(() =>
 				{
 					foreach (var (extension, isFolder) in types)
 					{

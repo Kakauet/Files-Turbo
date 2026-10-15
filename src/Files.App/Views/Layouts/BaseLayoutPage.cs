@@ -1354,6 +1354,8 @@ namespace Files.App.Views.Layouts
 			public volatile bool Completed;
 
 			public int Attempts;
+
+			public volatile int Priority;
 		}
 
 		// Visible rows first, top to bottom; realized rows outside the viewport after them.
@@ -1380,6 +1382,7 @@ namespace Files.App.Views.Layouts
 				var priority = GetWorkPriority(ItemsControl.IndexFromContainer(container));
 				if (imageJobs.TryGetValue(item, out var job))
 				{
+					job.Priority = priority;
 					fastImageWork?.SetPriority(job, priority);
 					slowImageWork?.SetPriority(job, priority);
 				}
@@ -1398,9 +1401,9 @@ namespace Files.App.Views.Layouts
 			if (work == ShellViewModel.ItemImageWork.None)
 				return;
 
-			var job = new ItemImageJob { Attempts = attempts };
-			imageJobs[item] = job;
 			var priority = GetWorkPriority(index);
+			var job = new ItemImageJob { Attempts = attempts, Priority = priority };
+			imageJobs[item] = job;
 			fastImageWork ??= new ViewportWorkQueue<ItemImageJob>(8, 4096,
 				action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () => action()),
 				faulted: exception => App.Logger.LogWarning(exception, "Failed to load a row image."), newestFirst: false);
@@ -1435,7 +1438,7 @@ namespace Files.App.Views.Layouts
 					{
 						job.Completed = true;
 					}
-				}, priority) is true;
+				}, job.Priority) is true;
 			}
 			finally
 			{

@@ -1,4 +1,4 @@
-﻿<!--  Copyright (c) Files Community. Licensed under the MIT License.  -->
+<!--  Copyright (c) Files Community. Licensed under the MIT License.  -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
 	<!--  The default CheckBox draws its check with an AnimatedIcon, which builds a Lottie composition tree for every
@@ -329,6 +329,17 @@
 						</Grid>
 						<ContentPresenter x:Name="ContentPresenter" Grid.Column="1" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTransitions="{TemplateBinding ContentTransitions}" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" AutomationProperties.AccessibilityView="Raw" TextWrapping="Wrap" />
 					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<!-- Keep the hover target while the hidden checkbox has no visible content. -->
+	<Style x:Key="FileItemSelectionCheckBoxHitTargetStyle" BasedOn="{StaticResource FileItemSelectionCheckBoxStyle}" TargetType="CheckBox">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="CheckBox">
+					<Border MinHeight="{StaticResource CheckBoxSize}" Background="Transparent" />
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>

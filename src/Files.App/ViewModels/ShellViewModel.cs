@@ -1262,7 +1262,7 @@ namespace Files.App.ViewModels
 					if (index < 0)
 					{
 						var count = FilesAndFolders.Count;
-						if (count == 0 || count > items.Count)
+						if (count < InitialItemsBatchSize || items.Count - count <= 1_000)
 							return;
 						for (var i = 0; i < count; i++)
 							if (!ReferenceEquals(FilesAndFolders[i], items[i]))
@@ -1271,7 +1271,8 @@ namespace Files.App.ViewModels
 					}
 
 					var started = Stopwatch.GetTimestamp();
-					var end = Math.Min(items.Count, index + 64);
+					AppMemoryHelper.NotifyActivity();
+					var end = Math.Min(items.Count, index + 256);
 					while (index < end)
 					{
 						FilesAndFolders.Add(items[index++]);
@@ -1296,7 +1297,7 @@ namespace Files.App.ViewModels
 				if (FilesAndFoldersFilter != filter)
 					return true;
 				if (index < items.Count)
-					await Task.Delay(1, token).ConfigureAwait(false);
+					await Task.CompletedTask.ConfigureAwait(ConfigureAwaitOptions.ForceYielding);
 			} while (index < items.Count);
 			return true;
 		}

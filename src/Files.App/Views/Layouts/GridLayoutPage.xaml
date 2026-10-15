@@ -30,7 +30,7 @@
 				<Setter Property="ItemsPanel">
 					<Setter.Value>
 						<ItemsPanelTemplate>
-							<ItemsWrapGrid CacheLength="1" Orientation="Vertical" />
+							<ItemsWrapGrid CacheLength="0" Orientation="Vertical" />
 						</ItemsPanelTemplate>
 					</Setter.Value>
 				</Setter>
@@ -47,7 +47,7 @@
 				<Setter Property="ItemsPanel">
 					<Setter.Value>
 						<ItemsPanelTemplate>
-							<ItemsWrapGrid CacheLength="1" Orientation="Horizontal" />
+							<ItemsWrapGrid CacheLength="0" Orientation="Horizontal" />
 						</ItemsPanelTemplate>
 					</Setter.Value>
 				</Setter>
@@ -221,7 +221,7 @@
 						Checked="ItemSelected_Checked"
 						DoubleTapped="SelectionCheckbox_DoubleTapped"
 						Opacity="0"
-						Style="{StaticResource FileItemSelectionCheckBoxStyle}"
+						Style="{StaticResource FileItemSelectionCheckBoxHitTargetStyle}"
 						Unchecked="ItemSelected_Unchecked" />
 
 					<Popup
@@ -245,6 +245,7 @@
 							<VisualState x:Name="HideCheckbox" />
 							<VisualState x:Name="ShowCheckbox">
 								<VisualState.Setters>
+									<Setter Target="SelectionCheckbox.Style" Value="{StaticResource FileItemSelectionCheckBoxStyle}" />
 									<Setter Target="SelectionCheckbox.Opacity" Value="1" />
 								</VisualState.Setters>
 							</VisualState>
@@ -343,7 +344,7 @@
 							Checked="ItemSelected_Checked"
 							DoubleTapped="SelectionCheckbox_DoubleTapped"
 							Opacity="0"
-							Style="{StaticResource FileItemSelectionCheckBoxStyle}"
+							Style="{StaticResource FileItemSelectionCheckBoxHitTargetStyle}"
 							Unchecked="ItemSelected_Unchecked" />
 					</Grid>
 
@@ -398,6 +399,7 @@
 							<VisualState x:Name="HideCheckbox" />
 							<VisualState x:Name="ShowCheckbox">
 								<VisualState.Setters>
+									<Setter Target="SelectionCheckbox.Style" Value="{StaticResource FileItemSelectionCheckBoxStyle}" />
 									<Setter Target="SelectionCheckbox.Opacity" Value="1" />
 									<Setter Target="IconBox.Opacity" Value="0" />
 								</VisualState.Setters>
@@ -496,7 +498,7 @@
 								Checked="ItemSelected_Checked"
 								DoubleTapped="SelectionCheckbox_DoubleTapped"
 								Opacity="0"
-								Style="{StaticResource FileItemSelectionCheckBoxStyle}"
+								Style="{StaticResource FileItemSelectionCheckBoxHitTargetStyle}"
 								Unchecked="ItemSelected_Unchecked" />
 						</Grid>
 
@@ -655,6 +657,7 @@
 							<VisualState x:Name="HideCheckbox" />
 							<VisualState x:Name="ShowCheckbox">
 								<VisualState.Setters>
+									<Setter Target="SelectionCheckbox.Style" Value="{StaticResource FileItemSelectionCheckBoxStyle}" />
 									<Setter Target="SelectionCheckbox.Opacity" Value="1" />
 								</VisualState.Setters>
 							</VisualState>
