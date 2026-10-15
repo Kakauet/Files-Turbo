@@ -117,7 +117,15 @@ namespace Files.App.Utils.Shell
 		private ShellPidl? pidl;
 
 		public ShellItem(string path)
+			: this(path, initialize: true)
 		{
+		}
+
+		protected ShellItem(string path, bool initialize)
+		{
+			if (!initialize)
+				return;
+
 			HRESULT result = PInvoke.SHCreateItemFromParsingName(path, null, out IShellItem item);
 			result.ThrowOnFailure();
 			shellItem = item;
@@ -343,7 +351,8 @@ namespace Files.App.Utils.Shell
 		private IPersistFile? persistFile;
 		private string? persistedPath;
 
-		public ShellLink(string linkPath, SLR_FLAGS resolution = SLR_FLAGS.SLR_NO_UI, HWND window = default, TimeSpan timeout = default, bool resolve = true) : base(linkPath)
+		public ShellLink(string linkPath, SLR_FLAGS resolution = SLR_FLAGS.SLR_NO_UI, HWND window = default, TimeSpan timeout = default,
+			bool resolve = true, bool initializeShellItem = true) : base(linkPath, initializeShellItem)
 		{
 			link = Win32ShellLink.CreateInstance<IShellLinkW>();
 			persistFile = (IPersistFile)link;

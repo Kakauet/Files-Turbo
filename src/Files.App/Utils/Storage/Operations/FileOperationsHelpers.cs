@@ -791,7 +791,7 @@ namespace Files.App.Utils.Storage
 						// Keep the apartment-threaded link and all its getters on one STA thread.
 						return await STATask.RunPooled(() =>
 						{
-							using var storedLink = new ShellLink(linkPath, resolve: false);
+							using var storedLink = new ShellLink(linkPath, resolve: false, initializeShellItem: false);
 							return ShellFolderExtensions.GetShellLinkItem(storedLink, includeFileInfo: false);
 						}, App.Logger, priority: STATaskPriority.Fast);
 					}
