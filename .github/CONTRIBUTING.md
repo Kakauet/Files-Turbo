@@ -1,45 +1,37 @@
-# Contributing to Files
-Files thrives off of the contributions and input from users. There are several ways you can get involved.
+# Contributing to Files Turbo
+Files Turbo is a performance fork of [Files](https://github.com/files-community/Files). It keeps the upstream
+feature set and only changes how work is done, so the most useful contributions are bug reports, measurements
+and performance fixes. All community interactions must abide by the [Code of Conduct](./CODE_OF_CONDUCT.md).
 
-We are happy to hear your feedback for the future of Files. Check the
-[issues tab](https://github.com/files-community/Files/issues) to see if others have
-submitted similar feedback. You can add your feedback to existing issues or you can open a new issue.
-
-We always look at your feedback when we decide what to work on next and we look forward to hearing your ideas. Remember that
-all community interactions must abide by the [Code of Conduct](./CODE_OF_CONDUCT.md).
-
-## Finding issues you can help with
-Looking for something to work on?
-Issues marked as ready to build are a good place to start. If you're interested in working on an issue, leave a comment to let everyone know and to help
-avoid duplicated effort from others.
+## Where to report
+* **Bugs in Files Turbo**: open an issue in this repository. Check first whether it also happens in the official
+  Files app; if it does, it is an upstream bug and belongs in the
+  [Files issues](https://github.com/files-community/Files/issues).
+* **Feature requests**: Files Turbo does not add features. Please suggest them to
+  [Files](https://github.com/files-community/Files/discussions), where they can benefit everyone.
+* **Performance problems**: open an issue with the folder size, the view (details, grid, ...), the time you
+  observed and, if possible, the same measurement in Files.
 
 ## Contributions we accept
-We welcome your contributions to the Files project, especially to fix bugs and to make
-improvements which address the top issues reported by Files users. Some general guidelines:
-
-* **DO** create one pull request per Issue, and ensure that the Issue is linked in the pull request.
-* **DO** follow our [Coding and Style](https://files.community/docs/contributing/code-style) guidelines, and keep code changes as small as possible.
-* **DO** include corresponding tests whenever possible.
-* **DO** check for additional occurrences of the same problem in other parts of the codebase before submitting your PR.
-* **DO** [link the issue](https://docs.github.com/en/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue#manually-linking-a-pull-request-to-an-issue) you are addressing in the 
-   pull request.
-* **DO** write a good description for your pull request. More detail is better. Describe *why* the change is being 
-   made and *why* you have chosen a particular solution. Describe any manual testing you performed to validate your change.
-* **DO NOT** submit a PR unless the connected issue is marked as ready to build or approved by an org member.
-   This enables us to have a discussion on the idea before anyone invests time on the implementation.
-* **DO NOT** merge multiple changes into one PR unless they have the same root cause.
-
-> Submitting a pull request for an approved Issue is not a guarantee it will be approved.
-> The change must meet our high bar for code quality, architecture, and performance.
+* **DO** keep behaviour visible to users identical to upstream Files, unless the change fixes a bug.
+* **DO** explain what was slow, why, and how you measured it before and after the change. Numbers without a
+  method are hard to review; include the machine, the folder and the number of runs.
+* **DO** add or update tests in `tests/Files.App.Turbo.UnitTests` whenever the logic can run without the UI.
+* **DO** follow the [Coding and Style](https://files.community/docs/contributing/code-style) guidelines of
+  Files and keep changes as small as possible, so they can also be offered upstream.
+* **DO NOT** merge unrelated changes into one pull request.
+* **DO NOT** change storage formats or settings files; Files Turbo must stay compatible with Files.
 
 ## Making changes to the code
+Build and test instructions are in the [README](../README.md#build). Before opening a pull request, run:
+```powershell
+dotnet test --project tests/Files.App.Turbo.UnitTests -c Release -p:Platform=x64
+```
+CI runs the same tests, builds the app and checks the formatting of changed XAML files.
 
 If your change is complex, please clean up the branch history before submitting a pull request.
 You can use [git rebase](https://docs.microsoft.com/en-us/azure/devops/repos/git/rebase#squash-local-commits)
-to group your changes into a small number of commits which we can review one at a time.
-
-When completing a pull request, we will generally squash your changes into a single commit. Please
-let us know if your pull request needs to be merged as separate commits.
+to group your changes into a small number of commits which can be reviewed one at a time.
 
 ## Running interaction tests (optional)
 The tests drive the app through [Appium](https://appium.io), which automates it using WinAppDriver.
@@ -58,11 +50,6 @@ The tests launch Appium themselves when it is not already running, so keep it on
 Finally, you will need to run the Files.Package at least once to have the debug version be registered on your machine.
 Once you have the debug version registered, you can run the tests from the test explorer in Visual Studio.
 
-## Review Process
-After submitting a pull request, members of the Files team will review your code. Any member of the community may
-participate in the review, but at least one member of the Files team will ultimately approve
-the request.
-
-Often, multiple iterations will be needed to respond to feedback from reviewers. Try looking at
-[past pull requests](https://github.com/files-community/Files/pulls?q=is%3Apr+is%3Aclosed) to see
-what the experience might be like.
+## Upstream changes
+Improvements that are useful to everyone are best contributed to Files directly. If a Files Turbo change could
+be accepted upstream, mention it in the pull request so it can be offered to Files as well.

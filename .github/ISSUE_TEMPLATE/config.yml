@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Feature requests
+    url: https://github.com/files-community/Files/discussions
+    about: Files Turbo does not add features. Please suggest them to Files, where everyone can benefit.
+  - name: Bugs that also happen in Files
+    url: https://github.com/files-community/Files/issues
+    about: If the problem also happens in the official Files app, please report it upstream.
