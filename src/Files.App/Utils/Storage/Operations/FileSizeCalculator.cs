@@ -13,11 +13,9 @@ namespace Files.App.Utils.Storage.Operations
 		private readonly string[] _paths;
 		private readonly ConcurrentDictionary<string, long> _computedFiles = new(StringComparer.OrdinalIgnoreCase);
 		private long _size;
-		private int _itemsCount;
-		private readonly ProgressNotificationGate notifications = new();
 
-		public long Size => Interlocked.Read(ref _size);
-		public int ItemsCount => Volatile.Read(ref _itemsCount);
+		public long Size => _size;
+		public int ItemsCount => _computedFiles.Count;
 		public bool Completed { get; private set; }
 
 		public event Action<int>? ItemsCountChanged;
@@ -39,7 +37,6 @@ namespace Files.App.Utils.Storage.Operations
 				});
 
 			Completed = true;
-			ItemsCountChanged?.Invoke(ItemsCount);
 
 			unsafe void ComputeSizeRecursively(string path, CancellationToken token)
 			{
@@ -52,7 +49,7 @@ namespace Files.App.Utils.Storage.Operations
 				{
 					queue.Enqueue(path);
 
-					while (!token.IsCancellationRequested && queue.TryDequeue(out var directory))
+					while (queue.TryDequeue(out var directory))
 					{
 						WIN32_FIND_DATAW findData = default;
 
@@ -72,8 +69,6 @@ namespace Files.App.Utils.Storage.Operations
 								{
 									do
 									{
-										if (token.IsCancellationRequested)
-											break;
 										FILE_FLAGS_AND_ATTRIBUTES attributes = (FILE_FLAGS_AND_ATTRIBUTES)findData.dwFileAttributes;
 
 										if (attributes.HasFlag(FILE_FLAGS_AND_ATTRIBUTES.FILE_ATTRIBUTE_REPARSE_POINT))
@@ -141,24 +136,12 @@ namespace Files.App.Utils.Storage.Operations
 			if (_computedFiles.TryAdd(path, size))
 			{
 				Interlocked.Add(ref _size, size);
-				Interlocked.Increment(ref _itemsCount);
-				if (notifications.TryEnter())
-					ItemsCountChanged?.Invoke(ItemsCount);
+				ItemsCountChanged?.Invoke(ItemsCount);
 			}
-		}
-
-		internal void AddKnownFileSize(string path, long size) => AddFileSize(path, size);
-
-		internal void CompleteKnownSizes()
-		{
-			Completed = true;
-			ItemsCountChanged?.Invoke(ItemsCount);
 		}
 
 		public void ForceComputeFileSize(string path)
 		{
-			if (_computedFiles.ContainsKey(path))
-				return;
 			if (!Win32Helper.HasFileAttribute(path, FileAttributes.Directory))
 				ComputeFileSize(path);
 		}

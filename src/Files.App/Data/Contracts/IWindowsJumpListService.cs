@@ -13,8 +13,6 @@ namespace Files.App.Data.Contracts
 
 		Task RemoveFolderAsync(string path);
 
-		Task RemoveFoldersAsync(IEnumerable<string> paths);
-
 		Task<IEnumerable<string>> GetFoldersAsync();
 	}
 }
