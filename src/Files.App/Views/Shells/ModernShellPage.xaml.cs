@@ -36,7 +36,6 @@ namespace Files.App.Views.Shells
 
 		public ModernShellPage() : base(new CurrentInstanceViewModel())
 		{
-			var probeStart = Stopwatch.GetTimestamp();
 			InitializeComponent();
 
 			ShellViewModel = new ShellViewModel(InstanceViewModel.FolderSettings);
@@ -55,7 +54,6 @@ namespace Files.App.Views.Shells
 
 			_navigationInteractionTracker = new NavigationInteractionTracker(this, BackIcon, ForwardIcon);
 			_navigationInteractionTracker.NavigationRequested += OverscrollNavigationRequested;
-			SettingsOpeningProbe.Stage("Views/Shells/ModernShellPage.xaml.cs", probeStart);
 		}
 
 		private async void ShellViewModel_FocusFilterHeader(object? sender, EventArgs e)

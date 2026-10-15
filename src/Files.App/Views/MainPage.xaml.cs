@@ -348,7 +348,6 @@ namespace Files.App.Views
 
 		private void Page_Loaded(object sender, RoutedEventArgs e)
 		{
-			SettingsOpeningProbe.Start();
 			ViewModel.OnPageLoaded();
 
 			MainWindow.Instance.AppWindow.Changed += (_, args) =>

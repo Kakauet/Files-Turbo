@@ -92,9 +92,7 @@ namespace Files.App.ViewModels.Settings
 			StatusCenterVisibilityOptions.Add(StatusCenterVisibility.DuringOngoingFileOperations, Strings.DuringOngoingFileOperations.GetLocalizedResource());
 			SelectedStatusCenterVisibilityOption = StatusCenterVisibilityOptions[UserSettingsService.AppearanceSettingsService.StatusCenterVisibility];
 
-			var probeFonts = Stopwatch.GetTimestamp();
 			LoadAppThemeFontFamilyOptions();
-			SettingsOpeningProbe.Stage("fonts", probeFonts);
 
 			SelectImageCommand = new RelayCommand(SelectBackgroundImage);
 			RemoveImageCommand = new RelayCommand(RemoveBackgroundImage);
