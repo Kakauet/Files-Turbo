@@ -1407,12 +1407,12 @@ namespace Files.App.Views.Layouts
 			fastImageWork ??= new ViewportWorkQueue<ItemImageJob>(8, 4096,
 				action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () => action()),
 				faulted: exception => App.Logger.LogWarning(exception, "Failed to load a row image."), newestFirst: false);
-			if (!fastImageWork.Enqueue(job, token => RunItemImageAsync(container, item, shellViewModel, request, work, priority, job, token), priority))
+			if (!fastImageWork.Enqueue(job, token => RunItemImageAsync(container, item, shellViewModel, request, work, job, token), priority))
 				job.Completed = true;
 		}
 
 		private async Task RunItemImageAsync(SelectorItem container, ListedItem item, ShellViewModel shellViewModel,
-			ShellViewModel.ItemImageRequest request, ShellViewModel.ItemImageWork work, int priority, ItemImageJob job, CancellationToken queuedToken = default)
+			ShellViewModel.ItemImageRequest request, ShellViewModel.ItemImageWork work, ItemImageJob job, CancellationToken queuedToken = default)
 		{
 			var token = job.Token;
 			using var fastCTS = queuedToken.CanBeCanceled ? CancellationTokenSource.CreateLinkedTokenSource(token, queuedToken) : null;
