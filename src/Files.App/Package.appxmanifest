@@ -17,7 +17,7 @@
     <Identity
         Name="FilesTurbo.Experimental"
         Publisher="CN=Files"
-        Version="4.3.0.4" />
+        Version="4.3.0.5" />
 
     <Properties>
         <DisplayName>Files Turbo</DisplayName>
