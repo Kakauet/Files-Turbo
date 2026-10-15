@@ -1,44 +1,53 @@
 # Files Turbo
 
-Files Turbo is an unofficial, experimental performance fork of [Files](https://github.com/files-community/Files),
-the file manager built by the Files Community. It is based on Files 4.2.39 (upstream commit
-`1994d9a4269f5144c70bc67d6a48de4a20616912`) with the Files 4.3 translations, keeps the upstream feature set and
-storage formats, and changes how work is scheduled so that large folders, thumbnails, search and file operations
-cost less.
+A faster build of [Files](https://github.com/files-community/Files), the file manager for Windows made by the
+Files Community.
 
-Files Turbo is not affiliated with or endorsed by the Files Community. Please report problems with this fork
-here, not in the upstream repository. The upstream README is kept in [UPSTREAM_README.md](UPSTREAM_README.md).
+Files Turbo doesn't remove anything from Files. Every feature and every setting is still there, and so are the
+animations, transparency and the rest of the visual effects. Nothing was traded away for speed. What changed is
+the work the app does behind the scenes: it does less of it, does it in a better order, and stops as soon as the
+result is no longer needed. You get the same app, just much better optimized, especially in large folders, search,
+thumbnails and file operations.
+
+This is an unofficial fork and is not affiliated with or endorsed by the Files Community. It is based on Files
+4.2.39 (commit `1994d9a4269f5144c70bc67d6a48de4a20616912`) plus the Files 4.3 translations, and it reads and
+writes the same settings and data as Files. Please report problems with Files Turbo here, not upstream. The
+original README is in [UPSTREAM_README.md](UPSTREAM_README.md).
 
 > [!WARNING]
-> Files Turbo is experimental and its packages are not signed. It copies, moves, renames and deletes your files
-> like Files does, so keep backups of anything important and try it on data you can afford to lose first.
+> Files Turbo is experimental and its packages are not signed. It copies, moves, renames and deletes files just
+> like Files does, so keep backups of anything important and try it first on data you can afford to lose.
 
-## What is different
+## What's faster
 
-- **Folder loading**: Win32 enumeration with an ordered first screen, linear publication and in-place
-  reconciliation instead of repeated resets; obsolete navigations are cancelled.
-- **Background work**: a prioritized STA pool and a viewport queue, so rows on screen are served first and
-  work for rows that scrolled away is dropped.
-- **Images**: shell images kept as scaled pixel buffers, bounded thumbnail and icon caches, no downloads of
-  cloud placeholders, association checks that also read the registry class keys.
-- **Search**: native parallel name search with batched result publication.
-- **File operations**: one parse per folder when queuing shell operations, tag database updates only for
-  tagged items, watcher events applied in batches, bulk rename in one shell operation, coalesced recycle bin
-  size queries.
-- **Shortcuts and status bar**: `.lnk` files are read once on the STA pool with only the link data that the
-  listing needs, and the status bar measures only itself when the item or selection count changes.
-- **Settings**: settings cards prepare only the size rules that apply and skip zero-width states before the
-  first layout, so the Settings dialog opens with less layout work.
-- **Idle cost**: the tab loading ring no longer animates while hidden.
+- **Opening folders.** The files that fit on screen show up first and the rest are added without rebuilding the
+  list over and over. If you leave a folder before it finishes loading, that work is cancelled.
+- **Scrolling.** Icons and thumbnails for the rows you're looking at load first. Rows you've scrolled past are
+  skipped.
+- **Thumbnails and icons.** They're kept at the size they're shown, in caches that don't grow forever. Cloud files
+  that are only placeholders aren't downloaded just to draw a thumbnail.
+- **Search.** Name search runs in parallel and results are added in groups instead of one at a time.
+- **File operations.** Copy, move, delete and rename have less overhead per file. Bulk rename is a single
+  operation, tags are only updated for files that have them, and folder change notifications are handled in
+  batches.
+- **Desktop and folders full of shortcuts.** Shortcuts are read once, and only for the details the list needs.
+- **Settings.** The Settings page opens with much less layout work.
+- **When you're not doing anything.** The tab loading animation no longer keeps running while it's hidden, so an
+  idle window stops keeping the CPU busy.
 
-Behaviour visible to users follows upstream.
+### For developers
+
+The main changes are Win32 folder enumeration with an ordered first screen, in-place reconciliation of the item
+collection instead of resets, a prioritized STA thread pool, a viewport work queue that drops work for rows that
+are no longer visible, bounded thumbnail and icon caches, and batched publication of search results and file
+system watcher events. The [unit tests](tests/Files.App.Turbo.UnitTests) cover most of this logic.
 
 ## Performance
 
-Files Turbo and Files were measured on the same machine with an external harness that drives both apps like a
-user (typing paths, pressing keys, using menus) and detects what is painted on screen, so no app-internal timers
-are involved. Both apps were built from source with the same Release x64 ReadyToRun settings and registered
-under separate package identities so they share no settings or caches.
+Both apps were measured on the same machine with an external tool that uses them like a person would (typing
+paths, pressing keys, using menus) and watches what appears on screen, so neither app's own timers are involved.
+Files and Files Turbo were built from source with the same Release x64 ReadyToRun settings and installed side by
+side, so they never shared settings or caches.
 
 <!-- TODO before publishing: fill this table from the final evaluation (median, Turbo vs Files 4.3). -->
 
@@ -50,44 +59,36 @@ under separate package identities so they share no settings or caches.
 | Copy 10 000 small files | | | |
 | CPU while idle with a folder open | | | |
 
-Results depend on the machine, the disk and the Windows caches; treat them as indicative, not as a guarantee.
-
-## Versions
-
-Files Turbo versions have the form `4.3.0.N`, where `N` counts Files Turbo releases. They are not upstream Files
-releases. The package identity is separate from Files, so both can be installed at the same time.
-
-## How this fork was made
-
-Much of the code in this fork was written with AI coding agents (OpenAI Codex and Claude Code) under the
-direction of the maintainer, which is why some commits are authored by "Codex". Changes were checked with the
-unit tests below and measured with the benchmark harness before they were kept.
-
-## Build
-
-Requirements: Windows 11 x64 and a .NET 10 SDK (`global.json` rolls forward).
-
-```powershell
-$p = '-p:Configuration=Release', '-p:Platform=x64', '-p:RuntimeIdentifier=win-x64', '-p:SelfContained=true',
-     '-p:PublishReadyToRun=true', '-p:PublishReadyToRunComposite=true', '-p:GenerateAppxPackageOnBuild=true',
-     '-p:AppxPackageSigningEnabled=false', '-p:AppxBundle=Never', '-p:UapAppxPackageBuildMode=SideloadOnly'
-dotnet restore src/Files.App.Server/Files.App.Server.csproj @p   # not restored by the app build
-dotnet build src/Files.App/Files.App.csproj @p
-```
+Your numbers will depend on your machine, your disk and what Windows already has cached, so take these as a guide
+rather than a promise.
 
 ## Install
 
-The package identity is `FilesTurbo.Experimental` with the display name "Files Turbo", so it installs next to
-Files and Windows Explorer without replacing either. The package is not signed, so Windows only accepts it as a
-development registration: turn on Developer Mode (Settings → System → For developers), expand the generated MSIX
-into a folder and register it:
+Files Turbo installs next to Files and Windows Explorer and doesn't replace either of them (its package name is
+`FilesTurbo.Experimental`). Because the package isn't signed, Windows only accepts it as a developer install:
+
+1. Turn on Developer Mode in Settings → System → For developers.
+2. Extract the MSIX into a folder.
+3. Register it from PowerShell:
 
 ```powershell
 Add-AppxPackage -Register <layout>\AppxManifest.xml
 ```
 
-To go back, register the previous layout again (`Remove-AppxPackage <PackageFullName> -PreserveApplicationData`
-first when the version number is the same).
+To go back to an earlier build, register its folder the same way. If both builds have the same version number,
+run `Remove-AppxPackage <PackageFullName> -PreserveApplicationData` first.
+
+## Build from source
+
+You need Windows 11 x64 and the .NET 10 SDK.
+
+```powershell
+$p = '-p:Configuration=Release', '-p:Platform=x64', '-p:RuntimeIdentifier=win-x64', '-p:SelfContained=true',
+     '-p:PublishReadyToRun=true', '-p:PublishReadyToRunComposite=true', '-p:GenerateAppxPackageOnBuild=true',
+     '-p:AppxPackageSigningEnabled=false', '-p:AppxBundle=Never', '-p:UapAppxPackageBuildMode=SideloadOnly'
+dotnet restore src/Files.App.Server/Files.App.Server.csproj @p   # the app build doesn't restore this one
+dotnet build src/Files.App/Files.App.csproj @p
+```
 
 ## Tests
 
@@ -95,23 +96,29 @@ first when the version number is the same).
 dotnet test --project tests/Files.App.Turbo.UnitTests -c Release -p:Platform=x64
 ```
 
-`Files.App.Turbo.UnitTests` compiles the production sources it covers (collection reconciliation, listing
-order, viewport queue, search, caches, STA scheduling, navigation, tag synchronization, operation results,
-association lookup) and runs without packaging or UI. The upstream test projects are unchanged.
+These tests compile the Files Turbo code they cover and run without packaging or UI. The upstream test projects
+are unchanged. [CI](.github/workflows/ci.yml) runs them, builds the app and checks the formatting of changed XAML
+files on every push to `main` and every pull request.
 
-[Files Turbo CI](.github/workflows/ci.yml) runs these tests, builds the app (Release, x64) and checks the
-formatting of changed XAML files on every push to `main` and on every pull request.
+## Versions
+
+Versions look like `4.3.0.N`, where `N` counts Files Turbo releases. They don't match upstream Files releases.
+
+## How it was made
+
+I built Files Turbo with the help of AI coding agents (OpenAI Codex and Claude Code), which is why some commits
+are authored by "Codex". I chose what to change, and every change was tested and measured before it stayed in.
 
 ## Reporting problems
 
-Open an issue in this repository with the Files Turbo version (Settings → About) and the steps to reproduce it.
-If the same problem also happens in the official Files app, it is an upstream bug: please report it to
-[files-community/Files](https://github.com/files-community/Files/issues) instead. Contributions are described in
-[CONTRIBUTING.md](.github/CONTRIBUTING.md).
+Open an issue here with your Files Turbo version (Settings → About) and the steps to reproduce the problem. If it
+also happens in the official Files app, it's an upstream bug, so please report it to
+[files-community/Files](https://github.com/files-community/Files/issues) instead. See
+[CONTRIBUTING.md](.github/CONTRIBUTING.md) if you'd like to help.
 
-## License and attribution
+## License
 
-Files is created by the [Files Community](https://github.com/files-community) and licensed under the MIT
-license ([LICENSE-MIT](LICENSE-MIT)); some components are under the Mozilla Public License 2.0
+Files is made by the [Files Community](https://github.com/files-community) and released under the MIT license
+([LICENSE-MIT](LICENSE-MIT)), with some components under the Mozilla Public License 2.0
 ([LICENSE-MPL](LICENSE-MPL)). Files Turbo changes are released under the same terms. Third-party notices are in
 [.github/NOTICE.md](.github/NOTICE.md).
