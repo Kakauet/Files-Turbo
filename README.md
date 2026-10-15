@@ -18,6 +18,17 @@ original README is in [UPSTREAM_README.md](UPSTREAM_README.md).
 > Files Turbo is experimental and its packages are not signed. It copies, moves, renames and deletes files just
 > like Files does, so keep backups of anything important and try it first on data you can afford to lose.
 
+## Fixed in Files Turbo
+
+- **No more CPU use in the background.** In Files, the tab loading indicator keeps animating after it's hidden,
+  so a window that's just sitting there keeps using about 9 % of a CPU core. Files Turbo stops it, and an idle
+  window drops to under 0.5 %.
+- **Smooth sidebar resizing.** Dragging the edge of the left sidebar used to stutter badly, because Files wrote
+  the new width to its settings file on every mouse movement. Now the sidebar follows the pointer smoothly and
+  the width is saved once, when you let go.
+- **Instant search.** As you type in the address bar, matches appear right away by filtering the ones already
+  found, before the full search even starts. And the full search itself is faster than in Files.
+
 ## What's faster
 
 - **Opening folders.** The files that fit on screen show up first and the rest are added without rebuilding the
@@ -26,14 +37,13 @@ original README is in [UPSTREAM_README.md](UPSTREAM_README.md).
   skipped.
 - **Thumbnails and icons.** They're kept at the size they're shown, in caches that don't grow forever. Cloud files
   that are only placeholders aren't downloaded just to draw a thumbnail.
-- **Search.** Name search runs in parallel and results are added in groups instead of one at a time.
+- **Search.** Name search runs in parallel, results are added in groups instead of one at a time, and typing a
+  new letter cancels the previous search instead of waiting for it.
 - **File operations.** Copy, move, delete and rename have less overhead per file. Bulk rename is a single
   operation, tags are only updated for files that have them, and folder change notifications are handled in
   batches.
 - **Desktop and folders full of shortcuts.** Shortcuts are read once, and only for the details the list needs.
 - **Settings.** The Settings page opens with much less layout work.
-- **When you're not doing anything.** The tab loading animation no longer keeps running while it's hidden, so an
-  idle window stops keeping the CPU busy.
 
 ### For developers
 
