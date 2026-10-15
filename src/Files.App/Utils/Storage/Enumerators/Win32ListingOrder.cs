@@ -12,7 +12,7 @@ namespace Files.App.Utils.Storage
 	/// </summary>
 	internal static class Win32ListingOrder
 	{
-		private const int PrefixSize = 64;
+		private const int DefaultPrefixSize = 64;
 
 		internal sealed record Entry(Win32PInvoke.WIN32_FIND_DATA Data, int Index, string Name, bool IsFile,
 			DateTimeOffset Modified, DateTimeOffset Created, long Size, int GroupIndex, string? GroupText);
@@ -25,7 +25,7 @@ namespace Files.App.Utils.Storage
 
 		internal static IEnumerable<Win32PInvoke.WIN32_FIND_DATA>? TryOrder(List<Win32PInvoke.WIN32_FIND_DATA> data,
 			SortOption sort, SortDirection direction, bool alongside, bool filesFirst, GroupOption group,
-			SortDirection groupDirection, GroupByDateUnit dateUnit, bool showExtensions, CancellationToken token)
+			SortDirection groupDirection, GroupByDateUnit dateUnit, bool showExtensions, CancellationToken token, int prefixSize = DefaultPrefixSize)
 		{
 			if (sort is not (SortOption.Name or SortOption.DateModified or SortOption.DateCreated or SortOption.Size) ||
 				group is not (GroupOption.None or GroupOption.DateModified or GroupOption.DateCreated))
@@ -56,7 +56,7 @@ namespace Files.App.Utils.Storage
 			var compare = CreateComparison(sort, direction, alongside, filesFirst, group, groupDirection);
 			token.ThrowIfCancellationRequested();
 			if (entries.Count > 2_000)
-				return OrderedPrefix.Read(entries, compare, PrefixSize, token).Select(entry => entry.Data);
+				return OrderedPrefix.Read(entries, compare, prefixSize, token).Select(entry => entry.Data);
 
 			entries.Sort(compare);
 			return entries.Select(entry => entry.Data).ToList();

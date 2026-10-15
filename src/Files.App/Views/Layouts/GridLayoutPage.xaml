@@ -30,7 +30,7 @@
 				<Setter Property="ItemsPanel">
 					<Setter.Value>
 						<ItemsPanelTemplate>
-							<ItemsWrapGrid Orientation="Vertical" />
+							<ItemsWrapGrid CacheLength="1" Orientation="Vertical" />
 						</ItemsPanelTemplate>
 					</Setter.Value>
 				</Setter>
@@ -47,7 +47,7 @@
 				<Setter Property="ItemsPanel">
 					<Setter.Value>
 						<ItemsPanelTemplate>
-							<ItemsWrapGrid Orientation="Horizontal" />
+							<ItemsWrapGrid CacheLength="1" Orientation="Horizontal" />
 						</ItemsPanelTemplate>
 					</Setter.Value>
 				</Setter>

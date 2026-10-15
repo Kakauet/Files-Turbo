@@ -435,7 +435,20 @@ namespace Files.App.ViewModels
 			try
 			{
 				// A stuck shell extension must not hold the listing back
-				await iconCacheService.PreloadAsync(types, size, cancellationToken).WaitAsync(TimeSpan.FromMilliseconds(250), cancellationToken);
+				var associations = Task.Run(() =>
+				{
+					foreach (var (extension, isFolder) in types)
+					{
+						cancellationToken.ThrowIfCancellationRequested();
+						if (!isFolder)
+						{
+							ShellAssociationCache.HasThumbnailProvider(extension);
+							ShellAssociationCache.HasPerFileIcon(extension);
+						}
+					}
+				}, cancellationToken);
+				await Task.WhenAll(associations, iconCacheService.PreloadAsync(types, size, cancellationToken))
+					.WaitAsync(TimeSpan.FromMilliseconds(250), cancellationToken);
 			}
 			catch (TimeoutException)
 			{

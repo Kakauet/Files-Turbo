@@ -1064,7 +1064,8 @@ namespace Files.App.ViewModels
 		{
 			var isFolderEmpty = FilesAndFolders.Count == 0 && !IsLocationUnavailable;
 
-			EmptyTextType = isFolderEmpty ? (IsSearchResults ? EmptyTextType.NoSearchResultsFound : EmptyTextType.FolderEmpty) : EmptyTextType.None;
+			EmptyTextType = !isFolderEmpty ? EmptyTextType.None : IsLoadingItems ? EmptyTextType.Loading :
+				IsSearchResults ? EmptyTextType.NoSearchResultsFound : EmptyTextType.FolderEmpty;
 		}
 
 		public void UpdateNetworkAvailabilityInfoBar()
@@ -1493,7 +1494,13 @@ namespace Files.App.ViewModels
 		public bool IsLoadingItems
 		{
 			get => isLoadingItems;
-			set => isLoadingItems = value;
+			set
+			{
+				if (isLoadingItems == value)
+					return;
+				isLoadingItems = value;
+				UpdateEmptyTextType();
+			}
 		}
 
 		private async Task<BitmapImage?> GetShieldIcon()
@@ -2152,6 +2159,8 @@ namespace Files.App.ViewModels
 			return groupImage;
 		}
 
+		internal int InitialItemsBatchSize { get; set; } = 64;
+
 		public void RefreshItems(string? previousDir, Action? postLoadCallback = null)
 		{
 			_ = RapidAddItemsToCollectionAsync(WorkingDirectory, previousDir, postLoadCallback);
@@ -2561,6 +2570,7 @@ namespace Files.App.ViewModels
 						sortOption is SortOption.Name or SortOption.DateModified or SortOption.DateCreated or SortOption.Size &&
 						groupOption is GroupOption.None or GroupOption.DateModified or GroupOption.DateCreated;
 					var preparedOrder = false;
+					var initialBatchSize = InitialItemsBatchSize;
 					await Task.Run(async () =>
 					{
 						List<ListedItem> fileList = await Win32StorageEnumerator.ListEntries(path, hFile, findData, cancellationToken, -1, GetPreloadIconSize(), intermediateAction: async (intermediateList) =>
@@ -2580,10 +2590,10 @@ namespace Files.App.ViewModels
 							prepareOrder: canPrepareOrder ? data =>
 							{
 								var sorted = Win32ListingOrder.TryOrder(data, sortOption, sortDirection, alongside, filesFirst,
-									groupOption, groupDirection, dateUnit, showExtensions, cancellationToken);
+									groupOption, groupDirection, dateUnit, showExtensions, cancellationToken, initialBatchSize);
 								preparedOrder = sorted is not null;
 								return sorted;
-							} : null);
+							} : null, firstBatchSize: initialBatchSize);
 
 						lock (loadCollectionSync)
 						{

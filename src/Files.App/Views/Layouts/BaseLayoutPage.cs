@@ -70,7 +70,7 @@ namespace Files.App.Views.Layouts
 		private readonly Dictionary<ListedItem, int> metadataFailures = new(ReferenceEqualityComparer.Instance);
 		private readonly Dictionary<ListedItem, ItemImageJob> imageJobs = new(ReferenceEqualityComparer.Instance);
 		private ViewportWorkQueue<ItemImageJob>? slowImageWork;
-		private ViewportWorkQueue<ItemImageJob>? searchIconWork;
+		private ViewportWorkQueue<ItemImageJob>? fastImageWork;
 		private ViewportWorkQueue<ListedItem>? metadataWork;
 		private bool viewportRefillQueued;
 
@@ -512,6 +512,13 @@ namespace Files.App.Views.Layouts
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 
+		[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
+		protected virtual int GetInitialItemsBatchSize()
+		{
+			var height = ActualHeight > 0 ? ActualHeight : (ParentShellPageInstance as FrameworkElement)?.ActualHeight ?? 0;
+			return FirstScreenBatch.GetCount(1, height, 1, 28);
+		}
+
 		protected override async void OnNavigatedTo(NavigationEventArgs e)
 		{
 			base.OnNavigatedTo(e);
@@ -541,7 +548,7 @@ namespace Files.App.Views.Layouts
 			folderSettings.GroupDirectionPreferenceUpdated += FolderSettings_GroupDirectionPreferenceUpdated;
 			folderSettings.GroupByDateUnitPreferenceUpdated += FolderSettings_GroupByDateUnitPreferenceUpdated;
 
-			shellViewModel.EmptyTextType = EmptyTextType.None;
+			shellViewModel.EmptyTextType = !args.IsLayoutSwitch && !args.IsSearchResultPage ? EmptyTextType.Loading : EmptyTextType.None;
 			parentShellPage.ToolbarViewModel.CanRefresh = true;
 
 			// Derived layouts read the page type as soon as navigation yields.
@@ -581,7 +588,10 @@ namespace Files.App.Views.Layouts
 					folderSettings.DirectoryGroupOption = GroupOption.None;
 
 				if (!args.IsLayoutSwitch || previousDir != workingDir)
+				{
+					shellViewModel.InitialItemsBatchSize = GetInitialItemsBatchSize();
 					shellViewModel.RefreshItems(previousDir, SetSelectedItemsOnNavigation);
+				}
 				else
 					parentShellPage.ToolbarViewModel.CanGoForward = false;
 			}
@@ -1295,8 +1305,8 @@ namespace Files.App.Views.Layouts
 		{
 			scrollSettleTimer?.Stop();
 			CancelAllItemImages();
-			searchIconWork?.Dispose();
-			searchIconWork = null;
+			fastImageWork?.Dispose();
+			fastImageWork = null;
 			slowImageWork?.Dispose();
 			slowImageWork = null;
 			metadataWork?.Dispose();
@@ -1355,7 +1365,7 @@ namespace Files.App.Views.Layouts
 		// Runs once per scroll gesture, not per scroll event, so pending work follows the new viewport.
 		private void ReprioritizeViewportWork()
 		{
-			if (slowImageWork is null && searchIconWork is null && metadataWork is null)
+			if (slowImageWork is null && fastImageWork is null && metadataWork is null)
 				return;
 
 			foreach (var (container, item) in realizedItems)
@@ -1363,7 +1373,7 @@ namespace Files.App.Views.Layouts
 				var priority = GetWorkPriority(ItemsControl.IndexFromContainer(container));
 				if (imageJobs.TryGetValue(item, out var job))
 				{
-					searchIconWork?.SetPriority(job, priority);
+					fastImageWork?.SetPriority(job, priority);
 					slowImageWork?.SetPriority(job, priority);
 				}
 				metadataWork?.SetPriority(item, priority);
@@ -1384,16 +1394,11 @@ namespace Files.App.Views.Layouts
 			var job = new ItemImageJob { Attempts = attempts };
 			imageJobs[item] = job;
 			var priority = GetWorkPriority(index);
-			if (navigationArguments?.IsSearchResultPage == true)
-			{
-				searchIconWork ??= new ViewportWorkQueue<ItemImageJob>(8, 4096,
-					action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () => action()),
-					faulted: exception => App.Logger.LogWarning(exception, "Failed to load a search result icon."), newestFirst: false);
-				if (!searchIconWork.Enqueue(job, token => RunItemImageAsync(container, item, shellViewModel, request, work, priority, job, token), priority))
-					job.Completed = true;
-			}
-			else
-				_ = RunItemImageAsync(container, item, shellViewModel, request, work, priority, job);
+			fastImageWork ??= new ViewportWorkQueue<ItemImageJob>(8, 4096,
+				action => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, () => action()),
+				faulted: exception => App.Logger.LogWarning(exception, "Failed to load a row image."), newestFirst: false);
+			if (!fastImageWork.Enqueue(job, token => RunItemImageAsync(container, item, shellViewModel, request, work, priority, job, token), priority))
+				job.Completed = true;
 		}
 
 		private async Task RunItemImageAsync(SelectorItem container, ListedItem item, ShellViewModel shellViewModel,
@@ -1439,7 +1444,7 @@ namespace Files.App.Views.Layouts
 
 			job.Cancellation.Cancel();
 			job.Cancellation.Dispose();
-			searchIconWork?.Cancel(job);
+			fastImageWork?.Cancel(job);
 			slowImageWork?.Cancel(job);
 		}
 
@@ -1451,7 +1456,7 @@ namespace Files.App.Views.Layouts
 				job.Cancellation.Dispose();
 			}
 			imageJobs.Clear();
-			searchIconWork?.CancelAll();
+			fastImageWork?.CancelAll();
 			slowImageWork?.CancelAll();
 		}
 
@@ -1884,9 +1889,14 @@ namespace Files.App.Views.Layouts
 				return;
 
 			UninitializeDrag(container);
+			// Ordinary rows already carry their type; checking Directory.Exists here stalls realization.
+			var isDropTargetFile = item is IShortcutItem
+				? item.IsExecutable || item.IsScriptFile
+				: item.PrimaryItemAttribute == StorageItemTypes.File &&
+					((ReadOnlySpan<string>)[".exe", ".bat", ".cmd", ".ahk", ".py", ".ps1"]).Contains(
+						item.FileExtension ?? Path.GetExtension(item.ItemPath), StringComparer.OrdinalIgnoreCase);
 			if ((item.PrimaryItemAttribute == StorageItemTypes.Folder && !StorageTrashBinService.IsUnderTrashBin(item.ItemPath))
-				|| item.IsExecutable
-				|| item.IsScriptFile)
+				|| isDropTargetFile)
 			{
 				container.AllowDrop = true;
 				container.AddHandler(UIElement.DragOverEvent, Item_DragOverEventHandler, true);

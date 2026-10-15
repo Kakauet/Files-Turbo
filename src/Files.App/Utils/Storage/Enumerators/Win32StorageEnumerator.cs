@@ -28,12 +28,14 @@ namespace Files.App.Utils.Storage
 			uint iconSize,
 			Func<List<ListedItem>, Task> intermediateAction,
 			Task<bool>? repositoryState = null,
-			Func<List<Win32PInvoke.WIN32_FIND_DATA>, IEnumerable<Win32PInvoke.WIN32_FIND_DATA>?>? prepareOrder = null
+			Func<List<Win32PInvoke.WIN32_FIND_DATA>, IEnumerable<Win32PInvoke.WIN32_FIND_DATA>?>? prepareOrder = null,
+			int firstBatchSize = FirstBatchSize
 		)
 		{
 			var sampler = new IntervalSampler(500);
 			Task publication = Task.CompletedTask;
-			var hasFlushedFirstBatch = false;
+			var publishedCount = 0;
+			firstBatchSize = Math.Clamp(firstBatchSize, FirstBatchSize, 512);
 			var tempList = new List<ListedItem>();
 			var count = 0;
 
@@ -142,11 +144,11 @@ namespace Files.App.Utils.Storage
 					// slow storage produced in 25 ms. Later batches follow a fixed cadence: each publication copies the
 					// whole listing, so a per-count cadence would make loading large folders quadratic.
 					if (intermediateAction is not null &&
-						(hasFlushedFirstBatch
+						(publishedCount >= firstBatchSize
 							? sampler.CheckNow()
-							: tempList.Count >= FirstBatchSize || tempList.Count > 0 && firstBatchSampler.CheckNow()))
+							: tempList.Count >= firstBatchSize - publishedCount || tempList.Count > 0 && firstBatchSampler.CheckNow()))
 					{
-						hasFlushedFirstBatch = true;
+						publishedCount += tempList.Count;
 						var batch = tempList;
 						tempList = new();
 						publication = publication.ContinueWith(async previous =>

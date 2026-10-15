@@ -1,4 +1,4 @@
-﻿<!--  Copyright (c) Files Community. Licensed under the MIT License.  -->
+<!--  Copyright (c) Files Community. Licensed under the MIT License.  -->
 <UserControl
 	x:Class="Files.App.UserControls.FolderEmptyIndicator"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -24,6 +24,15 @@
 					<VisualState.StateTriggers>
 						<triggers:IsEqualStateTrigger Value="{x:Bind EmptyTextType, Mode=OneWay}" To="0" />
 					</VisualState.StateTriggers>
+				</VisualState>
+				<VisualState x:Name="LoadingState">
+					<VisualState.StateTriggers>
+						<triggers:IsEqualStateTrigger Value="{x:Bind EmptyTextType, Mode=OneWay}" To="3" />
+					</VisualState.StateTriggers>
+					<VisualState.Setters>
+						<Setter Target="EmptyText.Visibility" Value="Visible" />
+						<Setter Target="EmptyText.Text" Value="{helpers:ResourceString Name=Loading}" />
+					</VisualState.Setters>
 				</VisualState>
 				<VisualState x:Name="FolderEmptyState">
 					<VisualState.StateTriggers>

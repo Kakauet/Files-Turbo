@@ -226,6 +226,20 @@ namespace Files.App.Views.Layouts
 				FileList.SelectedItems.Remove(e);
 		}
 
+		[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
+		protected override int GetInitialItemsBatchSize()
+		{
+			var shell = ParentShellPageInstance as FrameworkElement;
+			var width = FileList.ActualWidth > 0 ? FileList.ActualWidth : shell?.ActualWidth ?? 0;
+			var height = FileList.ActualHeight > 0 ? FileList.ActualHeight : shell?.ActualHeight ?? 0;
+			if (FolderSettings?.LayoutMode == FolderLayoutModes.GridView)
+				return FirstScreenBatch.GetCount(width, height, ItemWidthGridView, ItemWidthGridView + 40);
+			if (FolderSettings?.LayoutMode == FolderLayoutModes.CardsView)
+				return FirstScreenBatch.GetCount(width, height, CardsViewIconBoxWidth + CardsViewDetailsBoxWidth,
+					Math.Max(CardsViewIconBoxHeight, CardsViewDetailsBoxHeight));
+			return FirstScreenBatch.GetCount(width, height, 200, LayoutSizeKindHelper.GetListViewRowHeight(LayoutSettingsService.ListViewSize));
+		}
+
 		protected override void OnNavigatedTo(NavigationEventArgs eventArgs)
 		{
 			if (eventArgs.Parameter is NavigationArguments navArgs)
