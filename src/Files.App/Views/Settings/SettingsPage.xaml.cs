@@ -233,5 +233,21 @@ namespace Files.App.Views
 						&& DependencyObjectHelpers.FindParent<SettingsExpander>(c) is null)
 				?? (FrameworkElement?)FindExpander(root, result.HeaderText);
 		}
+		protected override global::Windows.Foundation.Size MeasureOverride(global::Windows.Foundation.Size size)
+		{
+			var probeLayout = Stopwatch.GetTimestamp();
+			var result = base.MeasureOverride(size);
+			SettingsOpeningProbe.Stage("Measure-SettingsPage.xaml-" + size.Width + "x" + size.Height, probeLayout);
+			return result;
+		}
+
+		protected override global::Windows.Foundation.Size ArrangeOverride(global::Windows.Foundation.Size size)
+		{
+			var probeLayout = Stopwatch.GetTimestamp();
+			var result = base.ArrangeOverride(size);
+			SettingsOpeningProbe.Stage("Arrange-SettingsPage.xaml-" + size.Width + "x" + size.Height, probeLayout);
+			return result;
+		}
+
 	}
 }

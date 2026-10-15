@@ -1,4 +1,4 @@
-﻿// Copyright (c) Files Community
+ï»¿// Copyright (c) Files Community
 // SPDX-License-Identifier: MPL-2.0
 
 using Microsoft.UI.Xaml.Controls;
@@ -26,7 +26,9 @@ namespace Files.App.UserControls
 
 		protected override Size MeasureOverride(Size availableSize)
 		{
+			var probeLayout = Stopwatch.GetTimestamp();
 			var baseSize = base.MeasureOverride(availableSize);
+			SettingsOpeningProbe.Stage("combo-" + Name, probeLayout);
 
 			if (baseSize.Width != 64)
 				_cachedWidth = baseSize.Width;
