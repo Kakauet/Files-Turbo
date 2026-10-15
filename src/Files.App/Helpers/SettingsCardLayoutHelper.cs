@@ -15,19 +15,35 @@ internal static class SettingsCardLayoutHelper
 	[DynamicWindowsRuntimeCast(typeof(Panel))]
 	internal static void Prepare(object? content)
 	{
+		if (content is UIElement { Visibility: Visibility.Collapsed })
+			return;
+
 		switch (content)
 		{
 			case SettingsCard card:
-				PrepareCard(card);
+				card.Loading += Card_Loading;
 				break;
 			case SettingsExpander expander:
-				PrepareHeader(expander);
+				expander.Loading += Expander_Loading;
 				break;
 			case Panel panel:
 				foreach (var child in panel.Children)
 					Prepare(child);
 				break;
 		}
+	}
+
+	private static void Card_Loading(FrameworkElement sender, object args)
+	{
+		sender.Loading -= Card_Loading;
+		if (sender is SettingsCard card)
+			PrepareCard(card);
+	}
+
+	private static void Expander_Loading(FrameworkElement sender, object args)
+	{
+		sender.Loading -= Expander_Loading;
+		PrepareHeader(sender);
 	}
 
 	[DynamicWindowsRuntimeCast(typeof(Control))]
@@ -47,7 +63,9 @@ internal static class SettingsCardLayoutHelper
 	[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
 	private static void PrepareCard(SettingsCard card)
 	{
+		var probeCard = Stopwatch.GetTimestamp();
 		card.ApplyTemplate();
+		SettingsOpeningProbe.Stage("card-template-" + VisualTreeHelper.GetChildrenCount(card), probeCard);
 		if (VisualTreeHelper.GetChildrenCount(card) == 0 ||
 			VisualTreeHelper.GetChild(card, 0) is not FrameworkElement root || root.ActualWidth > 0)
 			return;
@@ -60,6 +78,7 @@ internal static class SettingsCardLayoutHelper
 			.ToArray();
 		if (triggers.Length == 0)
 			return;
+		SettingsOpeningProbe.Stage("card-triggers-" + triggers.Length, probeCard);
 
 		// Zero is not the offered width: avoid wrapping before the first arrange.
 		foreach (var trigger in triggers)

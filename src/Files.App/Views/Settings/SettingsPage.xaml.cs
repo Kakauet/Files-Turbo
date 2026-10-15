@@ -131,6 +131,7 @@ namespace Files.App.Views
 			NavigateToPage(navItem.PageKind);
 		}
 
+		[DynamicWindowsRuntimeCast(typeof(Page))]
 		private void NavigateToPage(SettingsPageKind selectedPage)
 		{
 			var pageType = selectedPage switch
@@ -150,8 +151,16 @@ namespace Files.App.Views
 			var probeNavigate = Stopwatch.GetTimestamp();
 			SettingsContentFrame.Navigate(pageType, null, new SuppressNavigationTransitionInfo());
 			if (SettingsContentFrame.Content is Page page)
-				SettingsCardLayoutHelper.Prepare(page.Content);
+				page.Loading += Section_Loading;
 			SettingsOpeningProbe.Stage("section-construct-" + selectedPage, probeNavigate);
+		}
+
+		[DynamicWindowsRuntimeCast(typeof(Page))]
+		private static void Section_Loading(FrameworkElement sender, object args)
+		{
+			sender.Loading -= Section_Loading;
+			if (sender is Page page)
+				SettingsCardLayoutHelper.Prepare(page.Content);
 		}
 
 		[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
