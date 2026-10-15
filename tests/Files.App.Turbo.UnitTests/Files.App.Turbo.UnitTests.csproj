@@ -62,6 +62,11 @@
         <Compile Include="..\..\src\Files.App\Utils\Storage\Search\SearchSuggestionNarrowing.cs" Link="Linked\SearchSuggestionNarrowing.cs" />
         <Compile Include="..\..\src\Files.App\Utils\Storage\Search\SearchSuggestionPipeline.cs" Link="Linked\SearchSuggestionPipeline.cs" />
         <Compile Include="..\..\src\Files.App\Utils\Storage\Search\SearchResultBuffer.cs" Link="Linked\SearchResultBuffer.cs" />
+        <Compile Include="..\..\src\Files.App\Services\DateTimeFormatter\AbstractDateTimeFormatter.cs" Link="Linked\AbstractDateTimeFormatter.cs" />
+        <Compile Include="..\..\src\Files.App\Services\DateTimeFormatter\SystemDateTimeFormatter.cs" Link="Linked\SystemDateTimeFormatter.cs" />
+        <Compile Include="..\..\src\Files.App\Services\DateTimeFormatter\UniversalDateTimeFormatter.cs" Link="Linked\UniversalDateTimeFormatter.cs" />
+        <Compile Include="..\..\src\Files.App\Services\DateTimeFormatter\ApplicationDateTimeFormatter.cs" Link="Linked\ApplicationDateTimeFormatter.cs" />
     </ItemGroup>
 
+    <ItemGroup><Compile Include="..\..\src\Files.App\Utils\Storage\Operations\ArchiveBatchPlan.cs" Link="Linked\ArchiveBatchPlan.cs" /></ItemGroup>
 </Project>

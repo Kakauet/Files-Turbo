@@ -38,7 +38,7 @@ namespace Microsoft.UI.Xaml.Media
 
 namespace Files.App
 {
-	internal static class Strings
+	internal static partial class Strings
 	{
 		public const string GroupItemsCount_Plural = "{0} items";
 		public const string GroupItemsCount_Singular = "{0} item";

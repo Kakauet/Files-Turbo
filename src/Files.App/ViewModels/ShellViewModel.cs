@@ -3,6 +3,7 @@
 
 using Files.App.Services.SizeProvider;
 using Files.Shared.Helpers;
+using Files.App.Utils.Storage.Operations;
 using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
@@ -3266,6 +3267,14 @@ namespace Files.App.ViewModels
 										{
 											operationQueue.TryDequeue(out _);
 											var newPath = nextOp.FileName;
+											if (ArchiveBatchPlan.IsPublicationRename(operation.FileName, newPath))
+											{
+												await RemoveFileOrFolderAsync(operation.FileName);
+												var (published, _) = await AddFileOrFoldersAsync([newPath]);
+												lastItemAdded = published;
+												anyEdits = true;
+												break;
+											}
 											await dispatcherQueue.EnqueueOrInvokeAsync(() =>
 											{
 												if (renamed.ItemPath is { } oldPath)

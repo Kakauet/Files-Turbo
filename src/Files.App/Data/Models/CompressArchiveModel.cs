@@ -194,6 +194,8 @@ namespace Files.App.Data.Models
 			compressor.FileCompressionFinished += Compressor_FileCompressionFinished;
 
 			var cts = new CancellationTokenSource();
+			string? temporaryPath = FileFormat is ArchiveFormats.Zip ? ArchivePath + ".tmp-" + Guid.NewGuid().ToString("N") : null;
+			string writePath = temporaryPath ?? ArchivePath;
 
 			try
 			{
@@ -218,15 +220,20 @@ namespace Files.App.Data.Models
 
 				await Task.Run(() =>
 				{
-					foreach (string directory in directories)
+					var directoryPaths = directories.Select(Path.GetFullPath).ToArray();
+					var scans = ArchiveBatchPlan.ScanInOrder(directoryPaths, directoryPath =>
 					{
-						var directoryPath = Path.GetFullPath(directory);
 						var archivableItems = new List<string>();
-
-						AddArchivableItems(directoryPath, archivableItems, skippedItems);
-						directoryItems.Add((directoryPath, archivableItems));
+						var skipped = new List<string>();
+						AddArchivableItems(directoryPath, archivableItems, skipped);
+						return (Path: directoryPath, ArchivableItems: archivableItems, Skipped: skipped);
+					}, FileFormat is ArchiveFormats.Zip && directoryPaths.Length > 1 &&
+						ArchiveBatchPlan.TryGetCommonRootLength(sources, out _));
+					foreach (var scan in scans)
+					{
+						directoryItems.Add((scan.Path, scan.ArchivableItems));
+						skippedItems.AddRange(scan.Skipped);
 					}
-
 					foreach (var file in files)
 					{
 						if (CanOpenFile(file))
@@ -254,81 +261,110 @@ namespace Files.App.Data.Models
 					}
 				}
 
-				foreach ((string directoryPath, List<string> archivableItems) in directoryItems)
+				if (FileFormat is ArchiveFormats.Zip && directoryItems.Count > 0 && directoryItems.All(group => group.ArchivableItems.Any(File.Exists)) &&
+					ArchiveBatchPlan.TryGetCommonRootLength(sources, out var batchRootLength))
 				{
-					if (archivableItems.Any(File.Exists))
-					{
-						var commonRootLength = GetCommonRootLength(directoryPath, sources.Length > 1);
-
-						if (string.IsNullOrEmpty(Password))
-							await compressor.CompressFilesAsync(ArchivePath, commonRootLength, [.. archivableItems]);
-						else
-							await compressor.CompressFilesEncryptedAsync(ArchivePath, commonRootLength, Password, [.. archivableItems]);
-					}
+					string[] batch = [.. directoryItems.SelectMany(group => group.ArchivableItems), .. archivableFiles];
+					if (string.IsNullOrEmpty(Password))
+						await compressor.CompressFilesAsync(writePath, batchRootLength, batch);
 					else
+						await compressor.CompressFilesEncryptedAsync(writePath, batchRootLength, Password, batch);
+				}
+				else
+				{
+					foreach ((string directoryPath, List<string> archivableItems) in directoryItems)
 					{
-						// The directory has no files, so we need to create entries manually
-						var fileDictionary = new Dictionary<string, string>();
-						AddEntry(fileDictionary, directoryPath, "");
-
-						compressor.CompressFileDictionary(fileDictionary, ArchivePath, Password);
-
-						static void AddEntry(IDictionary<string, string> fileDictionary, string directory, string entryPrefix)
+						if (archivableItems.Any(File.Exists))
 						{
-							DirectoryInfo directoryInfo = new DirectoryInfo(directory);
+							var commonRootLength = GetCommonRootLength(directoryPath, sources.Length > 1);
 
-							DirectoryInfo[] directories;
-
-							try
-							{
-								directories = directoryInfo.GetDirectories();
-							}
-							catch (Exception)
-							{
-								// The directory contents are inaccessible (e.g. a broken junction), skip it
-								return;
-							}
-
-							if (directories.Length == 0)
-							{
-								AddArchiveEntry(fileDictionary, entryPrefix + directoryInfo.Name, null);
-							}
+							if (string.IsNullOrEmpty(Password))
+								await compressor.CompressFilesAsync(writePath, commonRootLength, [.. archivableItems]);
 							else
+								await compressor.CompressFilesEncryptedAsync(writePath, commonRootLength, Password, [.. archivableItems]);
+						}
+						else
+						{
+							// The directory has no files, so we need to create entries manually
+							var fileDictionary = new Dictionary<string, string>();
+							AddEntry(fileDictionary, directoryPath, "");
+
+							compressor.CompressFileDictionary(fileDictionary, writePath, Password);
+
+							static void AddEntry(IDictionary<string, string> fileDictionary, string directory, string entryPrefix)
 							{
-								entryPrefix += directoryInfo.Name + Path.DirectorySeparatorChar;
-								foreach (DirectoryInfo directoryInfo2 in directories)
-									AddEntry(fileDictionary, directoryInfo2.FullName, entryPrefix);
+								DirectoryInfo directoryInfo = new DirectoryInfo(directory);
+
+								DirectoryInfo[] directories;
+
+								try
+								{
+									directories = directoryInfo.GetDirectories();
+								}
+								catch (Exception)
+								{
+									// The directory contents are inaccessible (e.g. a broken junction), skip it
+									return;
+								}
+
+								if (directories.Length == 0)
+								{
+									AddArchiveEntry(fileDictionary, entryPrefix + directoryInfo.Name, null);
+								}
+								else
+								{
+									entryPrefix += directoryInfo.Name + Path.DirectorySeparatorChar;
+									foreach (DirectoryInfo directoryInfo2 in directories)
+										AddEntry(fileDictionary, directoryInfo2.FullName, entryPrefix);
+								}
 							}
+
+							// SevenZipSharp uses a null source path to represent an empty directory.
+							static void AddArchiveEntry(IDictionary<string, string> entries, string name, string? sourcePath)
+								=> entries.Add(name, sourcePath!);
 						}
 
-						// SevenZipSharp uses a null source path to represent an empty directory.
-						static void AddArchiveEntry(IDictionary<string, string> entries, string name, string? sourcePath)
-							=> entries.Add(name, sourcePath!);
+						compressor.CompressionMode = CompressionMode.Append;
 					}
 
-					compressor.CompressionMode = CompressionMode.Append;
-				}
+					if (archivableFiles.Count > 0)
+					{
+						if (string.IsNullOrEmpty(Password))
+							await compressor.CompressFilesAsync(writePath, [.. archivableFiles]);
+						else
+							await compressor.CompressFilesEncryptedAsync(writePath, Password, [.. archivableFiles]);
+					}
 
-				if (archivableFiles.Count > 0)
-				{
-					if (string.IsNullOrEmpty(Password))
-						await compressor.CompressFilesAsync(ArchivePath, [.. archivableFiles]);
-					else
-						await compressor.CompressFilesEncryptedAsync(ArchivePath, Password, [.. archivableFiles]);
 				}
-
 				cts.Cancel();
+				if (temporaryPath is not null)
+				{
+					CancellationToken.ThrowIfCancellationRequested();
+					File.Move(temporaryPath, ArchivePath);
+				}
 
 				return true;
 			}
 			catch (Exception ex)
 			{
 				var logger = Ioc.Default.GetRequiredService<ILogger<App>>();
+				IsCancelled |= CancellationToken.IsCancellationRequested;
 				logger?.LogWarning(ex, $"Error compressing folder: {LogPathHelper.RedactPath(ArchivePath)}");
 
 				cts.Cancel();
 
 				return false;
+			}
+			finally
+			{
+				if (temporaryPath is not null)
+				{
+					try { File.Delete(temporaryPath); }
+					catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+					{
+						App.Logger.LogWarning(ex, "Could not remove the temporary archive.");
+					}
+				}
 			}
 		}
 
