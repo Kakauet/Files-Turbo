@@ -112,14 +112,14 @@ namespace Files.App.UserControls
 				if (!IsLoaded)
 					return;
 
-				// UpdateLayout throws COMException when the pane hosting the bar is being
-				// torn down; skipping leaves the bar in its previous, still-valid state
+				// The pane may be torn down before this queued measurement runs.
 				SafetyExtensions.IgnoreExceptions(() =>
 				{
 					// Reveal everything to measure the new content, then re-decide;
 					// no frame renders in between
 					VisualStateManager.GoToState(this, _stateNames[0], false);
-					UpdateLayout();
+					// UpdateLayout also forces the file view's pending layout on every count change.
+					RootGrid.Measure(new Windows.Foundation.Size(ActualWidth, double.PositiveInfinity));
 					UpdateResponsiveState();
 				}, App.Logger);
 			});
