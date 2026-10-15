@@ -18,8 +18,6 @@ namespace Files.App.Views.Shells
 
 		private NavigationInteractionTracker _navigationInteractionTracker;
 
-		private NavigationParams? _initialSettingsNavigation;
-
 		private NavigationParams? _NavParams;
 		public NavigationParams? NavParams
 		{
@@ -32,12 +30,6 @@ namespace Files.App.Views.Shells
 
 					if (IsLoaded)
 						OnNavigationParamsChanged();
-					else if (value?.NavPath == "Settings")
-					{
-						// Include Settings in the first layout instead of adding it from Loaded.
-						OnNavigationParamsChanged();
-						_initialSettingsNavigation = value;
-					}
 				}
 			}
 		}
@@ -124,11 +116,6 @@ namespace Files.App.Views.Shells
 		protected override void OnNavigationParamsChanged()
 		{
 			var navParams = NavParams;
-			var preparedSettings = _initialSettingsNavigation;
-			_initialSettingsNavigation = null;
-			if (preparedSettings is not null && ReferenceEquals(preparedSettings, navParams))
-				return;
-
 			if (string.IsNullOrEmpty(navParams?.NavPath) || navParams.NavPath == "Home")
 			{
 				NavigateHome();
