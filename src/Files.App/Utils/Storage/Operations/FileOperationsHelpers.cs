@@ -774,7 +774,8 @@ namespace Files.App.Utils.Storage
 		/// network). Pass <see langword="false"/> when only the data stored in the link file is needed,
 		/// e.g. for listing items.
 		/// </param>
-		public static async Task<ShellLinkItem?> ParseLinkAsync(string linkPath, bool resolveTarget = true)
+		/// <param name="includeFileInfo">Whether to query the link file's shell metadata in addition to its target data.</param>
+		public static async Task<ShellLinkItem?> ParseLinkAsync(string linkPath, bool resolveTarget = true, bool includeFileInfo = true)
 		{
 			if (string.IsNullOrEmpty(linkPath))
 				return null;
@@ -797,7 +798,7 @@ namespace Files.App.Utils.Storage
 						return new ShellLinkItem { TargetPath = targetPath, InvalidTarget = true };
 					}
 
-					return ShellFolderExtensions.GetShellLinkItem(link);
+					return ShellFolderExtensions.GetShellLinkItem(link, includeFileInfo);
 				}
 				else if (FileExtensionHelpers.IsWebLinkFile(linkPath))
 				{

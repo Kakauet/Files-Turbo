@@ -109,27 +109,26 @@ namespace Files.App.Utils.Shell
 			return new(isFolder, parsingPath, fileName, filePath, recycleDate, modifiedDate, createdDate, fileSize, fileSizeBytes ?? 0, fileType, folderItem.PIDL.GetBytes());
 		}
 
-		public static ShellLinkItem? GetShellLinkItem(ShellLink? linkItem)
+		public static ShellLinkItem? GetShellLinkItem(ShellLink? linkItem, bool includeFileInfo = true)
 		{
 			if (linkItem is null)
 				return null;
 
-			var baseItem = GetShellFileItem(linkItem);
-			if (baseItem is null)
+			// Native listings already have the file metadata; querying shell properties repeats disk and handler work.
+			var baseItem = includeFileInfo ? GetShellFileItem(linkItem) : null;
+			if (includeFileInfo && baseItem is null)
 				return null;
 
 			string targetPath = Environment.ExpandEnvironmentVariables(linkItem.TargetPath);
-			var link = new ShellLinkItem(baseItem)
-			{
-				// The attributes persisted in the link file avoid opening the target,
-				// which can block on unreachable network locations
-				IsFolder = linkItem.StoredTargetIsFolder() ?? linkItem.IsTargetFolder(targetPath),
-				RunAsAdmin = linkItem.RunAsAdministrator,
-				ShowWindowCommand = (Windows.Win32.UI.WindowsAndMessaging.SHOW_WINDOW_CMD)linkItem.ShowState,
-				Arguments = linkItem.Arguments,
-				WorkingDirectory = Environment.ExpandEnvironmentVariables(linkItem.WorkingDirectory),
-				TargetPath = targetPath
-			};
+			var link = baseItem is not null ? new ShellLinkItem(baseItem) : new ShellLinkItem();
+			// The attributes persisted in the link file avoid opening the target,
+			// which can block on unreachable network locations
+			link.IsFolder = linkItem.StoredTargetIsFolder() ?? linkItem.IsTargetFolder(targetPath);
+			link.RunAsAdmin = linkItem.RunAsAdministrator;
+			link.ShowWindowCommand = (Windows.Win32.UI.WindowsAndMessaging.SHOW_WINDOW_CMD)linkItem.ShowState;
+			link.Arguments = linkItem.Arguments;
+			link.WorkingDirectory = Environment.ExpandEnvironmentVariables(linkItem.WorkingDirectory);
+			link.TargetPath = targetPath;
 
 			return link;
 		}

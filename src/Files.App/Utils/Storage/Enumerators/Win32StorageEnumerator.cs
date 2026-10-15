@@ -413,7 +413,7 @@ namespace Files.App.Utils.Storage
 
 				// Listing only needs the data stored in the link file; resolving the target
 				// can block on moved or unreachable targets and is done when the item is opened
-				var shInfo = await FileOperationsHelpers.ParseLinkAsync(itemPath, resolveTarget: false);
+				var shInfo = await FileOperationsHelpers.ParseLinkAsync(itemPath, resolveTarget: false, includeFileInfo: false);
 				if (shInfo is null)
 					return null;
 
