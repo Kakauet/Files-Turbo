@@ -12,7 +12,9 @@ namespace Files.App.Views.Settings
 
 		public GeneralPage()
 		{
+			var probeStart = Stopwatch.GetTimestamp();
 			InitializeComponent();
+			SettingsOpeningProbe.Stage("Views/Settings/GeneralPage.xaml.cs", probeStart);
 		}
 
 		private void RemoveStartupPage(object sender, RoutedEventArgs e)

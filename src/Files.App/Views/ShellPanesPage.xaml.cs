@@ -263,6 +263,7 @@ namespace Files.App.Views
 
 		public ShellPanesPage()
 		{
+			var probeStart = Stopwatch.GetTimestamp();
 			_panePointerPressedHandler = Pane_PointerPressed;
 			InitializeComponent();
 
@@ -294,6 +295,7 @@ namespace Files.App.Views
 
 			TabBar.TabDragStarted += TabBar_TabDragStarted;
 			TabBar.TabDragCompleted += TabBar_TabDragCompleted;
+			SettingsOpeningProbe.Stage("Views/ShellPanesPage.xaml.cs", probeStart);
 		}
 
 		// Public methods

@@ -26,7 +26,10 @@ namespace Files.App.Views
 
 		public SettingsPage()
 		{
+			var probeStart = Stopwatch.GetTimestamp();
 			InitializeComponent();
+			SettingsOpeningProbe.Stage("Views/Settings/SettingsPage.xaml.cs", probeStart);
+			SettingsOpeningProbe.Page = this;
 		}
 
 		private void SettingsPage_Loaded(object sender, RoutedEventArgs e)
@@ -59,7 +62,9 @@ namespace Files.App.Views
 			AppInstance.ToolbarViewModel.CanGoForward = AppInstance.CanNavigateForward;
 			AppInstance.ToolbarViewModel.CanNavigateToParent = false;
 
+			var probeDirectory = Stopwatch.GetTimestamp();
 			await shellViewModel.SetWorkingDirectoryAsync("Settings");
+			SettingsOpeningProbe.Stage("working-directory", probeDirectory);
 			shellViewModel.CheckForBackgroundImage();
 
 			AppInstance.SlimContentPage?.StatusBarViewModel.UpdateGitInfo(false, string.Empty, null);
@@ -142,7 +147,9 @@ namespace Files.App.Views
 				_ => typeof(GeneralPage),
 			};
 
+			var probeNavigate = Stopwatch.GetTimestamp();
 			SettingsContentFrame.Navigate(pageType, null, new SuppressNavigationTransitionInfo());
+			SettingsOpeningProbe.Stage("section-construct-" + selectedPage, probeNavigate);
 		}
 
 		[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]

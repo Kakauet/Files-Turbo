@@ -37,6 +37,7 @@ namespace Files.App.ViewModels.Settings
 
 		public SettingsPageViewModel()
 		{
+			var probeStart = Stopwatch.GetTimestamp();
 			NavigationItems.Add(CreateNavigationItem(SettingsPageKind.GeneralPage, "SettingsItemGeneral", Strings.General.GetLocalizedResource(), "App.ThemedIcons.Settings.General"));
 			NavigationItems.Add(CreateNavigationItem(SettingsPageKind.AppearancePage, "SettingsItemAppearance", Strings.Appearance.GetLocalizedResource(), "App.ThemedIcons.Settings.Appearance"));
 			NavigationItems.Add(CreateNavigationItem(SettingsPageKind.LayoutPage, "SettingsItemLayout", Strings.Layout.GetLocalizedResource(), "App.ThemedIcons.Settings.Layout"));
@@ -51,6 +52,7 @@ namespace Files.App.ViewModels.Settings
 				FlatNavigationItems.Add(new FlatSidebarItem(navItem, 0));
 
 			SetSelectedPage(SettingsPageKind.GeneralPage);
+			SettingsOpeningProbe.Stage("settings-view-model", probeStart);
 		}
 
 		public void SetSelectedPage(SettingsPageKind pageKind)
