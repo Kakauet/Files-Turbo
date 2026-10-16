@@ -132,6 +132,12 @@ Versions look like `4.3.0.N`, where `N` counts Files Turbo releases. They don't 
 I built Files Turbo with the help of AI coding agents (OpenAI Codex and Claude Code), which is why some commits
 are authored by "Codex". I chose what to change, and every change was tested and measured before it stayed in.
 
+## Known issues
+
+- After Files Turbo has been open for many hours, moving, deleting or recycling files can hang, also in Windows
+  Explorer and other apps. Closing and reopening Files Turbo fixes it. Version 4.3.0.10 includes a likely fix that
+  hasn't been confirmed yet, so please open an issue if it still happens to you.
+
 ## Reporting problems
 
 Open an issue here with your Files Turbo version (Settings → About) and the steps to reproduce the problem. If it

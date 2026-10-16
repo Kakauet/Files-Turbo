@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.Marshalling;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.System.SystemServices;
@@ -50,19 +51,29 @@ namespace Files.App.Storage
 			List<IStorableChild> childItems = [];
 			IShellItem[] pChildShellItems = new IShellItem[1];
 
-			while ((hr = pEnumShellItems!.Next(1, pChildShellItems, null)) == HRESULT.S_OK)
+			try
 			{
-				IShellItem pChildShellItem = pChildShellItems[0];
-				bool isFolder = pChildShellItem.GetAttributes(SFGAO_FLAGS.SFGAO_FOLDER, out var dwAttributes).Succeeded && dwAttributes is SFGAO_FLAGS.SFGAO_FOLDER;
+				while ((hr = pEnumShellItems!.Next(1, pChildShellItems, null)) == HRESULT.S_OK)
+				{
+					IShellItem pChildShellItem = pChildShellItems[0];
+					bool isFolder = pChildShellItem.GetAttributes(SFGAO_FLAGS.SFGAO_FOLDER, out var dwAttributes).Succeeded && dwAttributes is SFGAO_FLAGS.SFGAO_FOLDER;
 
-				if (type.HasFlag(StorableType.File) && !isFolder)
-				{
-					childItems.Add(new WindowsFile(pChildShellItem));
+					if (type.HasFlag(StorableType.File) && !isFolder)
+					{
+						childItems.Add(new WindowsFile(pChildShellItem));
+					}
+					else if (type.HasFlag(StorableType.Folder) && isFolder)
+					{
+						childItems.Add(new WindowsFolder(pChildShellItem));
+					}
 				}
-				else if (type.HasFlag(StorableType.Folder) && isFolder)
-				{
-					childItems.Add(new WindowsFolder(pChildShellItem));
-				}
+			}
+			finally
+			{
+				// The Quick Access enumerator holds the shell's destination list lock until it is released, and waiting
+				// for the GC lets those locks pile up and stall every app's file operations
+				if ((object?)pEnumShellItems is ComObject comObject)
+					comObject.FinalRelease();
 			}
 
 			if (hr.ThrowIfFailedOnDebug().Failed)
