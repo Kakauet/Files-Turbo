@@ -60,6 +60,14 @@ paths, pressing keys, using menus) and watches what appears on screen, so neithe
 Files and Files Turbo were built from source with the same Release x64 ReadyToRun settings and installed side by
 side, so they never shared settings or caches.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/performance-dark.png">
+  <img alt="Files 4.3 versus Files Turbo: a 10 000-item folder fills the screen 5.2× faster, a 100 000-item folder 19.8× faster, thumbnails 8× faster, startup 1.4× faster, exact search 2.6× faster, bulk rename 29× faster, idle CPU drops from 6.4 % to about 0 % and private memory is 11 % lower." src=".github/assets/performance-light.png">
+</picture>
+
+<details>
+<summary>The same numbers as a table</summary>
+
 | Scenario | Files 4.3 | Files Turbo | Change |
 |---|---:|---:|---:|
 | Open a folder with 10 000 items, until the screen is filled | 544 ms | 105 ms | 5.2× faster |
@@ -71,6 +79,8 @@ side, so they never shared settings or caches.
 | Bulk rename 1 000 files | 87.3 s | 3.0 s | 29× faster |
 | CPU while idle with a folder open | 6.4 % | 0.0 % | idle |
 | Private memory with a 10 000-item folder open | 325 MiB | 289 MiB | 11 % less |
+
+</details>
 
 Medians of 10 runs per app (5 for bulk rename in Files) on a laptop with an Intel Core i7-13620H, 32 GB of RAM and
 an NVMe SSD, running Windows 11 25H2. Every row is a clear difference: its 95 % confidence interval doesn't
