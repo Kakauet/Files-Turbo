@@ -91,11 +91,15 @@ Files Turbo installs next to Files and Windows Explorer and doesn't replace eith
 `FilesTurbo.Experimental`). Because the package isn't signed, Windows only accepts it as a developer install:
 
 1. Turn on Developer Mode in Settings → System → For developers.
-2. Extract the MSIX into a folder.
-3. Register it from PowerShell:
+2. Download `Files-Turbo-<version>-x64.zip` and `Microsoft.WindowsAppRuntime.2-x64.msix` from the
+   [latest release](https://github.com/Kakauet/Files-Turbo/releases/latest), and extract the zip into a folder
+   you'll keep (Windows runs the app from there).
+3. Install the Windows App SDK runtime (signed by Microsoft; skip this if you already have it) and register Files
+   Turbo from PowerShell:
 
 ```powershell
-Add-AppxPackage -Register <layout>\AppxManifest.xml
+Add-AppxPackage .\Microsoft.WindowsAppRuntime.2-x64.msix
+Add-AppxPackage -Register <folder>\AppxManifest.xml
 ```
 
 To go back to an earlier build, register its folder the same way. If both builds have the same version number,
