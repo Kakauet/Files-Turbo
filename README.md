@@ -21,13 +21,13 @@ original README is in [UPSTREAM_README.md](UPSTREAM_README.md).
 ## Fixed in Files Turbo
 
 - **No more CPU use in the background.** In Files, the tab loading indicator keeps animating after it's hidden,
-  so a window that's just sitting there keeps using about 9 % of a CPU core. Files Turbo stops it, and an idle
-  window drops to under 0.5 %.
+  so a window that's just sitting there used a median 6.41 % of a CPU core in the final evaluation. Files Turbo
+  stops it, and an idle window measured a median 0.00 % (p95 0.279 %, three samples; rounded readings).
 - **Smooth sidebar resizing.** Dragging the edge of the left sidebar used to stutter badly, because Files wrote
   the new width to its settings file on every mouse movement. Now the sidebar follows the pointer smoothly and
   the width is saved once, when you let go.
 - **Instant search.** As you type in the address bar, matches appear right away by filtering the ones already
-  found, before the full search even starts. And the full search itself is faster than in Files.
+  found, before the full search even starts.
 
 ## What's faster
 
@@ -59,15 +59,14 @@ paths, pressing keys, using menus) and watches what appears on screen, so neithe
 Files and Files Turbo were built from source with the same Release x64 ReadyToRun settings and installed side by
 side, so they never shared settings or caches.
 
-<!-- TODO before publishing: fill this table from the final evaluation (median, Turbo vs Files 4.3). -->
-
 | Scenario | Files 4.3 | Files Turbo | Change |
 |---|---:|---:|---:|
-| Open a folder with 10 000 items, full screen painted | | | |
-| Open a folder with 100 000 items, listing complete | | | |
-| Name search in a 100 000-file tree | | | |
-| Copy 10 000 small files | | | |
-| CPU while idle with a folder open | | | |
+| Open a folder with 10 000 items, full screen painted | 543.511 ms | 105.097 ms | -80.66 % |
+| Open a folder with 100 000 items, listing complete | 4096.965 ms | 1336.671 ms | -67.37 % |
+| Exact name search in a 100 000-file tree | 243.533 ms | 92.852 ms | -61.87 % |
+| Bulk rename 1 000 small files | 87.275 s | 3.034 s | -96.52 % |
+| CPU while idle with a folder open | 6.41 % | 0.00 % (p95 0.279 %; n=3; rounded readings) | -100.00 % |
+| Working set after returning to an empty folder | 30.70 MiB | 418.10 MiB | +1261.89 % |
 
 Your numbers will depend on your machine, your disk and what Windows already has cached, so take these as a guide
 rather than a promise.
