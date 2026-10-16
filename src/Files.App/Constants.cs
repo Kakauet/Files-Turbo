@@ -262,8 +262,8 @@ namespace Files.App
 		{
 			// These strings are intentionally hardcoded and cannot be moved to resource files.
 			// The Windows App Runtime (which powers the resource loading system) may itself be unavailable at this point
-			public const string MissingRuntimeMessage = "Files failed to start. A required Windows component could not be loaded. Try reinstalling Files from the Microsoft Store or from https://files.community/download";
-			public const string MissingRuntimeTitle = "Files - Startup Error";
+			public const string MissingRuntimeMessage = "Files Turbo failed to start. A required Windows component could not be loaded. Try installing the Windows App SDK runtime and Files Turbo again from https://github.com/Kakauet/Files-Turbo/releases/latest";
+			public const string MissingRuntimeTitle = "Files Turbo - Startup Error";
 		}
 	}
 }

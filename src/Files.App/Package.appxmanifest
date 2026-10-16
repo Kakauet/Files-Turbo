@@ -17,7 +17,7 @@
     <Identity
         Name="FilesTurbo.Experimental"
         Publisher="CN=Files"
-        Version="4.3.0.10" />
+        Version="4.3.0.11" />
 
     <Properties>
         <DisplayName>Files Turbo</DisplayName>
@@ -141,7 +141,7 @@
                     <uap5:StartupTask
                       TaskId="3AA55462-A5FA-4933-88C4-712D0B6CDEBB"
                       Enabled="false"
-                      DisplayName="Files" />
+                      DisplayName="Files Turbo" />
                 </uap5:Extension>
 
                 <Extension Category="windows.updateTask" EntryPoint="Files.App.BackgroundTasks.UpdateTask" />
