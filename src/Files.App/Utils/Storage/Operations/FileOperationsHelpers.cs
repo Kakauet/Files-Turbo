@@ -221,6 +221,9 @@ namespace Files.App.Utils.Storage
 
 			return STATask.Run(async () =>
 			{
+				// The size enumeration holds handles inside folders, and Windows refuses to recycle or delete a folder meanwhile
+				await sizeTask.ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+
 				using var op = new ShellFileOperations2();
 
 				op.Options = FILEOPERATION_FLAGS.FOF_SILENT | FILEOPERATION_FLAGS.FOF_NOCONFIRMATION | FILEOPERATION_FLAGS.FOF_NOERRORUI;
@@ -495,6 +498,9 @@ namespace Files.App.Utils.Storage
 
 			return STATask.Run(async () =>
 			{
+				// The size enumeration holds handles inside folders, and Windows refuses to move a folder meanwhile
+				await sizeTask.ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+
 				using var op = new ShellFileOperations2();
 				var shellOperationResult = new ShellOperationResult();
 

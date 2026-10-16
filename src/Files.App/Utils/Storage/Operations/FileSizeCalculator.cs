@@ -116,16 +116,7 @@ namespace Files.App.Utils.Storage.Operations
 			if (_computedFiles.TryGetValue(path, out var size))
 				return size;
 
-			using var hFile = PInvoke.CreateFile(
-				path,
-				(uint)FILE_ACCESS_RIGHTS.FILE_READ_ATTRIBUTES,
-				FILE_SHARE_MODE.FILE_SHARE_READ,
-				null,
-				FILE_CREATION_DISPOSITION.OPEN_EXISTING,
-				0,
-				null);
-
-			if (!hFile.IsInvalid && PInvoke.GetFileSizeEx(hFile, out size))
+			if (FileSizeReader.TryGetSize(path, out size))
 				AddFileSize(path, size);
 
 			return size;

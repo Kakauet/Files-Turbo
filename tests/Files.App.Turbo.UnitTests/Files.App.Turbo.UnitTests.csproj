@@ -70,4 +70,5 @@
     </ItemGroup>
 
     <ItemGroup><Compile Include="..\..\src\Files.App\Utils\Storage\Operations\ArchiveBatchPlan.cs" Link="Linked\ArchiveBatchPlan.cs" /></ItemGroup>
+    <ItemGroup><Compile Include="..\..\src\Files.App\Utils\Storage\Operations\FileSizeReader.cs" Link="Linked\FileSizeReader.cs" /></ItemGroup>
 </Project>
