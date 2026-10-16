@@ -47,8 +47,20 @@
 				</Button>
 			</wctcontrols:SettingsCard>
 
-			<wctcontrols:SettingsCard Header="{helpers:ResourceString Name=TurboCustomizationAuthor}">
-				<HyperlinkButton Content="Kakauet" NavigateUri="https://github.com/Kakauet" />
+			<!--  Files Turbo credits  -->
+			<wctcontrols:SettingsCard
+				HorizontalAlignment="Stretch"
+				Command="{x:Bind ViewModel.OpenTurboAuthorCommand}"
+				Description="{helpers:ResourceString Name=TurboBasedOnFiles}"
+				Header="{helpers:ResourceString Name=TurboMadeBy}"
+				IsClickEnabled="True">
+				<wctcontrols:SettingsCard.HeaderIcon>
+					<FontIcon Glyph="&#xE77B;" />
+				</wctcontrols:SettingsCard.HeaderIcon>
+
+				<wctcontrols:SettingsCard.ActionIcon>
+					<FontIcon Glyph="&#xE8A7;" />
+				</wctcontrols:SettingsCard.ActionIcon>
 			</wctcontrols:SettingsCard>
 
 			<!--  GitHub Sponsor  -->

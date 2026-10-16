@@ -39,6 +39,7 @@ namespace Files.App.ViewModels.Settings
 		public ICommand CopyWindowsVersionCommand { get; }
 		public ICommand CopyUserIDCommand { get; }
 		public ICommand SupportUsCommand { get; }
+		public ICommand OpenTurboAuthorCommand { get; }
 		public ICommand OpenLogLocationCommand { get; }
 		public ICommand OpenDocumentationCommand { get; }
 		public ICommand OpenDiscordCommand { get; }
@@ -83,6 +84,7 @@ namespace Files.App.ViewModels.Settings
 			CopyWindowsVersionCommand = new RelayCommand(CopyWindowsVersion);
 			CopyUserIDCommand = new RelayCommand(CopyUserID);
 			SupportUsCommand = new AsyncRelayCommand(SupportUs);
+			OpenTurboAuthorCommand = new AsyncRelayCommand(DoOpenTurboAuthor);
 			OpenDocumentationCommand = new AsyncRelayCommand(DoOpenDocumentation);
 			OpenDiscordCommand = new AsyncRelayCommand(DoOpenDiscord);
 			SubmitFeatureRequestCommand = new AsyncRelayCommand(DoSubmitFeatureRequest);
@@ -182,6 +184,11 @@ namespace Files.App.ViewModels.Settings
 		public Task SupportUs()
 		{
 			return Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.SupportUsUrl)).AsTask();
+		}
+
+		private Task DoOpenTurboAuthor()
+		{
+			return Launcher.LaunchUriAsync(new Uri(Constants.ExternalUrl.TurboAuthorUrl)).AsTask();
 		}
 
 		public string GetAppVersion()

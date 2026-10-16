@@ -4743,7 +4743,10 @@
   <data name="SearchResultsIncomplete" xml:space="preserve">
     <value>No se pudo buscar en algunas ubicaciones. Los resultados pueden estar incompletos.</value>
   </data>
-  <data name="TurboCustomizationAuthor" xml:space="preserve">
-    <value>Files Turbo — personalizado por</value>
+  <data name="TurboMadeBy" xml:space="preserve">
+    <value>Creado por Kakauet</value>
+  </data>
+  <data name="TurboBasedOnFiles" xml:space="preserve">
+    <value>Basado en Files, de Files Community</value>
   </data>
 </root>
