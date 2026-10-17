@@ -273,6 +273,9 @@ GdipCreateBitmapFromScan0
 BITMAP
 DIBSECTION
 GetObject
+GetDIBits
+CreateCompatibleDC
+DeleteDC
 _SICHINTF
 RoGetAgileReference
 IQueryInfo

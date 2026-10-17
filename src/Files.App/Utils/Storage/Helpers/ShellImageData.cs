@@ -62,16 +62,29 @@ namespace Files.App.Utils.Storage
 			if (bitmap.bmBits is null || bitmap.bmBitsPixel != 32 || bitmap.bmWidth <= 0 || bitmap.bmHeight <= 0)
 				return null;
 
-			int width = bitmap.bmWidth, height = bitmap.bmHeight, stride = bitmap.bmWidthBytes;
-			var bottomUp = section.dsBmih.biHeight > 0;
+			int width = bitmap.bmWidth, height = bitmap.bmHeight;
 			var source = new byte[width * height * 4];
-			fixed (byte* destination = source)
+			// GetObject loses the original height sign. Ask GDI for an explicitly top-down DIB.
+			BITMAPINFO info = default;
+			info.bmiHeader.biSize = (uint)sizeof(BITMAPINFOHEADER);
+			info.bmiHeader.biWidth = width;
+			info.bmiHeader.biHeight = -height;
+			info.bmiHeader.biPlanes = 1;
+			info.bmiHeader.biBitCount = 32;
+			var dc = PInvoke.CreateCompatibleDC(default);
+			if (dc.IsNull)
+				return null;
+			try
 			{
-				for (var y = 0; y < height; y++)
+				fixed (byte* destination = source)
 				{
-					var row = (byte*)bitmap.bmBits + (bottomUp ? height - 1 - y : y) * stride;
-					Buffer.MemoryCopy(row, destination + y * width * 4, width * 4, width * 4);
+					if (PInvoke.GetDIBits(dc, hBitmap, 0, (uint)height, destination, &info, DIB_USAGE.DIB_RGB_COLORS) != height)
+						return null;
 				}
+			}
+			finally
+			{
+				PInvoke.DeleteDC(dc);
 			}
 
 			NormalizeAlpha(source);

@@ -11,12 +11,15 @@ thumbnails and file operations.
 
 This is an unofficial fork and is not affiliated with or endorsed by the Files Community. It is based on Files
 4.2.39 (commit `1994d9a4269f5144c70bc67d6a48de4a20616912`) plus the Files 4.3 translations, and it reads and
-writes the same settings and data as Files. Please report problems with Files Turbo here, not upstream. The
+writes the same settings and data formats as Files. Please report problems with Files Turbo here, not upstream. The
 original README is in [UPSTREAM_README.md](UPSTREAM_README.md).
 
 > [!WARNING]
 > Files Turbo is experimental and its packages are not signed. It copies, moves, renames and deletes files just
 > like Files does, so keep backups of anything important and try it first on data you can afford to lose.
+
+The latest release is [Files Turbo 4.3.0.12](https://github.com/Kakauet/Files-Turbo/releases/tag/v4.3.0.12).
+See the [changelog](CHANGELOG.md) for the latest fixes.
 
 ## Fixed in Files Turbo
 
@@ -29,6 +32,14 @@ original README is in [UPSTREAM_README.md](UPSTREAM_README.md).
 - **Instant search.** As you type in the address bar, matches appear right away by filtering the ones already
   found, before the full search even starts. The full search is also faster in most cases: up to 2.6 times
   faster for exact names.
+- **File operations keep working in long sessions.** Earlier builds could leave Windows' Quick Access list
+  locked after reading it. Over time, the locks accumulated and could hang move, delete and recycle operations,
+  including in Explorer and other apps. The reader is now released as soon as it finishes. The fix introduced in
+  4.3.0.10 has been confirmed during daily use.
+- **Thumbnails stay the right way up.** Some folder previews and other shell thumbnails appeared upside down.
+  They now display in the correct orientation, with transparency preserved.
+- **Sorting follows file changes.** When a file or folder's date or size changes, its position now updates too,
+  even if it stays in the same date group. Reordering preserves the selection, including multiple selected items.
 
 ## What's faster
 
@@ -146,18 +157,19 @@ Versions look like `4.3.0.N`, where `N` counts Files Turbo releases. They don't 
 I built Files Turbo with the help of AI coding agents (OpenAI Codex and Claude Code), which is why some commits
 are authored by "Codex". I chose what to change, and every change was tested and measured before it stayed in.
 
-## Known issues
-
-- After Files Turbo has been open for many hours, moving, deleting or recycling files can hang, also in Windows
-  Explorer and other apps. Closing and reopening Files Turbo fixes it. Version 4.3.0.10 includes a likely fix that
-  hasn't been confirmed yet, so please open an issue if it still happens to you.
-
 ## Reporting problems
 
 Open an issue here with your Files Turbo version (Settings → About) and the steps to reproduce the problem. If it
 also happens in the official Files app, it's an upstream bug, so please report it to
 [files-community/Files](https://github.com/files-community/Files/issues) instead. See
 [CONTRIBUTING.md](.github/CONTRIBUTING.md) if you'd like to help.
+
+### Date grouping
+
+Sorting and grouping are separate settings. If a recently modified folder appears in an older date group, check
+**Group by** in the sort menu. Grouping by **Date created** keeps it in its creation-date group, even when you sort
+by modification date. To put recent changes at the top, choose **Group by → Date modified** and
+**Sort by → Date modified → Descending**.
 
 ## License
 

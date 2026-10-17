@@ -1165,7 +1165,7 @@ namespace Files.App.ViewModels
 			=> string.IsNullOrEmpty(filter) || item.Name?.Contains(filter, StringComparison.OrdinalIgnoreCase) == true;
 
 		// Apply changes immediately after manipulating on filesAndFolders completed
-		public async Task ApplyFilesAndFoldersChangesAsync(CancellationToken cancellationToken = default, bool preserveSortedPrefix = false, bool deferSortedTail = false)
+		public async Task ApplyFilesAndFoldersChangesAsync(CancellationToken cancellationToken = default, bool preserveSortedPrefix = false, bool deferSortedTail = false, bool preserveSelection = false)
 		{
 			using var applyCTS = CancellationTokenSource.CreateLinkedTokenSource(addFilesCTS.Token, cancellationToken);
 			var token = applyCTS.Token;
@@ -1206,6 +1206,9 @@ namespace Files.App.ViewModels
 
 							if (!TryPublishFilesAndFoldersWithoutReset(displayedFilesAndFolders, preserveSortedPrefix))
 							{
+								var layout = preserveSelection && ReferenceEquals(ContentPageContext.ShellPage?.ShellViewModel, this)
+									? ContentPageContext.ShellPage?.SlimContentPage : null;
+								var selectedItems = layout?.SelectedItems?.ToList();
 								FilesAndFolders.BeginBulkOperation();
 								try
 								{
@@ -1219,6 +1222,8 @@ namespace Files.App.ViewModels
 								{
 									FilesAndFolders.EndBulkOperation();
 								}
+								if (selectedItems is { Count: > 0 })
+									layout!.ItemManipulationModel.SetSelectedItems(selectedItems);
 							}
 
 							UpdateEmptyTextType();
@@ -3661,15 +3666,18 @@ namespace Files.App.ViewModels
 				var matchingItems = filesAndFolders.ToList().Where(x => x.ItemPath is { } itemPath && pathSet.Contains(itemPath));
 				var results = await Task.WhenAll(matchingItems.Select(x => GetFileOrFolderUpdateInfoAsync(x, hasSyncStatus)));
 
+				var sortKeyChanged = false;
 				await dispatcherQueue.EnqueueOrInvokeAsync(() =>
 				{
 					var itemsRegrouped = false;
+					var sortKey = SortingHelper.GetSortFunc(folderSettings.DirectorySortOption);
 
 					foreach (var result in results)
 					{
 						if (result is not null)
 						{
 							var item = result.Value.Item;
+							var previousSortKey = sortKey(item);
 							var contentChanged = item.ItemDateModifiedReal != result.Value.Modified || result.Value.Size is { } updatedSize && item.FileSizeBytes != updatedSize;
 							item.ItemDateModifiedReal = result.Value.Modified;
 							item.ItemDateCreatedReal = result.Value.Created;
@@ -3696,6 +3704,7 @@ namespace Files.App.ViewModels
 							// its group key, e.g. when the date modified is restored after
 							// extracting an archive, see #14461
 							itemsRegrouped |= FilesAndFolders.UpdateItemGroup(item);
+							sortKeyChanged |= !Equals(previousSortKey, sortKey(item));
 						}
 					}
 
@@ -3716,6 +3725,11 @@ namespace Files.App.ViewModels
 					}
 				},
 				Microsoft.UI.Dispatching.DispatcherQueuePriority.Low);
+				if (sortKeyChanged)
+				{
+					await OrderFilesAndFoldersAsync();
+					await ApplyFilesAndFoldersChangesAsync(preserveSelection: true);
+				}
 			}
 			finally
 			{
