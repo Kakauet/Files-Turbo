@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Specialized;
 using System.IO;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -201,69 +202,93 @@ namespace Files.App.Services
 				if (hr.Failed)
 					return false;
 
-				// Get IEnumShellItems of the quick access shell folder
-				hr = pFolderShellItem.BindToHandler(null, PInvoke.BHID_EnumItems, out IEnumShellItems? pEnumShellItems);
+				IEnumShellItems? pEnumShellItems = null;
+				try
+				{
+					// Get IEnumShellItems of the quick access shell folder
+					hr = pFolderShellItem.BindToHandler(null, PInvoke.BHID_EnumItems, out pEnumShellItems);
+				}
+				finally
+				{
+					if ((object?)pFolderShellItem is ComObject folderComObject)
+						folderComObject.FinalRelease();
+				}
+
 				if (hr.Failed || pEnumShellItems is null)
+				{
+					if ((object?)pEnumShellItems is ComObject failedEnumeratorComObject)
+						failedEnumeratorComObject.FinalRelease();
+
 					return false;
+				}
 
 				// Enumerate recent items and populate the list
 				int index = 0;
 				List<RecentItem> recentItems = [];
 				IShellItem[] pShellItems = new IShellItem[1];
-				while (pEnumShellItems.Next(1, pShellItems, null) == HRESULT.S_OK)
+				try
 				{
-					IShellItem shellItem = pShellItems[0];
-
-					// Get top 20 items
-					if (index is 20)
-						break;
-
-					// Exclude folders, but keep archives (ZIP/7z/RAR) which the shell reports as both folder and stream.
-					if (shellItem.GetAttributes(SFGAO_FLAGS.SFGAO_FOLDER | SFGAO_FLAGS.SFGAO_STREAM, out var attribute).Succeeded &&
-						(attribute & SFGAO_FLAGS.SFGAO_FOLDER) == SFGAO_FLAGS.SFGAO_FOLDER &&
-						(attribute & SFGAO_FLAGS.SFGAO_STREAM) == 0)
-						continue;
-
-					// Get the target path
-					shellItem.GetDisplayName(SIGDN.SIGDN_DESKTOPABSOLUTEEDITING, out var szDisplayName);
-					var targetPath = szDisplayName.ToString();
-					PInvoke.CoTaskMemFree(szDisplayName.Value);
-
-					// Get the display name
-					shellItem.GetDisplayName(SIGDN.SIGDN_NORMALDISPLAY, out szDisplayName);
-					var fileName = szDisplayName.ToString();
-					PInvoke.CoTaskMemFree(szDisplayName.Value);
-
-					// Strip the file extension except when the file name only contains extension (e.g. ".gitignore")
-					if (!FoldersSettingsService.ShowFileExtensions &&
-						SystemIO.Path.GetFileNameWithoutExtension(fileName) is string fileNameWithoutExtension)
-						fileName = string.IsNullOrEmpty(fileNameWithoutExtension) ? SystemIO.Path.GetFileName(fileName) : fileNameWithoutExtension;
-
-					// Get the date last modified
-					DateTime lastModified = DateTime.MinValue;
-
-					if (shellItem is IShellItem2 shellItem2 &&
-						PInvoke.PSGetPropertyKeyFromName("System.DateModified", out var propertyKey).Succeeded)
+					while (pEnumShellItems.Next(1, pShellItems, null) == HRESULT.S_OK)
 					{
-						hr = shellItem2.GetString(propertyKey, out var szPropertyValue);
-						if (hr.Succeeded)
+						IShellItem shellItem = pShellItems[0];
+
+						// Get top 20 items
+						if (index is 20)
+							break;
+
+						// Exclude folders, but keep archives (ZIP/7z/RAR) which the shell reports as both folder and stream.
+						if (shellItem.GetAttributes(SFGAO_FLAGS.SFGAO_FOLDER | SFGAO_FLAGS.SFGAO_STREAM, out var attribute).Succeeded &&
+							(attribute & SFGAO_FLAGS.SFGAO_FOLDER) == SFGAO_FLAGS.SFGAO_FOLDER &&
+							(attribute & SFGAO_FLAGS.SFGAO_STREAM) == 0)
+							continue;
+
+						// Get the target path
+						shellItem.GetDisplayName(SIGDN.SIGDN_DESKTOPABSOLUTEEDITING, out var szDisplayName);
+						var targetPath = szDisplayName.ToString();
+						PInvoke.CoTaskMemFree(szDisplayName.Value);
+
+						// Get the display name
+						shellItem.GetDisplayName(SIGDN.SIGDN_NORMALDISPLAY, out szDisplayName);
+						var fileName = szDisplayName.ToString();
+						PInvoke.CoTaskMemFree(szDisplayName.Value);
+
+						// Strip the file extension except when the file name only contains extension (e.g. ".gitignore")
+						if (!FoldersSettingsService.ShowFileExtensions &&
+							SystemIO.Path.GetFileNameWithoutExtension(fileName) is string fileNameWithoutExtension)
+							fileName = string.IsNullOrEmpty(fileNameWithoutExtension) ? SystemIO.Path.GetFileName(fileName) : fileNameWithoutExtension;
+
+						// Get the date last modified
+						DateTime lastModified = DateTime.MinValue;
+
+						if (shellItem is IShellItem2 shellItem2 &&
+							PInvoke.PSGetPropertyKeyFromName("System.DateModified", out var propertyKey).Succeeded)
 						{
-							if (!DateTime.TryParse(szPropertyValue.ToString(), out lastModified))
-								lastModified = DateTime.MinValue;
+							hr = shellItem2.GetString(propertyKey, out var szPropertyValue);
+							if (hr.Succeeded)
+							{
+								if (!DateTime.TryParse(szPropertyValue.ToString(), out lastModified))
+									lastModified = DateTime.MinValue;
 
-							PInvoke.CoTaskMemFree(szPropertyValue);
+								PInvoke.CoTaskMemFree(szPropertyValue);
+							}
 						}
+
+						recentItems.Add(new()
+						{
+							Path = targetPath,
+							Name = fileName,
+							ShellItem = shellItem,
+							LastModified = lastModified,
+						});
+
+						index++;
 					}
-
-					recentItems.Add(new()
-					{
-						Path = targetPath,
-						Name = fileName,
-						ShellItem = shellItem,
-						LastModified = lastModified,
-					});
-
-					index++;
+				}
+				finally
+				{
+					// The automatic-destination watcher reopens this list after every change; release its lock before returning.
+					if ((object?)pEnumShellItems is ComObject enumeratorComObject)
+						enumeratorComObject.FinalRelease();
 				}
 
 				if (recentItems.Count is 0)

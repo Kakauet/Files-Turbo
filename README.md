@@ -18,7 +18,7 @@ original README is in [UPSTREAM_README.md](UPSTREAM_README.md).
 > Files Turbo is experimental and its packages are not signed. It copies, moves, renames and deletes files just
 > like Files does, so keep backups of anything important and try it first on data you can afford to lose.
 
-The latest release is [Files Turbo 4.3.0.12](https://github.com/Kakauet/Files-Turbo/releases/tag/v4.3.0.12).
+The latest release is [Files Turbo 4.3.0.13](https://github.com/Kakauet/Files-Turbo/releases/tag/v4.3.0.13).
 See the [changelog](CHANGELOG.md) for the latest fixes.
 
 ## Fixed in Files Turbo
@@ -32,10 +32,6 @@ See the [changelog](CHANGELOG.md) for the latest fixes.
 - **Instant search.** As you type in the address bar, matches appear right away by filtering the ones already
   found, before the full search even starts. The full search is also faster in most cases: up to 2.6 times
   faster for exact names.
-- **File operations keep working in long sessions.** Earlier builds could leave Windows' Quick Access list
-  locked after reading it. Over time, the locks accumulated and could hang move, delete and recycle operations,
-  including in Explorer and other apps. The reader is now released as soon as it finishes. The fix introduced in
-  4.3.0.10 has been confirmed during daily use.
 - **Thumbnails stay the right way up.** Some folder previews and other shell thumbnails appeared upside down.
   They now display in the correct orientation, with transparency preserved.
 - **Sorting follows file changes.** When a file or folder's date or size changes, its position now updates too,
